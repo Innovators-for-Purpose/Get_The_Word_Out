@@ -1,7 +1,28 @@
 {
-  "type":"module",
+  "type": "module",
   "dependencies": {
     "express": "^4.19.2",
+    "gyp": "^0.5.0",
+    "node-gyp": "^10.2.0",
+    "prebuild-install": "^7.1.2",
     "sequelize": "^6.37.3"
-  }
+  },
+  "name": "library_helper-events",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Innovators-for-Purpose/Library_Helper-Events.git"
+  },
+  "author": "IFP",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Innovators-for-Purpose/Library_Helper-Events/issues"
+  },
+  "homepage": "https://github.com/Innovators-for-Purpose/Library_Helper-Events#readme"
 }

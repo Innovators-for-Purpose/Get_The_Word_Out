@@ -12,12 +12,24 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.get('/form',(req, res) => {
+app.get('/eventform',(req, res) => {
     res.sendFile(path.join( _dirname, 'index.html'));
 })
-app.post('/form', (req, res) => {
+app.post('/eventform', (req, res) => {
 
 })
+
+app.get('/helpform',(req, res) => {
+    res.sendFile(path.join( _dirname, 'Helpfrom.html'));
+})
+app.post('/helpform', (req, res) => {
+
+})
+
+app.get('/admin',(req, res) => {
+    res.sendFile(path.join( _dirname, 'index.html'));
+})
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
