@@ -17,28 +17,44 @@ let db = new sqlite3.Database(':memory:', (err) => {
     console.log('Close the database connection.');
   });
 
-  /*const users = [
-  { name: "Josh Smith", email: "josh.smith@example.com" },
-  { name: "Jane Doe", email: "jane.doe@example.com" },
-];
-
-const Computer_Help = [
-  {
-    title: "Printer not working",
-    description:
-      "I can not figure out how to print"
-
-  }
-];
-
-const Book_Help = [
-  {
-    title: "Can't find book",
-    description:
-      "I need help finding a book"
-   
-  }
+  const User = sequelize.define(
+    'User',
+    {
+      // Model attributes are defined here
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      firstName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      lastName: {
+        type: DataTypes.STRING,
+        
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      contact: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      },
+      notify: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      }
+    }
+    
+  );
   
-];
-*/
 
+
+
+
+W

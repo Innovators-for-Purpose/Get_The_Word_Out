@@ -4,7 +4,7 @@ const port = 3000;
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
+const sequelize = require("./setup");
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
 
@@ -34,3 +34,11 @@ app.get('/admin',(req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+(async () => {
+  try {
+    await sequelize.sync();
+  } catch (error) {
+    console.error("Failed to synchronize models:", error);
+  }
+})();
