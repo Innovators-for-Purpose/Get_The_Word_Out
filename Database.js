@@ -2,7 +2,7 @@ import sqlite3 from 'sqlite3';
 
 
 //const baseURL = "http://localhost:3000";
-
+//  init database
 let db = new sqlite3.Database(':memory:', (err) => {
     if (err) {
       return console.error(err.message);

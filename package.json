@@ -5,7 +5,8 @@
     "gyp": "^0.5.0",
     "node-gyp": "^10.2.0",
     "prebuild-install": "^7.1.2",
-    "sequelize": "^6.37.3"
+    "sequelize": "^6.37.3",
+    "sqlite": "^5.1.1"
   },
   "name": "library_helper-events",
   "version": "1.0.0",
