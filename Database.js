@@ -1,5 +1,5 @@
-import sqlite3 from 'sqlite3';
-
+const sqlite3 = require ('sqlite3');
+const sequelize = require('sequelize');
 
 //const baseURL = "http://localhost:3000";
 //  init database

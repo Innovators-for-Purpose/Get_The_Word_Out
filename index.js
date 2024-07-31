@@ -1,12 +1,11 @@
-import express from 'express';
+const express = require("express");
 const app = express();
-const port = 3000;
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-const sequelize = require("./setup");
-const _filename = fileURLToPath(import.meta.url);
-const _dirname = dirname(_filename);
+const port = 3142;
+const path = require ('path');
+const { fileURLToPath }  = require ('url');
+const { dirname } = require ('path');
+const sequelize = require("sequelize");
+
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -20,20 +19,20 @@ app.post('/eventform', (req, res) => {
 })
 
 app.get('/helpform',(req, res) => {
-    res.sendFile(path.join( _dirname, 'Helpfrom.html'));
+    res.sendFile(path.join( '/home/strelizia/Library_Helper-Events/Helpform.html'));
 })
 app.post('/helpform', (req, res) => {
 
 })
 
 app.get('/admin',(req, res) => {
-    res.sendFile(path.join( _dirname, 'index.html'));
+    res.sendFile(path.join(  'index.html'));
 })
 
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+app.listen(3142, () => {
+  console.log("Server started on port 3142");
+});
 
 (async () => {
   try {
