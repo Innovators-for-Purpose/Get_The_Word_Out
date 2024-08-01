@@ -7,7 +7,7 @@ const { dirname } = require ('path');
 const sequelize = require("/home/strelizia/Library_Helper-Events/setup.js");
 const sqlite = require ('sqlite')
 const bodyParser = require("body-parser")
-let data = `INSERT INTO dummy (firstName,LastName,email, txt) VALUES (?,?)`;
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -20,6 +20,7 @@ app.get('/eventform',(req, res) => {
 })
 app.post('/eventform', (req, res) => {
   let db = new sqlite.Database("test.db");
+  let data = `INSERT INTO dummy (firstName,LastName,email, txt) VALUES (?,?)`;
   db.query(data)
 
   
