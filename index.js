@@ -7,8 +7,9 @@ const { dirname } = require ('path');
 const sequelize = require("/home/strelizia/Library_Helper-Events/setup.js");
 const sqlite = require ('sqlite')
 const bodyParser = require("body-parser")
+multer = require("multer")
 
-
+app.use(multer().array());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', (req, res) => {
@@ -18,10 +19,15 @@ app.get('/', (req, res) => {
 app.get('/eventform',(req, res) => {
     res.sendFile(path.join( '/home/strelizia/Library_Helper-Events/Helpform.html'));
 })
+
 app.post('/eventform', (req, res) => {
-  let db = new sqlite.Database("test.db");
-  let data = `INSERT INTO dummy (firstName,LastName,email, txt) VALUES (?,?)`;
-  db.query(data)
+  let db = new sqlite.Database("/home/strelizia/Library_Helper-Events/test.db");
+  db.run(`INSERT INTO dummy (email, txt) VALUES (?,?)`, [
+    req.body.email, req.body.txt
+    ], function (err) {
+      if (err) { console.log(err); }
+      else { console.log(`INSERTED - ID ${this.lastID}`); }
+    });
 
   
   db.close();
@@ -33,13 +39,13 @@ app.post('/eventform', (req, res) => {
 
 
 
-app.get('/admin',(req, res) => {
-    res.sendFile(path.join(  'index.html'));
+app.get('/signin',(req, res) => {
+    res.sendFile(path.join(  '/home/strelizia/Library_Helper-Events/index.html'));
 })
 
-app.post('/admin',(req, res) => {
+app.post('/sigin',(req, res) => {
 
-  
+
 })
 
 app.listen(3141, () => {
