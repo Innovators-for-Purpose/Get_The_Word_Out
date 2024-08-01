@@ -37,6 +37,10 @@ app.get('/admin',(req, res) => {
     res.sendFile(path.join(  'index.html'));
 })
 
+app.post('/admin',(req, res) => {
+
+  
+})
 
 app.listen(3141, () => {
   console.log("Server started on port 3142");
