@@ -1,11 +1,12 @@
 const sqlite3 = require ('sqlite3');
 const sequelize = require('sequelize');
+const fs = require("fs")
 
-//const baseURL = "http://localhost:3000";
-//  init database
-let db = new sqlite3.Database(':memory:', (err) => {
+let db = new sqlite3.Database('test.db', (err) => {
     if (err) {
       return console.error(err.message);
+    }else{
+      db.exec(fs.readFileSync("databasetest.sql",  "utf8"));
     }
     console.log('Connected to the in-memory SQlite database.');
   });
@@ -17,6 +18,7 @@ let db = new sqlite3.Database(':memory:', (err) => {
     console.log('Close the database connection.');
   });
 
+  /*
   const User = sequelize.define(
     'User',
     {
@@ -52,9 +54,9 @@ let db = new sqlite3.Database(':memory:', (err) => {
     }
     
   );
-  
+  */
 
 
 
 
-W
+

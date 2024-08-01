@@ -27,13 +27,14 @@
         formData.forEach((value, key) => data[key] = value);
 
         try {
-            const response = await fetch('/helpform', {
+            const response = await fetch('/eventform', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.Stringify(data)
-            });
+                body:data})
+                .then(res => res.text())
+                .then(txt => alert(txt))
+                .catch(err => console.error(err));
+                return false;
+            
             if (response.ok) {
                 console.log('Form data saved successfully!');
             } else {
