@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://use.typekit.net/mev6qqe.css">
+        <link rel="stylesheet" href="/style.css">
+    </head>
+    <body>
+        <div class="bg"></div>
+        </div>
+        <div id="form">
+            <h1>Create An Event</h1>
+            <div class="formBox">
+                <h4>Autofill with AI</h4>
+                <button id="button" class="uploadFileButton">Upload File</button>
+                <h5>(Upload a picture of the event on the  community bulletin board)</h5>
+                <form id="eventForm">
+                    <label for="eventTitle">Event Title *</label><br>
+                    <textarea type="text" name="eventTitle" id="eventTitle" required></textarea><br>
+                    <label for="Description">Event Description *</label><br>
+                    <textarea type="text" name="Description" id="Description" required></textarea><br>
+                    <label for="Date">Date *</label><br>
+                    <input type="date" name="Date" id="Date">
+                    <label for="Time" class="timeLabel">Time *</label></br>
+                    <input type="time" name="Time" id="Time" required>
+                    <label for="Location" class="locationLabel">Location *</label><br>
+                    <textarea type="text" name="Location" id="Location" required></textarea><br>
+                    <label for="Age" class="ageRange">Age Range *</label><br>
+                    <select name="Age" id="Age"><br>
+                        <option value="1"></option>
+                        <option value="2">age 5-10</option>
+                        <option value="3">age 10-15</option>
+                        <option value="4">age 15-18</option>
+                        <option value="5">age 18-30</option>
+                    </select><br><br>
+                    <label for="Category">Category *</label><br>
+                    <select name="Category" id="Category">
+                        <option value="0"></option>
+                        <option value="1">Category 1</option>
+                        <option value="2">Category 2</option>
+                        <option value="3">Category 3</option>
+                        <option value="4">Category 4</option>
+                    </select><br>
+                    <button id="button" class="createEvent">Create Button</button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            const eventBody = JSON.stringify({ 
+                eventTitle: eventTitle, description: description, location: location, venue: venue, 
+                time: time, category: category, age: age, date: date
+            });
+
+            const createEvent = await fetch("/events/create-event", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: eventBody
+            })
+        </script>
+    </body>
+</html>
