@@ -52,7 +52,7 @@
                 time: time, category: category, age: age, date: date
             });
 
-            const createEvent = await fetch("/events/create-event", {
+            const createEvent = await fetch("/events/eventForm", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

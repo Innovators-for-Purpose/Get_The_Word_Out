@@ -1,9 +1,0 @@
-CREATE TABLE testdb (
-  id INTEGER,
-  firstName STRING NOT NULL,
-  lastName STRING NOT NULL,
-  phoneNumber  STRING NOT NULL,
-  email TEXT NOT NULL,
-  descrip TEXT NOT NULL,
-  PRIMARY KEY("id" AUTOINCREMENT)
-);

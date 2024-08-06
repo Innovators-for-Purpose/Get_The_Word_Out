@@ -1,12 +1,74 @@
 const express = require("express");
 const app = express();
+const sequelize = require("./setup.js");
+
+const eventRoutes = require("./routes/eventRoutes.js");
+const userRoutes = require("./routes/userRoutes.js")
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.use(express.static("public"));
+app.use("/events", eventRoutes);
+app.use("/login",userRoutes);
+
+app.listen(3000, () => {
+  console.log("Server started on port 3000");
+}); 
+
+(async () => {
+  try {
+    await sequelize.sync();
+  } catch (error) {
+    console.error("Failed to synchronize models:", error);
+  }
+})();
+
+app.get('*', (_, res) => {
+  res.status(404).send("Error 404; page not found")
+}); // Page not found error redirect
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+const express = require("express");
+const app = express();
 const port = 3000;
 const path = require ('path');
 const { fileURLToPath }  = require ('url');
 const { dirname } = require ('path');
 const sequelize = require('./setup')
 const sqlite = require ('sqlite')
+const sqlite3 = require ('sqlite3')
 const bodyParser = require("body-parser")
+multer = require("multer")
 multer = require("multer")
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -61,3 +123,4 @@ app.listen(3142, () => {
     console.error("Failed to synchronize models:", error);
   }
 })();
+*/
