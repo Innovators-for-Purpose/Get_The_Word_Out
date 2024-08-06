@@ -1,0 +1,11 @@
+{
+    "title" : "Sample Event",
+    "uid" : "1",
+    "description" : "This is a test to use as a sample event",
+    "location" : "449 Broadway",
+    "venue" : "Main",
+    "time" : "4:30",
+    "category" : "STEAM",
+    "age" : "7+",
+    "date" : "8/14/24"
+  }
