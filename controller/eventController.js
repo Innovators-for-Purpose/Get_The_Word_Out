@@ -1,12 +1,23 @@
 const Event = require("../models/Event.js");
 
 
-exports.getAllEvents = async (req, res) => {
+exports.getALLEvents = async (req, res) => {
   try {
     const events = await Event.findAll();
     res.json(events);
   } catch (error) {
     console.error("Failed to fetch events:", error);
+    res.status(500).json({ success: false, error: "Server Error" });
+  }
+};
+
+exports.singleEvent = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const event = await Event.findAll({where: {id: id}});
+    res.status(201).json({ success: true, event});
+  } catch (error) {
+    console.error("Error getting event data in controller:", error);
     res.status(500).json({ success: false, error: "Server Error" });
   }
 };
@@ -34,6 +45,16 @@ exports.createEvent = async (req, res) => {
   }
 };
 
+exports.deleteEvent = async (req, res) => {
+  try {
+    const { id } = req.body;
+    await Event.destroy({where: {id: id}});
+    res.status(202).json({ success: true });
+  } catch (error) {
+    console.error("Error deleting event in controller:", error);
+    res.status(500).json({ success: false, error: "Server Error" });
+  }
+};
 
 
 

@@ -13,11 +13,11 @@ const sequelize = require("../setup.js");
       allowNull: false,
     },
     uid: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     description: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     location: {
@@ -25,23 +25,23 @@ const sequelize = require("../setup.js");
       allowNull: false,
     },
     venue: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     time: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.TIME,
       allowNull: false,
     },
     category: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.ENUM('STEAM','Music','Art','Entertainment','Technology','Other'),
       allowNull: false,
     },
     age: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.ENUM('1-7','7+'),
       allowNull: false,
     },
     date: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.DATE,
       allowNull: false,
     }
   });
