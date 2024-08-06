@@ -1,11 +1,11 @@
 {
-    "title" : "Sample Event",
+    "title" : "Programing Classes",
     "uid" : "1",
-    "description" : "This is a test to use as a sample event",
+    "description" : "This class is for beginners who want to learn how to program. We will be teaching Javascript.",
     "location" : "449 Broadway",
     "venue" : "Main",
     "time" : "4:30",
     "category" : "STEAM",
-    "age" : "7+",
+    "age" : "Teen/13-17",
     "date" : "8/14/24"
   }
