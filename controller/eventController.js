@@ -4,7 +4,7 @@ const Event = require("../models/Event.js");
 exports.getALLEvents = async (req, res) => {
   try {
     const events = await Event.findAll();
-    res.json(events);
+    res.render('event-list', { events: events });
   } catch (error) {
     console.error("Failed to fetch events:", error);
     res.status(500).json({ success: false, error: "Server Error" });
@@ -22,7 +22,6 @@ exports.singleEvent = async (req, res) => {
   }
 };
 
-
 exports.createEvent = async (req, res) => {
   try {
     const { title,uid, description, location, venue, time, category, age, date } = req.body;
@@ -38,6 +37,7 @@ exports.createEvent = async (req, res) => {
       age, 
       date
     });
+    console.log(event);
     res.status(201).json({ success: true, data: event });
   } catch (error) {
     console.error("Error creating event in controller:", error);

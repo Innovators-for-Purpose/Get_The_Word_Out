@@ -64,26 +64,28 @@ const port = 3000;
 const path = require ('path');
 const { fileURLToPath }  = require ('url');
 const { dirname } = require ('path');
-const sequelize = require("/home/strelizia/Library_Helper-Events/setup.js");
+const sequelize = require('./setup')
 const sqlite = require ('sqlite')
 const sqlite3 = require ('sqlite3')
 const bodyParser = require("body-parser")
 multer = require("multer")
+multer = require("multer")
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(multer().array());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
-app.get('/eventform',(req, res) => {
-    res.sendFile(path.join( '/home/strelizia/Library_Helper-Events/Helpform.html'));
-})
 
 app.post('/eventform', (req, res) => {
-  let db = new sqlite3.Database("/home/strelizia/Library_Helper-Events/test.db");
-  db.run("INSERT INTO dummy (NULL,'firstName','lastName','phoneNumber','email','descrip') VALUES('antonio','barandao','','','','')", [
+  let db = new sqlite.Database("/home/strelizia/Library_Helper-Events/test.db");
+  db.run(`INSERT INTO dummy (email, txt) VALUES (?,?)`, [
     req.body.email, req.body.txt
     ], function (err) {
       if (err) { console.log(err); }
@@ -98,18 +100,19 @@ app.post('/eventform', (req, res) => {
 
 })
 
-
-
 app.get('/signin',(req, res) => {
     res.sendFile(path.join(  '/home/strelizia/Library_Helper-Events/index.html'));
 })
 
 app.post('/sigin',(req, res) => {
 
-
 })
 
-app.listen(3141, () => {
+app.get('/create-event', (req, res) => {
+  res.render("event.ejs")
+})
+
+app.listen(3142, () => {
   console.log("Server started on port 3142");
 });
 

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+        <header>
+            <h1>Events</h1>
+        </header>
+        <% events.forEach(event => { %>
+            <div class="eventSquare" onclick="gotoEvent(<%= event.id %>)">
+                <button class="eventTitleButton">
+                    <h3 class="eventTitle"><%= event.title %></h3>
+                    <p class="eventDate"><% event.date %></p>
+                    <p class="eventLocation"><% event.location %></p>
+                </button>
+            </div>
+        <% }) %>
+    </body>
+</html>
