@@ -37,7 +37,7 @@ const sequelize = require("../setup.js");
       allowNull: false,
     },
     age: {
-      type: DataTypes.ENUM('1-7','7+'),
+      type: DataTypes.ENUM('Kids/1-7','Pre-teen/7-12','Teen/13-17,Young Adults/18-25','Adults/25-65', 'Senior/65+'),
       allowNull: false,
     },
     date: {

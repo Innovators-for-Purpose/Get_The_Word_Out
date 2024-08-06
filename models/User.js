@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("/home/strelizia/Library_Helper-Events/setup.js");
+const sequelize = require("../setup.js");
   
   
   const User = sequelize.define('user', {
