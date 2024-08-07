@@ -11,9 +11,25 @@ exports.getALLEvents = async (req, res) => {
   }
 };
 
+exports.getEventDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const event = await Event.findByPk(id);
+    if (event) {
+      res.render("event-view-page", { event });
+    } else {
+      res.status(404).render("error", { message: "Event not found" });
+    }
+  } catch (error) {
+    console.error("Error getting event details in controller:", error);
+    res.status(500).render("error", { message: "Server Error" });
+  }
+};
+
 exports.singleEvent = async (req, res) => {
   try {
     const { id } = req.body;
+    console.log(req.body);
     const event = await Event.findAll({where: {id: id}});
     res.status(201).json({ success: true, event});
   } catch (error) {
@@ -24,14 +40,14 @@ exports.singleEvent = async (req, res) => {
 
 exports.createEvent = async (req, res) => {
   try {
-    const { title,uid, description, location, venue, time, category, age, date } = req.body;
+    const { title, uid, description, location, venue, time, category, age, date } = req.body;
     console.log("body",req.body)
     const event = await Event.create({
       title, 
-      uid,
+      uid: 1,
       description, 
       location, 
-      venue, 
+      venue: "venue", 
       time, 
       category, 
       age, 

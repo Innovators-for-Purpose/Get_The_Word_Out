@@ -8,9 +8,19 @@ const userRoutes = require("./routes/userRoutes.js")
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.set("views", "./views");
+app.set("view engine", "ejs");
 app.use(express.static("public"));
-app.use("/events", eventRoutes);
+app.use("/events/", eventRoutes);
 app.use("/login",userRoutes);
+
+app.get("/", (rew, res) => {
+  res.render("index");
+});
+
+app.get("/Create", (req, res) => {
+  res.render("event");
+});
 
 app.listen(3000, () => {
   console.log("Server started on port 3000");

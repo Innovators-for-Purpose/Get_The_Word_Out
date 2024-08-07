@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html>
-    <head></head>
-    <body>
-        <header>
-            <h1>Events</h1>
-        </header>
-        <% events.forEach(event => { %>
-            <div class="eventSquare" onclick="gotoEvent(<%= event.id %>)">
-                <button class="eventTitleButton">
-                    <h3 class="eventTitle"><%= event.title %></h3>
-                    <p class="eventDate"><% event.date %></p>
-                    <p class="eventLocation"><% event.location %></p>
-                </button>
-            </div>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://use.typekit.net/mev6qqe.css">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/events.css">
+  </head>
+  <body>
+    <header>
+    </header>
+    <div class="bg"></div>
+    <h1 class="pageTitle">Existing Events</h1>
+    <div class="eventContainer">
+      <% events.forEach(event => { %>
+        <div onclick="gotoEvent(<%= event.id %>)">
+          <button class="eventButton">
+            <h2 class="eventTitle"><%= event.title %></h2>
+          </button><br><br>
+        </div>
         <% }) %>
-    </body>
+    </div>
+    <script>
+      function gotoEvent(eventId) {
+        window.location.href = `events/event/${eventId}`;
+      }
+    </script>
+  </body>
 </html>
