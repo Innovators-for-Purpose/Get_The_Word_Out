@@ -1,0 +1,259 @@
+/* html,
+body {
+    display: inline-list;
+    font-family: "quicksand", sans-serif;
+    font-display:auto;
+    font-style: normal;
+    font-weight: 700;
+} */
+
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Quicksand", system-ui;
+    background: url(images/bg.png);
+    background-size: cover;
+}
+
+
+body {
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+}
+
+/* header{
+    display: flex;
+    justify-content: flex-start;
+} */
+
+.navLogo{
+    font-size: 25px;
+    font-weight: 900;
+    margin-right: auto;
+    margin-top: -480px;
+    margin-left: 50px;
+
+}
+
+/* .navLogo{
+    font-size: 25px;
+    font-weight: bold;
+    display: flex;
+    align-items: flex-start;
+    margin-top: -400px;
+} */
+
+span{
+    color: #5AA5FF;
+}
+
+h1 {
+    position: relative;
+    text-align: center;
+    margin-top: 10px;
+}
+
+
+/* .allContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 10px;
+    opacity: 0px;
+    background: #ff0000;
+    border: 2px solid #EAEAEC; 
+    transition: all .25s;
+    cursor: pointer;
+    gap: 100px;
+    padding: 0px 10px 0px 10px;
+
+} */
+
+
+
+/* .allContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;  
+} */
+
+/* .allContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+} */
+
+/* .eTnModContainer{
+    display: flex;
+    flex-direction: column;
+} */
+
+/* .fixEvent{
+    display: flex;
+    flex-direction: row;
+} */
+
+/* .eventContainer{
+    margin-bottom: 20px;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-radius: 10px;
+    opacity: 0px;
+    background-color: #db1717;
+    border: 2px solid #EAEAEC; 
+    transition: all .25s;
+    cursor: pointer;
+    gap: 100px;
+    padding: 0px 10px 0px 10px;
+} */
+
+
+/* .fixEvent{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+} */
+
+/* .eventTitle{
+    background: rgb(144, 171, 144);
+}; */
+
+/* .eventButton {
+    width: 602px;
+    height: 100%;
+    border-radius: 10px;
+    opacity: 0px;
+    background: #FFFFFF;
+    border: 2px solid #EAEAEC; 
+    transition: all .25s;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+} */
+
+.eventButton {
+    margin-top: 30px;
+};
+
+/* .eventContainer:hover {
+    transform: translateY(-2px);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}; */
+
+/* .eventContainer:active {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}; */
+
+
+/* ------- */
+
+/* .bg{
+    background-image: url("/images/background.png");
+    background-position: 10px -100px;
+    background-size: 1450px 900px;
+    background-repeat: no-repeat;
+    text-align: left;
+    padding-left: 450px;
+    height: 425px;
+    position: absolute;
+    width: 1000px;
+    top: 150px;
+    left: 0;
+    z-index: -1;
+    opacity: 0.2;
+};
+
+.eventContainer{
+    background-color: #503b3b;
+    display: flex;
+}
+
+.editor{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.allContainer{
+    display: flex;
+    flex-direction: column;
+    background-color: #882525;
+} */
+
+
+/* ------- */
+
+.allContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+}
+
+.eventContainer {
+    width: 100%;
+}
+
+.eventButton {
+    background-color: rgb(255, 255, 255);
+    padding: 15px;
+    border-radius: 10px 10px 0px 0px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+
+
+
+.eventTitle {
+    margin: 0;
+    flex-grow: 1;
+    font-size: 24px;
+    color: #333;
+}
+
+.editor {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+    padding-right: 15px;
+    justify-content: center;
+    background-color: rgb(115, 115, 115);
+    border-radius: 0px 0px 10px 10px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    height: 30px;
+}
+
+
+.fixEvent {
+    cursor: pointer;
+}
+
+.material-icons {
+    font-size: 20px;
+    color: #000000;
+    cursor: pointer;
+}
+
+
+.eventButton:hover {
+    background-color: #f8f8f8;
+}

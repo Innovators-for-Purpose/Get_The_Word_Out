@@ -9,7 +9,9 @@ exports.getALLEvents = async (req, res) => {
     console.error("Failed to fetch events:", error);
     res.status(500).json({ success: false, error: "Server Error" });
   }
-};
+}
+
+
 
 exports.getEventDetails = async (req, res) => {
   try {
@@ -71,8 +73,6 @@ exports.deleteEvent = async (req, res) => {
     res.status(500).json({ success: false, error: "Server Error" });
   }
 };
-
-
 
 
 

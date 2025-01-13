@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://use.typekit.net/mev6qqe.css">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/createevents.css">
 </head>
 <body>
-    <div class="bg"></div>
+    
     <div id="form">
+        <div class="navLogo">
+            <p>GT<span class="word">W</span>O</p>
+          </div>
+        <!-- <div class="bg"></div> -->
+
         <h1 id="currentPageTitle">Create An Event</h1>
         <div class="formBox">
-            <h4>Autofill with AI</h4>
-            <button id="button" class="uploadFileButton">Upload File</button>
+            <h4>Upload thumbnail of event</h4>
+            <!-- <button id="button" class="uploadFileButton">Browse File</button> -->
+            <input type="file" name="Browse File">
             <h5>(Upload a picture of the event on the community bulletin board)</h5>
             <form id="eventForm">
                 <label for="eventTitle">Event Title *</label><br>
@@ -40,31 +46,174 @@
                     <option value="3">Category 3</option>
                     <option value="4">Category 4</option>
                 </select><br>
-                <button type="submit" id="button" class="createEvent">Create Event</button>
+                <!-- <button type="submit" id="button" class="createEvent">Continue</button> -->
+                <button type="button" id="previewButton" class="createEvent">Continue</button>
             </form>
         </div>
     </div>
+
+    <!-- <div id="previewModal">
+        <div class="preview-modal-content">
+            <h2>Preview Your Event</h2>
+            <div id="previewContent">
+                <div class="thumbnail"></div>
+                <div class="locTime">
+                    <div class="loc">
+                        <h4>Location<%= "event.location" %></h4>
+                    </div>
+                    <div class="timee">
+                        <h4>Time <%= "event.time" %></h4>
+                    </div>
+
+                </div>
+                <div class="description">
+
+                </div>
+
+            </div>
+            <div class="preview-actions">
+                <button id="editBtn">Edit</button>
+                <button id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div> -->
+
+
+    <div id="previewModal">
+        <div class="preview-modal-content">
+            <h2>Preview Your Event</h2>
+            <div id="previewContent">
+            </div>
+            <div class="preview-actions">
+                <button id="editBtn">Edit</button>
+                <button id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
     <script>
-        document.getElementById("eventForm").addEventListener("submit", async function(event) {
+        // document.getElementById("eventForm").addEventListener("submit", async function(event) {
+        //     event.preventDefault();
+        //     const formData = new FormData(event.target);
+        //     const formObject = {};
+        //     formData.forEach((value, key) => { formObject[key] = value; });
+        //     const response = await fetch("/events/eventForm", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify(formObject),
+        //     });
+        //     const result = await response.json();
+        //     if (result.success) {
+        //         console.log("Event created successfully:", result.data);
+        //         window.location.href = "/events";
+        //     } else {
+        //         console.error("Error creating event:", result.error);
+        //     }
+        // });
+
+        const form = document.getElementById('eventForm');
+        const previewButton = document.getElementById('previewButton');
+        const previewModal = document.getElementById('previewModal');
+        const previewContent = document.getElementById('previewContent');
+        const editBtn = document.getElementById('editBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+
+    
+        const ageRangeMap = {
+            '1': 'Not Selected',
+            '2': 'age 5-10',
+            '3': 'age 10-15', 
+            '4': 'age 15-18',
+            '5': 'age 18-30'
+        };
+
+        const categoryMap = {
+            '0': 'Not Selected',
+            '1': 'Category 1',
+            '2': 'Category 2', 
+            '3': 'Category 3',
+            '4': 'Category 4'
+        };
+
+    
+        previewButton.addEventListener('click', (event) => {
+            
             event.preventDefault();
-            const formData = new FormData(event.target);
-            const formObject = {};
-            formData.forEach((value, key) => { formObject[key] = value; });
-            const response = await fetch("/events/eventForm", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formObject),
-            });
-            const result = await response.json();
-            if (result.success) {
-                console.log("Event created successfully:", result.data);
-                window.location.href = "/events";
+  
+            if (form.checkValidity()) {
+
+                previewContent.innerHTML = "";
+
+              
+                const previewFields = [
+                    { label: 'Event Title', value: document.getElementById('eventTitle').value },
+                    { label: 'Event Description', value: document.getElementById('Description').value },
+                    { label: 'Date', value: document.getElementById('Date').value },
+                    { label: 'Time', value: document.getElementById('Time').value },
+                    { label: 'Location', value: document.getElementById('Location').value },
+                    { 
+                        label: 'Age Range', 
+                        value: ageRangeMap[document.getElementById('Age').value] 
+                    },
+                    { 
+                        label: 'Category', 
+                        value: categoryMap[document.getElementById('Category').value] 
+                    }
+                ];
+
+            
+                previewFields.forEach(field => {
+                    const previewItem = document.createElement('div');
+                
+                    previewItem.classList.add('preview-item');
+                    previewItem.innerHTML = `
+                        <strong>${field.label}:</strong>
+                        <span>${field.value}</span>
+                    `;
+                    previewContent.appendChild(previewItem);
+                });
+
+                previewModal.style.display = 'block';
             } else {
-                console.error("Error creating event:", result.error);
+                form.reportValidity();
             }
         });
+
+       
+        editBtn.addEventListener('click', () => {
+            previewModal.style.display = 'none';
+        });
+
+        confirmBtn.addEventListener('click', async () => {
+            const formData = new FormData(form);
+            const formObject = {};
+            formData.forEach((value, key) => { formObject[key] = value; });
+
+            try {
+                const response = await fetch("/events/eventForm", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formObject),
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log("Event created successfully:", result.data);
+                    window.location.href = "/events";
+                } else {
+                    console.error("Error creating event:", result.error);
+                    alert("Failed to create event. Please try again.");
+                }
+            } catch (error) {
+                console.error("Submission error:", error);
+                alert("An error occurred while submitting the event.");
+            }
+        });
+        
     </script>
 </body>
 </html>

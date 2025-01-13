@@ -9,4 +9,4 @@ router.get("/event/:id", eventController.getEventDetails);
 router.get("/event/:id", eventController.getEventDetails);
 router.delete("/delete-event", eventController.deleteEvent)
 
-module.exports = router;    
+module.exports = router;

@@ -1,15 +1,148 @@
 <!DOCTYPE html>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
 <html>
     <head></head>
     <body>
+        <div class="navLogo">
+            <p>GT<span class="word">W</span>O</p>
+          </div>
+        <div class="bg"></div>
         <div class="evnetInformation">
             <h2 class="eventTitle"><%= event.title %></h2>
-            <div class="description">
-                <p class="eventDescription"><%= event.description %></p>
+            <div class="timeNdescription">
+                <div class="description">
+                    <p class="eventDescription"><%= event.description %></p>
+                </div>
+                <p class="date"><%= event.date %></p>
+                <p class="location"><%= event.location %></p>
+                <p class="age"><%= event.age%></p>
+                <p class="category"><%= event.category%></p>
             </div>
-            <p class="date"><%= event.date %></p>
-        </div>
+            </div>
+            
         <script>
         </script>
     </body>
+
+
+    <style>
+        /* body{
+            display: inline-list;
+            font-family: "quicksand", sans-serif;
+            font-display:auto;
+            font-style: normal;
+            font-weight: 300;
+        }  */
+/* 
+        .bg{
+            background-image: url("/images/background.png");
+            background-position: 10px -100px;
+            background-size: 1450px 900px;
+            background-repeat: no-repeat;
+            text-align: left;
+            padding-left: 450px;
+            height: 425px;
+            position: absolute;
+            width: 1000px;
+            top: 150px;
+            left: 0;
+            z-index: -1;
+            opacity: 0.2;
+        }  */
+
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: "Quicksand", system-ui;
+            background: url(/images/bg.png);
+            background-size: cover;
+        }
+
+
+        body {
+            background: rgba(255, 255, 255, 0.8);
+        } 
+                
+
+        .navLogo{
+            /* display: flex;
+            margin: -100px 0px 160px 50px; */
+            margin-left: 50px ;
+            font-size: 25px;
+
+
+        }
+
+
+        span{
+            color: #5AA5FF;
+        }
+
+        .eventTitle{
+            background: #5AA5FF;
+            padding: 10px 50px 10px 50px;
+            color: white;
+            border-radius: 5px;
+            margin-top: -150px;
+            text-transform: uppercase;
+            box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+        }
+
+        .evnetInformation{
+            height: 100%;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            margin-top: 300px;
+        }
+
+        .timeNdescription{
+            /* height: 100%; */
+            width: 500px;
+            background: rgba(0, 0, 0, 0.431);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+        }
+        
+
+        .description{
+            background: rgb(255, 255, 255);
+            width: 440px;
+            margin: 10px;
+            padding: 5px 20px 5px 20px;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .date{
+            background: rgb(255, 255, 255);
+            width: 440px;
+            margin: 0px 0px 10px 0px;
+            padding: 5px 20px 5px 20px;
+            text-align: center;
+            border-radius: 5px;
+        }
+
+        /* .bg{
+            background-image: url("/images/background.png");
+            background-position: 10px -100px;
+            background-size: 1450px 900px;
+            background-repeat: no-repeat;
+            text-align: left;
+            padding-left: 450px;
+            height: 425px;
+            position: absolute;
+            width: 1000px;
+            top: 150px;
+            left: 0;
+            z-index: -1;
+            opacity: 0.2;
+        } */
+    </style>
 </html>

@@ -3,27 +3,102 @@
   <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://use.typekit.net/mev6qqe.css">
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/events.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/existingevents.css">
   </head>
   <body>
-    <header>
     </header>
-    <div class="bg"></div>
+      <div class="navLogo">
+        <p>GT<span class="word">W</span>O</p>
+      </div>
+    <header>
+
+    <!-- <div class="bg"></div> -->
     <h1 class="pageTitle">Existing Events</h1>
-    <div class="eventContainer">
-      <% events.forEach(event => { %>
-        <div onclick="gotoEvent(<%= event.id %>)">
-          <button class="eventButton">
-            <h2 class="eventTitle"><%= event.title %></h2>
-          </button><br><br>
+    
+    <div class="allContainer">
+      <div class="eventContainer">
+        <% events.forEach(event => { %>
+          <div onclick="gotoEvent(<%= event.id %>)">
+            <div class="eventButton">
+              <h2 class="eventTitle"><%= event.title %></h2>
+            </div>
+          </div>
+          <!-- <div onclick="confirmDelete(<%= event.id %>)">
+            <p>DELETE</p>
+          </div> -->
+
+          <!-- ------- -->
+
+          <div class="editor">
+            <div class="fixEvent">
+              <div onclick="confirmDelete(<%= event.id %>)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                  <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                </svg>
+              </div>
+            </div>
+                
+            <div onclick="confirmDelete(<%= event.id %>)">
+              <i class="material-icons" style="font-size:20px">delete</i>
+            </div>
+          </div>
+      </div>
+
+      <!-- <div class="fixEvent">
+        <div onclick="confirmDelete(<%= event.id %>)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+          </svg>
         </div>
-        <% }) %>
-    </div>
+      </div>
+          
+      <div onclick="confirmDelete(<%= event.id %>)">
+        <i class="material-icons" style="font-size:20px">delete</i>
+      </div> -->
+
+     
+    
+      <% }) %>
+      </div>
+ 
+
+    
+
+
+
     <script>
       function gotoEvent(eventId) {
         window.location.href = `events/event/${eventId}`;
       }
+
+      function deleteEvent(eventId){
+        fetch(`/events/delete-event`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type' : 'application/json'
+          },
+          body: JSON.stringify({ id: eventId})
+        })
+        .then(response => {
+          if (response.ok){
+            window.location.reload()
+          } else {
+            alert('fail to delete event')
+          }
+        })
+        .catch(error => console.error('error', error))
+      }
+
+      function confirmDelete(eventId){
+        if(confirm('Are you sure you want to delete the event? This action cannot be undone ')){
+          deleteEvent(eventId);
+        }
+      }
     </script>
+
   </body>
 </html>
+
+

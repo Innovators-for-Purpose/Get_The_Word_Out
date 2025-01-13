@@ -1,0 +1,98 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Quicksand", system-ui;
+    background: url(images/bg.png);
+    background-size: cover;
+}
+
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.logo{
+    font-size: 20px;
+}
+
+.main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sgnup{
+    font-size: 20px;
+    margin-left: -200px;
+    font-weight: 300;
+    margin-bottom: -5px;
+    font-weight: 500;
+    font-size: 25px;
+}
+
+span{
+    color: #5AA5FF;
+}
+
+#signUpForm{
+    height: 100%;
+    width: 340px;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0px 10px 0px;
+    gap: 20px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    font-size: 13px;
+}
+
+.names{
+    display: flex;
+    flex-direction: row;
+    gap: 21.5px;
+    line-height: 20px;
+}
+
+.names input{
+    width: 125px;
+    gap: 20px;
+    height: 30px;
+    border: 2px solid #EAEAEC;
+    border-radius: 5px;
+    text-indent: 10px;
+    outline-color: #5AA5FF;
+}
+
+.btmPart input{
+    width: 280px;
+    height: 30px;
+    border: 2px solid #EAEAEC;
+    border-radius: 5px;
+    text-indent: 10px;
+    outline-color: #5AA5FF;
+}
+
+.btmPart{
+    line-height: 25px;
+}
+
+#signUpForm button {
+    color: white;
+    width: 288px;
+    height: 30px;
+    border: 1px solid #EAEAEC;
+    background-color: #5AA5FF;
+    border-radius: 5px;
+}
+
+.signUpLink {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: flex-start;
+}
