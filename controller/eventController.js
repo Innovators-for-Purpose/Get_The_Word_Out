@@ -45,6 +45,7 @@ exports.createEvent = async (req, res) => {
     const { title, uid, description, location, venue, time, category, age, date } = req.body;
     console.log("body",req.body)
     const event = await Event.create({
+      thumbnail,
       title, 
       uid: 1,
       description, 

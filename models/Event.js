@@ -8,6 +8,10 @@ const sequelize = require("../setup.js");
       primaryKey: true,
       autoIncrement: true,
     },
+    thumbnail: {
+      type: DataTypes.BLOB,
+      allowNull: true,
+    },
     title: {
       type: DataTypes.STRING,
       allowNull: false,

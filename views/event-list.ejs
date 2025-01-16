@@ -18,8 +18,12 @@
     <h1 class="pageTitle">Existing Events</h1>
     
         <% events.forEach(event => { %>
+
+          <!-- <span><%= JSON.stringify(event) %></span> -->
+
             <div onclick="gotoEvent(<%= event.id %>)">
               <div class="eventButton">
+                <img href=<%= event.thumbnail> alt="thumbnail">
                 <h2 class="eventTitle"><%= event.title %></h2>
               <div class="editor">
                 <div class="fixEvent">
