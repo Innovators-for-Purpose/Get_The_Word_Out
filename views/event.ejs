@@ -149,13 +149,7 @@
 
               
                 const previewFields = [
-                    {
-                        label: 'Event Thumbnail',
-                        image: document.getElementsByName('thumbnail')[0].files[0],
-                        value: document.getElementsByName('thumbnail')[0].files[0].name,
-                        size: document.getElementsByName('thumbnail')[0].files[0].size,
-                        type: document.getElementsByName('thumbnail')[0].files[0].type
-                    },
+
                     { label: 'Event Title', value: document.getElementsByName('title')[0].value },
                     { label: 'Event Description', value: document.getElementsByName('description')[0].value },
                     { label: 'Date', value: document.getElementsByName('date')[0].value },
@@ -169,7 +163,17 @@
                         label: 'Category', 
                         value: categoryMap[document.getElementsByName('category')[0].value] 
                     }
-                ];
+                ]; 
+
+                if ("0" in document.getElementsByName('thumbnail')[0].files){
+                    previewFields.push({
+                        label: 'Event Thumbnail',
+                        image: document.getElementsByName('thumbnail')[0].files[0],
+                        value: document.getElementsByName('thumbnail')[0].files[0].name,
+                        size: document.getElementsByName('thumbnail')[0].files[0].size,
+                        type: document.getElementsByName('thumbnail')[0].files[0].type
+                    })
+                }
                 console.log(previewFields);
             
                 previewFields.forEach(field => {

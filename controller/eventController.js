@@ -42,7 +42,7 @@ exports.singleEvent = async (req, res) => {
 
 exports.createEvent = async (req, res) => {
   try {
-    const { title, uid, description, location, venue, time, category, age, date } = req.body;
+    const {thumbnail, title, uid, description, location, venue, time, category, age, date } = req.body;
     console.log("body",req.body)
     const event = await Event.create({
       thumbnail,
