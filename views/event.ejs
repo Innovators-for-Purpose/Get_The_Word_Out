@@ -85,6 +85,7 @@
         <div class="preview-modal-content">
             <h2>Preview Your Event</h2>
             <div id="previewContent">
+                <!-- Image will be added here dynamically by JavaScript -->
             </div>
             <div class="preview-actions">
                 <button id="editBtn">Edit</button>
@@ -140,16 +141,21 @@
 
     
         previewButton.addEventListener('click', (event) => {
-            
             event.preventDefault();
   
             if (form.checkValidity()) {
-
                 previewContent.innerHTML = "";
-
+                
+                // Add image preview if file is selected
+                const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
+                if (thumbnailFile) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(thumbnailFile);
+                    img.style.maxWidth = '200px'; // Optional: control preview size
+                    previewContent.appendChild(img);
+                }
               
                 const previewFields = [
-
                     { label: 'Event Title', value: document.getElementsByName('title')[0].value },
                     { label: 'Event Description', value: document.getElementsByName('description')[0].value },
                     { label: 'Date', value: document.getElementsByName('date')[0].value },
@@ -200,25 +206,18 @@
 
         confirmBtn.addEventListener('click', async () => {
             const formData = new FormData(form);
-            const formObject = {};
-            console.log(formObject)
-            formData.forEach((value, key) => { formObject[key] = value; });
-
+            
             try {
-                // return false;
                 const response = await fetch("/events/eventForm", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(formObject),
+                    body: formData,
                 });
                 
                 const result = await response.json();
                 
                 if (result.success) {
                     console.log("Event created successfully:", result.data);
-                    window.location.href = "/events";
+                    window.location.href = `/events/event/${result.id}`;
                 } else {
                     console.error("Error creating event:", result.error);
                     alert("Failed to create event. Please try again.");
