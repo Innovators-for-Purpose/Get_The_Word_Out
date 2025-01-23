@@ -62,7 +62,6 @@ exports.createEvent = async (req, res) => {
       date
     });
 
-    // Return the new event's ID with the response
     res.status(201).json({ success: true, data: event, id: event.id });
   } catch (error) {
     console.error("Error creating event in controller:", error);
