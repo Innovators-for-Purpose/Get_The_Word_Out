@@ -58,5 +58,23 @@
         </form>
       </div>
 
+      <script>
+
+        const lgnBtn = document.getElementById("lgnButton");
+        const form = document.getElementById("signUpForm");
+
+        lgnBtn.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            if(form.checkValidity()){
+
+            } else {
+                form.reportValidity();
+            }
+        })
+
+
+      </script>
+
 </body>
 </html>
