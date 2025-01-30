@@ -54,31 +54,6 @@
         </div>
     </div>
 
-    <!-- <div id="previewModal">
-        <div class="preview-modal-content">
-            <h2>Preview Your Event</h2>
-            <div id="previewContent">
-                <div class="thumbnail"></div>
-                <div class="locTime">
-                    <div class="loc">
-                        <h4>Location<%= "event.location" %></h4>
-                    </div>
-                    <div class="timee">
-                        <h4>Time <%= "event.time" %></h4>
-                    </div>
-
-                </div>
-                <div class="description">
-
-                </div>
-
-            </div>
-            <div class="preview-actions">
-                <button id="editBtn">Edit</button>
-                <button id="confirmBtn">Confirm</button>
-            </div>
-        </div>
-    </div> -->
 
 
     <div id="previewModal">
@@ -94,26 +69,7 @@
         </div>
     </div>
     <script>
-        // document.getElementById("eventForm").addEventListener("submit", async function(event) {
-        //     event.preventDefault();
-        //     const formData = new FormData(event.target);
-        //     const formObject = {};
-        //     formData.forEach((value, key) => { formObject[key] = value; });
-        //     const response = await fetch("/events/eventForm", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify(formObject),
-        //     });
-        //     const result = await response.json();
-        //     if (result.success) {
-        //         console.log("Event created successfully:", result.data);
-        //         window.location.href = "/events";
-        //     } else {
-        //         console.error("Error creating event:", result.error);
-        //     }
-        // });
+
 
         const form = document.getElementById('eventForm');
         const previewButton = document.getElementById('previewButton');
