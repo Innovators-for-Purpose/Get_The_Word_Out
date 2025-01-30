@@ -46,11 +46,8 @@
 
                 </div>
             </div>
-            <!-- <div class="checkBoxLine">
-              <input type="checkbox">Remember Me</input>
-              <a href="">Forgot Password?</a><br>
-            </div> -->
-            <button type="submit" id="lgnButton" class="loginBtn">Create Account</button>
+
+            <button type="submit" id="lgnButton" class="loginBtn" name="lognBtn">Create Account</button>
             <div class="signUpLink">
               <p>Already have an account?</p>
               <a href="/login-page">Login.</a>
@@ -63,15 +60,41 @@
         const lgnBtn = document.getElementById("lgnButton");
         const form = document.getElementById("signUpForm");
 
-        lgnBtn.addEventListener("click", (event) => {
-            event.preventDefault();
+        // lgnBtn.addEventListener("click", (event) => {
+        //     event.preventDefault();
 
-            if(form.checkValidity()){
+        //     if(form.checkValidity()){
+               
+        //     } else {
+        //         form.reportValidity();
+        //     }
+        // })
 
-            } else {
-                form.reportValidity();
-            }
-        })
+
+        // login js
+
+        lgnBtn.addEventListener("click", async () => {
+                    const FormData = new FormData(form);
+
+                    try {
+                        const response = await fetch("/register", {
+                            method: "POST",
+                            body: formData,
+                        });
+                        const result = await response.json();
+
+                        if (result.success){
+                            console.log("User has been created successfully:", result.data);
+                            window.location.href = `events/signUpForm/${result.id}`;
+                        } else {
+                            console.error("Submission error:", error);
+                            alert("an error occured while submitting the login form")
+                        }
+                    } catch (error){
+                        console.error("Submission error:", error),
+                        alert("An error occured while submitting the login form")
+                    }
+                });
 
 
       </script>
