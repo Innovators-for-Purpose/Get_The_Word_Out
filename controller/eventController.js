@@ -41,8 +41,14 @@ exports.singleEvent = async (req, res) => {
 
 exports.createEvent = async (req, res) => {
   try {
-    const {thumbnail, title, uid, description, location, venue, time, category, age, date } = req.body;
-    console.log("body",req.body)
+
+    const { title, description, location, time, category, age, date } = req.body;
+    
+    let thumbnail = null;
+    if (req.file) {
+      thumbnail = req.file.buffer;
+    }
+
     const event = await Event.create({
       thumbnail,
       title, 
@@ -55,8 +61,9 @@ exports.createEvent = async (req, res) => {
       age, 
       date
     });
-    console.log(event);
-    res.status(201).json({ success: true, data: event });
+
+    res.status(201).json({ success: true, data: event, id: event.id });
+
   } catch (error) {
     console.error("Error creating event in controller:", error);
     res.status(500).json({ success: false, error: "Server Error" });
@@ -70,7 +77,7 @@ exports.deleteEvent = async (req, res) => {
     res.status(202).json({ success: true });
   } catch (error) {
     console.error("Error deleting event in controller:", error);
-    res.status(500).json({ success: false, error: "Server Error" });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 

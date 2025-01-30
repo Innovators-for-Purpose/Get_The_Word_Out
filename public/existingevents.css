@@ -80,13 +80,13 @@ h1 {
     gap: 10px;
 }
 
-/* .thumbnail-image{
+.thumbnail-image{
     height: 70px;
     width: 70px;
     object-fit: cover;
-} */
-
-.pageTitle{
-    position: absolute;
 }
+
+/* .pageTitle{
+    position: absolute;
+} */
 
