@@ -43,7 +43,7 @@ exports.loginUser = async (req, res) => {
         res.status(400).json({error: "Invalid email or user not found."});
         return;
       };
-
+      
     } catch (error) {
       console.error("Failed to login user:", error);
       res.status(500).send("Failed to login user.");

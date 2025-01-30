@@ -63,7 +63,6 @@ h1 {
 }
 
 h4 {
-    /* font-family: Quicksand; */
     font-size: 18px;
     font-weight: 700;
     line-height: 22.5px;
@@ -108,10 +107,7 @@ label{
     
 }
 
-/* #form{
-    text-align: 50px;
-    padding-left: 450px;
-} */
+
 
 #form{
     margin-top: 100px;
