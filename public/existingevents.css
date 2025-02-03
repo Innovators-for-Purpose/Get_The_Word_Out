@@ -1,7 +1,5 @@
 body, html {
     height: 100%;
-    margin: 0;
-    padding: 0;
     font-family: "Quicksand", system-ui;
     background: url(images/bg.png);
     background-size: cover;
@@ -16,7 +14,6 @@ body {
     align-items: center;
 
 }
-
 
 
 .navLogo{
@@ -51,6 +48,7 @@ h1 {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     cursor: pointer;
     margin-bottom: 20px;
+    justify-content: space-between;
 }
 
 
@@ -62,16 +60,10 @@ h1 {
 }
 
 
-
 .eventButton:hover {
     background-color: #f8f8f8;
 }
 
-.eventRow{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
 .editor{
     display: flex;
@@ -84,9 +76,30 @@ h1 {
     height: 70px;
     width: 70px;
     object-fit: cover;
+    border-radius: 10px;
 }
 
-/* .pageTitle{
-    position: absolute;
-} */
+.thumbnail-event-title{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
 
+.pageTitle{
+    position: absolute;
+    background-color: red;
+}
+
+.event-container{
+    background-color: green;
+    padding: 5px;
+}
+
+.event-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: pink;
+    width: full;
+}

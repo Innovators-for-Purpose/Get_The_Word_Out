@@ -8,24 +8,27 @@
     <link rel="stylesheet" href="/existingevents.css">
   </head>
   <body>
-    </header>
       <div class="navLogo">
         <p>GT<span class="word">W</span>O</p>
       </div>
-    <header>
+    
 
     <!-- <div class="bg"></div> -->
+     <div class="event-page-container">
     <h1 class="pageTitle">Existing Events</h1>
     
-        <% events.forEach(event => { %>
-
-          <!-- <span><%= JSON.stringify(event) %></span> -->
-
+    <% events.forEach(event => { %>
+      
+      <!-- <span><%= JSON.stringify(event) %></span> -->
+      
+      <div class="event-container">
             <div class="eventButton">
               <div onclick="gotoEvent(<%= event.id %>)">
                 <!-- <img src="<%= event.thumbnail %>" alt="thumbnail" style="max-width: 150px; max-height: 150px; object-fit: cover;"> -->
-                <img src="<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
-                <h2 class="eventTitle"><%= event.title %></h2>
+                 <div class="thumbnail-event-title">
+                    <img src="<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
+                    <h2 class="eventTitle"><%= event.title %></h2>
+                 </div>
               </div>
               <div class="editor">
                 <div class="fixEvent">
@@ -40,46 +43,49 @@
                 </div>
               </div>
             </div>
-          <% }) %>
+            <% }) %>
           </div>
+          </div>
+        </div>
+   
 
-    
-
-
-
-    <script>
-      
-      function gotoEvent(eventId) {
-        console.log('Going to event:', eventId);
-        window.location.href = `/events/event/${eventId}`;
-      }
-
-      function deleteEvent(eventId){
-        fetch(`/events/delete-event`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type' : 'application/json'
-          },
-          body: JSON.stringify({ id: eventId})
-        })
-        .then(response => {
-          if (response.ok){
-            window.location.reload()
-          } else {
-            alert('fail to delete event')
+        
+        
+        
+        
+        <script>
+          
+          function gotoEvent(eventId) {
+            console.log('Going to event:', eventId);
+            window.location.href = `/events/event/${eventId}`;
           }
-        })
-        .catch(error => console.error('error', error))
-      }
+          
+          function deleteEvent(eventId){
+            fetch(`/events/delete-event`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type' : 'application/json'
+              },
+              body: JSON.stringify({ id: eventId})
+            })
+            .then(response => {
+              if (response.ok){
+                window.location.reload()
+              } else {
+                alert('fail to delete event')
+              }
+            })
+            .catch(error => console.error('error', error))
+          }
+          
+          function confirmDelete(eventId){
+            if(confirm('Are you sure you want to delete the event? This action cannot be undone ')){
+              deleteEvent(eventId);
+            }
+          }
+          </script>
 
-      function confirmDelete(eventId){
-        if(confirm('Are you sure you want to delete the event? This action cannot be undone ')){
-          deleteEvent(eventId);
-        }
-      }
-    </script>
-
-  </body>
+</body>
 </html>
 
 

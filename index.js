@@ -31,6 +31,9 @@ app.get("/signup-page", (req, res) => {
 app.get("/login-page", (req, res) => {
   res.render("login");
 });
+app.get("/create-an-event", (req, res) => {
+  res.render("create-an-event");
+})
 
 
 app.get("/", (req, res) => {

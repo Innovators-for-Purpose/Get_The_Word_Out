@@ -16,6 +16,7 @@
                 <div class="description">
                     <p class="eventDescription"><%= event.description %></p>
                 </div>
+                <img src="<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
                 <p class="date"><%= event.date %></p>
                 <p class="location"><%= event.location %></p>
                 <p class="age"><%= event.age%></p>
@@ -104,20 +105,10 @@
             border-radius: 5px;
         }
 
-        /* .bg{
-            background-image: url("/images/background.png");
-            background-position: 10px -100px;
-            background-size: 1450px 900px;
-            background-repeat: no-repeat;
-            text-align: left;
-            padding-left: 450px;
-            height: 425px;
-            position: absolute;
-            width: 1000px;
-            top: 150px;
-            left: 0;
-            z-index: -1;
-            opacity: 0.2;
-        } */
+        .thumbnail-image{
+            height: 70px;
+            width: 150px;
+            object-fit: cover;
+        }
     </style>
 </html>
