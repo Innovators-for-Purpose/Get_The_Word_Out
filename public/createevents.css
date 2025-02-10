@@ -244,8 +244,8 @@ label{
     width: 80%;
     max-width: 500px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    /* display: flex; */
 }
+
 .preview-modal-content h2 {
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
@@ -278,3 +278,20 @@ label{
     background-color: #007bff;
     color: white;
 }
+
+.thumbnail-file input{
+    width: 345px;
+    border: 2px solid #F0F2F8;
+    padding: 0px 150px 0px 0px;
+    margin-bottom: -10px;
+    margin-top: -10px;
+    border-radius: 5px;
+}
+
+.thumbnail-file input[type="file"]::file-selector-button {
+    background-color: #F0F2F8;
+    width: 100px;
+    height: 30px;
+    border: none;
+    margin-right: 30px;
+  }
