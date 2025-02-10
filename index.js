@@ -49,6 +49,10 @@ app.get("/Create", (req, res) => {
   res.render("event");
 });
 
+app.get("/autofill", (req, res) =>{
+  res.render("autofill")
+})
+
 
 app.listen(3000, () => {
   console.log("Server started on port 3000");
