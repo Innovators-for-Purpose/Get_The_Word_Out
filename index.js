@@ -66,6 +66,8 @@ app.listen(3000, () => {
   }
 })();
 
+// hahaimgedion
+
 app.get('*', (_, res) => {
   res.status(404).send("Error 404; page not found")
 }); // Page not found error redirect
