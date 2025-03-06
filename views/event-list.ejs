@@ -12,19 +12,15 @@
         <p>GT<span class="word">W</span>O</p>
       </div>
     
-
-    <!-- <div class="bg"></div> -->
      <div class="event-page-container">
     <h1 class="pageTitle">Existing Events</h1>
     
     <% events.forEach(event => { %>
       
-      <!-- <span><%= JSON.stringify(event) %></span> -->
       
       <div class="event-container">
             <div class="eventButton">
               <div onclick="gotoEvent(<%= event.id %>)">
-                <!-- <img src="<%= event.thumbnail %>" alt="thumbnail" style="max-width: 150px; max-height: 150px; object-fit: cover;"> -->
                  <div class="thumbnail-event-title">
                     <img src="<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
                     <h2 class="eventTitle"><%= event.title %></h2>
@@ -48,11 +44,6 @@
           </div>
         </div>
    
-
-        
-        
-        
-        
         <script>
           
           function gotoEvent(eventId) {
