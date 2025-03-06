@@ -27,6 +27,10 @@ body {
     bottom:690px;
 }
 
+.navLogo a {
+    text-decoration: none !important;
+    color: black;
+}
 
 
 span{

@@ -8,9 +8,11 @@
     <link rel="stylesheet" href="/existingevents.css">
   </head>
   <body>
-      <div class="navLogo">
-        <p>GT<span class="word">W</span>O</p>
-      </div>
+    <div class="navLogo">
+      <a href= "http://localhost:3000">
+      <p>GT<span class="word">W</span>O</p>
+      </a>
+    </div>
     
 
     <!-- <div class="bg"></div> -->
@@ -19,12 +21,10 @@
     
     <% events.forEach(event => { %>
       
-      <!-- <span><%= JSON.stringify(event) %></span> -->
       
       <div class="event-container">
             <div class="eventButton">
               <div onclick="gotoEvent(<%= event.id %>)">
-                <!-- <img src="<%= event.thumbnail %>" alt="thumbnail" style="max-width: 150px; max-height: 150px; object-fit: cover;"> -->
                  <div class="thumbnail-event-title">
                     <img src="<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
                     <h2 class="eventTitle"><%= event.title %></h2>
@@ -48,11 +48,6 @@
           </div>
         </div>
    
-
-        
-        
-        
-        
         <script>
           
           function gotoEvent(eventId) {

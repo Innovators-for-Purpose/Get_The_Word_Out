@@ -57,8 +57,8 @@ exports.createEvent = async (req, res) => {
       location, 
       venue: "venue", 
       time, 
-      category, 
-      age, 
+      category: 1, 
+      age: 1, 
       date
     });
 
