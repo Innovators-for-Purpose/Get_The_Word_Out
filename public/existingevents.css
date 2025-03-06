@@ -22,7 +22,9 @@ body {
     margin-right: auto;
     margin-top: -480px;
     margin-left: 50px;
-
+    position:fixed;
+    left:15px;
+    bottom:690px;
 }
 
 .navLogo a {
@@ -61,6 +63,7 @@ h1 {
     flex-grow: 1;
     font-size: 24px;
     color: #333;
+
 }
 
 
@@ -92,18 +95,23 @@ h1 {
 
 .pageTitle{
     position: absolute;
-    background-color: red;
+    top:75px;
+    background-color: none;
 }
 
 .event-container{
-    background-color: green;
+    background-color: none;
     padding: 5px;
+    top:20px;
 }
 
 .event-page-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: pink;
+    background-color: none;
     width: full;
+    position:absolute;
+    top:130px;
+
 }
