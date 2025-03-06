@@ -43,6 +43,12 @@ body{
 
 }
 
+.navLogo a {
+    text-decoration: none !important;
+    color: black;
+}
+
+
 span{
     color: #5AA5FF;
 

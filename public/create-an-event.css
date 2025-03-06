@@ -31,7 +31,15 @@ body {
     font-weight: 700;
     position: relative;
 
+
 }
+
+
+.navLogo a {
+    text-decoration: none !important;
+    color: black
+}
+
 
 .logo{
     font-size: 25px;
