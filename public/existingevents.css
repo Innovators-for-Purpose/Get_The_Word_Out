@@ -1,35 +1,50 @@
 body, html {
     height: 100%;
     font-family: "Quicksand", system-ui;
-    background: url(images/bg.png);
-    background-size: cover;
+
+
 }
 
 
 body {
-    background: rgba(255, 255, 255, 0.8);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
+    position: relative;
 }
-
-
-.navLogo{
-    font-size: 25px;
-    font-weight: 900;
-    margin-right: auto;
-    margin-top: -480px;
-    margin-left: 50px;
+body::before{
+    content: "";
+    background-image:url(images/bg.png);
+    background-size:cover;
+    background-attachment: fixed;
     position:fixed;
-    left:15px;
-    bottom:690px;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:-2;
+}
+body::after{
+    content: "";
+    background: rgba(255, 255, 255, 0.8);
+    background-size:cover;
+    background-attachment: fixed;
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:-1;
 }
 
-.navLogo a {
-    text-decoration: none !important;
-    color: black;
+
+.navLogo {
+    font-size: 25px;
+    font-weight: 700;
+    position:fixed;
+    top: 0;
+    left: 0;
 }
 
 
