@@ -1,9 +1,7 @@
 body, html {
     height: 100%;
     font-family: "Quicksand", system-ui;
-
 }
-
 
 body {
     display: flex;
@@ -12,43 +10,52 @@ body {
     align-items: center;
     position: relative;
 }
-body::before{
-    content: "";
-    background-image:url(images/bg.png);
-    background-size:cover;
-    background-attachment: fixed;
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    z-index:-2;
-}
-body::after{
-    content: "";
-    background: rgba(255, 255, 255, 0.8);
-    background-size:cover;
-    background-attachment: fixed;
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    z-index:-1;
-}
 
-
-.navLogo {
-    font-size: 25px;
-    font-weight: 700;
-    position:fixed;
+body::before {
+    content: "";
+    background-image: url(images/bg.png);
+    background-size: cover;
+    background-attachment: fixed;
+    position: fixed;
     top: 0;
     left: 0;
-    text-decoration: none;
+    right: 0;
+    bottom: 0;
+    z-index: -2;
 }
 
+body::after {
+    content: "";
+    background: rgba(255, 255, 255, 0.8);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+}
 
-span{
+.navLogo {
+    display: flex;
+    position: relative;
+    z-index: 10px;
+    font-size: 25px;
+    font-weight: 700;
+    position: relative; /* Ensure alignment control */
+
+}
+
+.navLogo a {
+    text-decoration: none !important;
+    background-color:yellow;
+    color: black;
+}
+
+.logo {
+    font-size: 25px; /* Optional: Maintain visual consistency */
+}
+
+span {
     color: #5AA5FF;
 }
 
@@ -58,66 +65,60 @@ h1 {
     margin-top: 10px;
 }
 
-
 .eventButton {
     background-color: rgb(255, 255, 255);
     padding: 15px;
-    border-radius: 10px 10px 10px 10px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     gap: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     margin-bottom: 20px;
     justify-content: space-between;
 }
-
 
 .eventTitle {
     margin: 0;
     flex-grow: 1;
     font-size: 24px;
     color: #333;
-
 }
-
 
 .eventButton:hover {
     background-color: #f8f8f8;
 }
 
-
-.editor{
+.editor {
     display: flex;
     justify-content: center;
     flex-direction: row;
     gap: 10px;
 }
 
-.thumbnail-image{
+.thumbnail-image {
     height: 70px;
     width: 70px;
     object-fit: cover;
     border-radius: 10px;
 }
 
-.thumbnail-event-title{
+.thumbnail-event-title {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 10px;
 }
 
-.pageTitle{
+.pageTitle {
     position: absolute;
-    top:75px;
-    background-color: none;
+    top: 75px;
 }
 
-.event-container{
+.event-container {
     background-color: none;
     padding: 5px;
-    top:20px;
+    top: 20px;
 }
 
 .event-page-container {
@@ -125,8 +126,7 @@ h1 {
     justify-content: center;
     align-items: center;
     background-color: none;
-    width: full;
-    position:absolute;
-    top:130px;
-
+    width: 100%;
+    position: absolute;
+    top: 130px;
 }
