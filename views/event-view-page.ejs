@@ -12,19 +12,35 @@
         </div>
             <div class="bg"></div>
               <div class="evnetInformation">
-                <img src="" alt="">
+                <!-- <img src="" alt=""> -->
             </a>
-            <h2 class="eventTitle"><%= event.title %></h2>
-            <div class="timeNdescription">
-                <div class="description">
-                    <p class="eventDescription"><%= event.description %></p>
+
+            <div class="container">
+
+                <div class="eventT">
+                    <h2 class="eventTitle"><%= event.title %></h2>
                 </div>
-                <img src="<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
-                <p class="date"><%= event.date %></p>
-                <p class="location"><%= event.location %></p>
-                <p class="age"><%= event.age%></p>
-                <p class="category"><%= event.category%></p>
+
+                <div class="event-flyer">
+                    <img src="<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
+                </div>
+
+                <div class="timeNdescription">
+                    <div class="description">
+                        <p class="eventDescription"><%= event.description %></p>
+                    </div>
+                <div class="location-date">
+                    <p class="location"><%= event.location %></p>
+                    <p class="date"><%= event.date %></p>
+                </div>
+
+                <p class="date"><%= event.tags %></p>
+
+                    <!-- <p class="age"><%= event.age%></p> -->
+                    <!-- <p class="category"><%= event.category%></p> -->
+                </div>
             </div>
+
           </div>
             
         <script>
