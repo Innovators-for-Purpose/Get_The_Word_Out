@@ -2,7 +2,6 @@ body, html {
     height: 100%;
     font-family: "Quicksand", system-ui;
 
-
 }
 
 
@@ -45,6 +44,7 @@ body::after{
     position:fixed;
     top: 0;
     left: 0;
+    text-decoration: none;
 }
 
 
