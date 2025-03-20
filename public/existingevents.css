@@ -1,8 +1,8 @@
 body, html {
     height: 100%;
     font-family: "Quicksand", system-ui;
-    background: url(images/bg.png);
-    background-size: cover;
+
+
 }
 
 
@@ -24,7 +24,33 @@ body {
 .navLogo a {
     text-decoration: none !important;
     color: black;
+    
 }
+body::before{
+    content: "";
+    background-image:url(images/bg.png);
+    background-size:cover;
+    background-attachment: fixed;
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:-2;
+}
+body::after{
+    content: "";
+    background: rgba(255, 255, 255, 0.8);
+    background-size:cover;
+    background-attachment: fixed;
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:-1;
+}
+
 
 
 span{
