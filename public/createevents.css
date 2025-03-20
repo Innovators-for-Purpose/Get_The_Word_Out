@@ -12,32 +12,24 @@ body, html {
 body{
     font-family: "quicksand", sans-serif;
     background: rgba(255, 255, 255, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    flex-direction: column;
+    
 }
 
 .container{
     /* padding-top: 170px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 
 
-.navLogo{
-    display: flex;
-    font-size: 25px;
-    font-family: "quicksand", sans-serif;
-    font-weight: 700;
-    /* margin-left: -201px;
+.navLogo {
     font-size: 25px;
     font-weight: 700;
-    position: relative; */
-    /* margin-top: 400px; */
-    /* margin: 100px 0px 100px -300px; */
-    margin-left: -400px;
-    position: absolute;
+    padding-inline: 10px;
+
 }
 
 .navLogo a {

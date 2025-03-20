@@ -8,12 +8,6 @@ body, html {
 }
 
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .main{
     text-align: center;
     background: rgba(255, 255, 255, 0.8);
@@ -22,16 +16,13 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    
 }
 
 .navLogo{
-    display: flex;
-    margin: -325px 0px 160px 50px;
     font-size: 25px;
     font-weight: 700;
-    position: relative;
-
-
+   padding-inline: 10px;
 }
 
 
@@ -52,7 +43,7 @@ span{
 .create-an-event{
     display: flex;
     flex-direction: column;
-    background-color: white;
+    background-color: white  ;
     display: inline-block;
     width: 350px;
     padding-bottom: 30px;
