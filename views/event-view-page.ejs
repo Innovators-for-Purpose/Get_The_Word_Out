@@ -26,18 +26,41 @@
                 </div>
 
                 <div class="timeNdescription">
+
+                    <div class="loc-date-time-container">
+                        <div class="loc">
+                            <p class="location"><%= event.location %></p>
+                        </div>
+    
+    
+                            <div class="date-time-container">
+
+                                <div class="month-year">
+                                    <p class="time-date"><%= event.date.toLocaleString('default', {month: 'long'}) %></p>
+                                    <p class="time-date"><%= event.date.getDate() %></p>
+                                    <p class="time-date"><%= event.date.getFullYear() %></p>
+                                </div>
+    
+                                <div class="time">
+                                    <p class="time-date"><%= event.time %></p>
+                                </div>
+    
+                            </div>
+                    </div>
+                    
                     <div class="description">
                         <p class="eventDescription"><%= event.description %></p>
                     </div>
-                <div class="location-date">
-                    <p class="location"><%= event.location %></p>
-                    <p class="date"><%= event.date %></p>
-                </div>
+                
 
                 <p class="date"><%= event.tags %></p>
 
                     <!-- <p class="age"><%= event.age%></p> -->
                     <!-- <p class="category"><%= event.category%></p> -->
+
+                    <div class="goBack">
+                        <button>Go Back</button>
+                    </div>
                 </div>
             </div>
 
@@ -72,6 +95,13 @@
 
         }
 
+        .container{
+            margin-top: -250px;
+            background-color: rgb(255, 255, 255);
+            padding: 200px 50px 50px 50px;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            border-radius: 20px;
+        }
 
         span{
             color: #5AA5FF;
@@ -129,5 +159,33 @@
             width: 150px;
             object-fit: cover;
         }
+
+        .thumbnail-image{
+            height: 150px;
+            width: 500px;
+            margin: -10px 0px 5px 0px;
+            border-radius: 20px 20px 20px 20px;
+
+        }
+
+        .time-date {
+            font-size: 15px;
+        }
+
+        .month-year{
+            display: flex;
+            flex-direction: row;
+        }
+
+        .loc-date-time-container{
+            display: flex;
+            flex-direction: row;
+            gap: 100px;
+        }
+
+        .month-year{
+            gap: 10px;
+        }
+
     </style>
 </html>
