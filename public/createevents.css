@@ -63,6 +63,18 @@ label{
     text-align: left;
 }
 
+ .thumbAi{
+   font-family: Quicksand; 
+   font-size: 18px;
+   font-weight: 600;
+   position:relative;
+
+}
+
+.thumbAi a{
+    text-decoration: none !important;
+    color: gray; 
+}
 
 .formBox {
     background-color: rgb(255, 255, 255);

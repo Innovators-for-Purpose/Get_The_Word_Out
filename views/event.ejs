@@ -25,8 +25,29 @@
              <div class="thumbnail-file">
                 <input type="file" name="thumbnail" id="thumbnail-file">
              </div>
+             <h5>(Upload a picture of the event on the community bulletin board)</h5> 
 
-            <h5>(Upload a picture of the event on the community bulletin board)</h5>
+             <div class="thumbAi">
+                <div id="thumbPreview">
+                    <div class="thumb-ai-pop-up">
+                        <h2>Generate Thumbnail With Artafical Intellegence </h2>
+                        <h3>Please type in a short description of the image you'd like to generate as your thumbnail</h3>
+                        <div class="Formbox"> </div>
+                        <div class="createThumbnails">
+                        </div>
+                          
+                        <div class="ContinueActions">
+                           <button id="genThumb">Generate Thumbnail</button>
+                        </div>
+          
+                      </div>
+                  </div>
+                  
+                <button type="button" id="PreviewAi" class="thumbAi">
+                  <h6>Genarate Thumbnail with Artifical Intellegence</h6>
+                </button>
+             </div>
+
             <div class="sects">
                 <label for="eventTitle">Event Title *</label><br>
                 <input name="title" id="eventTitle" class="textareas" value="a" required></input><br>
@@ -140,6 +161,11 @@
         </div>
     </div> -->
 
+ 
+      
+       
+        
+
 
 
     <div id="previewModal">
@@ -155,6 +181,16 @@
         </div>
     </div>
     <script>
+    
+        const modelForm = document.getElementById('modelForm');
+        const previewAi = document.getElementById('previewAi');
+        const thumbPreview = document.getElementById('thumbPreview');
+        const createThumbnails = document.getElementById('createThumbnails');
+        const genThumb = document.getElementById('genThumb');
+
+
+
+
 
 
         const form = document.getElementById('eventForm');
