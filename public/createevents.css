@@ -38,6 +38,7 @@ body{
     /* margin: 100px 0px 100px -300px; */
     margin-left: -400px;
     position: absolute;
+    text-decoration: none;
 }
 
 .navLogo a {

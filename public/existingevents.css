@@ -37,18 +37,19 @@ body::after {
 
 .navLogo {
     display: flex;
-    position: relative;
+    position: fixed;
     z-index: 10px;
     font-size: 25px;
     font-weight: 700;
-    position: relative; /* Ensure alignment control */
+
 
 }
 
 .navLogo a {
     text-decoration: none !important;
-    background-color:yellow;
+    margin: -410px 650px 100px -570px;
     color: black;
+   position:fixed;
 }
 
 .logo {
@@ -63,24 +64,25 @@ h1 {
     position: relative;
     text-align: center;
     margin-top: 10px;
+
 }
 
 .eventButton {
-    background-color: rgb(255, 255, 255);
+    background-color: whitesmoke;
+    align-items: center !important;
     padding: 15px;
+    height:100px;
+    width:290px;
     border-radius: 10px;
     display: flex;
-    align-items: center;
     gap: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
     margin-bottom: 20px;
     justify-content: space-between;
 }
 
 .eventTitle {
     margin: 0;
-    flex-grow: 1;
     font-size: 24px;
     color: #333;
 }
@@ -95,6 +97,7 @@ h1 {
     flex-direction: row;
     gap: 10px;
 }
+
 
 .thumbnail-image {
     height: 70px;
@@ -119,10 +122,12 @@ h1 {
     background-color: none;
     padding: 5px;
     top: 20px;
+   align-items: center;
+    justify-content: center;
+    display: flex;
 }
 
 .event-page-container {
-    display: flex;
     justify-content: center;
     align-items: center;
     background-color: none;
