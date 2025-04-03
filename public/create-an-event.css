@@ -51,6 +51,53 @@ span{
     border-radius: 10px;
 }
 
+.thumbAi{
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+.popup-overlay {
+    display: none; /* Hide by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it’s above other content */
+}
+
+.thumbPreview {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.textbox {
+    width: 300px; 
+    padding: 10px;
+    margin-top: 100px;
+    margin-bottom: 200px;
+    border-radius: 4px;
+    border: 3px solid #2c2b2b;
+}
+.gradient-text {
+    background-image: linear-gradient(red, blue);
+    color: transparent;
+    background-clip: text;
+}
+.close {
+    font-size: 24px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
 .fill-methods{
     display: flex;
     flex-direction: column;

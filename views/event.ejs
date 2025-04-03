@@ -27,26 +27,23 @@
              </div>
              <h5>(Upload a picture of the event on the community bulletin board)</h5> 
 
-             <div class="thumbAi">
-                <div id="thumbPreview">
-                    <div class="thumb-ai-pop-up">
-                        <h2>Generate Thumbnail With Artafical Intellegence </h2>
-                        <h3>Please type in a short description of the image you'd like to generate as your thumbnail</h3>
-                        <div class="Formbox"> </div>
-                        <div class="createThumbnails">
-                        </div>
-                          
-                        <div class="ContinueActions">
-                           <button id="genThumb">Generate Thumbnail</button>
-                        </div>
-          
-                      </div>
-                  </div>
-                  
-                <button type="button" id="PreviewAi" class="thumbAi">
-                  <h6>Genarate Thumbnail with Artifical Intellegence</h6>
-                </button>
-             </div>
+                <div class="thumbAi">
+
+                    <button type="button" id="previewAi" class="thumbAi">
+                        <h6>Generate Thumbnail with Artificial Intelligence</h6>
+                    </button>
+                 </div>
+                
+                 <div class="popup-overlay" id="preview-overlay">
+                    <div class="thumbPreview" id="thumbPreview">
+                        <span class="close" id="close-preview">&times;</span>
+                        <h7 class= gradient-text>Genarate Thumbnail with Artifiical Intelligence</h7>
+                        <p>Please type in a short description of the image you'd like to generate as your thumbnail.</p>
+                        <input type="text" id="text-box" name="textbox"/>
+                        <button>Generate Thumbnail</button>
+                    </div>
+                </div>
+       
 
             <div class="sects">
                 <label for="eventTitle">Event Title *</label><br>
@@ -161,9 +158,6 @@
         </div>
     </div> -->
 
- 
-      
-       
         
 
 
@@ -182,18 +176,17 @@
     </div>
     <script>
     
-        const modelForm = document.getElementById('modelForm');
-        const previewAi = document.getElementById('previewAi');
-        const thumbPreview = document.getElementById('thumbPreview');
-        const createThumbnails = document.getElementById('createThumbnails');
-        const genThumb = document.getElementById('genThumb');
+    const previewOverlay = document.getElementById('preview-overlay');
+    const thumbPreview = document.getElementById('thumbPreview');
+    const previewAi = document.getElementById('previewAi');
+    const closePreview = document.getElementById('close-preview');
 
 
 
 
 
 
-        const form = document.getElementById('eventForm');
+        const eventForm = document.getElementById('eventForm');
         const previewButton = document.getElementById('previewButton');
         const previewModal = document.getElementById('previewModal');
         const previewContent = document.getElementById('previewContent');
@@ -217,9 +210,23 @@
         //     '4': 'Category 4'
         // };
 
+        
+        previewAi.addEventListener('click', () => {
+    previewOverlay.style.display = "flex";
+   });
+
+// Hide the popup when the close button is clicked
+closePreview.addEventListener('click', () => {
+    previewOverlay.style.display = 'none';
+    });
+
+
+          
+  
+          //show popup
     
-        previewButton.addEventListener('click', (event) => {
-            event.preventDefault();
+          eventForm.addEventListener('click', (eventForm) => {
+            previewButton.style.display='flex';
   
             if (form.checkValidity()) {
                 previewContent.innerHTML = "";
@@ -285,7 +292,7 @@
         confirmBtn.addEventListener('click', async () => {
             const formData = new FormData(form);
             
-            try {
+           try  {
                 const response = await fetch("/events/eventForm", {
                     method: "POST",
                     body: formData,

@@ -64,17 +64,16 @@ label{
 }
 
  .thumbAi{
-   font-family: Quicksand; 
-   font-size: 18px;
-   font-weight: 600;
-   position:relative;
+    padding: 0;
+    background: none;
+    font-family: Quicksand; 
+    font-size: 18px;
+    font-weight: 600;
+    position:relative;
+    color: gray;
+ }
 
-}
 
-.thumbAi a{
-    text-decoration: none !important;
-    color: gray; 
-}
 
 .formBox {
     background-color: rgb(255, 255, 255);
@@ -139,6 +138,34 @@ label{
     gap: 0px;
     margin-top: 100px;
 } */
+
+.popup-overlay {
+    display: none;  /* This hides the overlay by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;  /* Ensure the overlay is on top of other content */
+}
+.thumbPreview {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    position: relative;  /* Ensures positioning of the close button */
+}
+
+.close {
+    font-size: 24px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
 
 .bg{
     background-image: url("/images/background.png");
