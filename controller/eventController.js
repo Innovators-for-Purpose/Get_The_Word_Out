@@ -115,7 +115,7 @@ exports.editEvent = async (req, res) => {
           //     label: 'Category',
           //     value: categoryMap[document.getElementsByName('category')[0].value]
           // }
-        ];
+        ;
 
         if ("0" in document.getElementsByName('thumbnail')[0].files){
           previewFields.push({
@@ -145,9 +145,9 @@ exports.editEvent = async (req, res) => {
       }
     });
 
-  });
-  }
-}
+
+
+
 
 
 
