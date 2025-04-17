@@ -59,7 +59,8 @@ exports.createEvent = async (req, res) => {
       time, 
       category: 1, 
       age: 1, 
-      date
+      date,
+      tags,
     });
 
     res.status(201).json({ success: true, data: event, id: event.id });
