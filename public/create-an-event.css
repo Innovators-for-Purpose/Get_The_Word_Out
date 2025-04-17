@@ -52,9 +52,15 @@ span{
 }
 
 .thumbAi{
-    padding: 0;
-    border: none;
-    background: none;
+    order: none;  
+    outline: none;  
+    padding: 10px 20px;  
+    background-color: none ;  
+    color: rgb(115, 115, 115); 
+    font-size: 16px;  
+    border-radius: 8px; 
+    cursor: pointer; 
+   
 }
 
 .popup-overlay {

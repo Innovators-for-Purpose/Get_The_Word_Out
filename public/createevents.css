@@ -159,6 +159,15 @@ label{
     position: relative;  /* Ensures positioning of the close button */
 }
 
+.generate-thumbnail {
+    position: absolute;
+    bottom:0;
+    left:100px;
+    height:50px;
+    width:500px;
+    background: (90deg, rgba(0,212,255,1) 0%, rgba(90,61,255,1) 35%, rgba(9,9,121,1) 100%);
+    gap: 10px;
+}
 .close {
     font-size: 24px;
     position: absolute;
