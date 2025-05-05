@@ -23,7 +23,10 @@ body{
     flex-direction: column;
 }
 
+.h4{
 
+
+}
 
 .navLogo {
     font-size: 25px;
@@ -65,13 +68,20 @@ label{
 
  .thumbAi{
     padding: 0;
-    background: none;
-    font-family: Quicksand; 
+    border:none;
+    outline: none;
+     font-family:Quicksand;
     font-size: 18px;
     font-weight: 600;
     position:relative;
     color: gray;
- }
+    background-color: transparent ;
+    left: 50px;
+
+  
+    
+}
+
 
 
 
@@ -82,6 +92,9 @@ label{
     border-radius: 10px;
     border: 2px solid #EAEAEC;
     padding-left: 24px;
+    font-size: 16px;  
+    padding: 10px;  
+    resize: vertical; 
 }
 
 #button {
@@ -104,6 +117,15 @@ label{
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
+ .gradient-text {
+    background-image: linear-gradient(to right, #06CCFF, #3A29C9, #090979);
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+}
+ 
 
 #Description {
     width: 500px;
@@ -165,8 +187,9 @@ label{
     left:100px;
     height:50px;
     width:500px;
-    background: (90deg, rgba(0,212,255,1) 0%, rgba(90,61,255,1) 35%, rgba(9,9,121,1) 100%);
     gap: 10px;
+    background: (90deg, rgba(0,212,255,1) 0%, rgba(90,61,255,1) 35%, rgba(9,9,121,1) 100%);
+
 }
 .close {
     font-size: 24px;
@@ -289,7 +312,7 @@ label{
     border-radius: 5px;
 }
 
-.thumbnail-file input[type="file"]::file-selector-button {
+.thumbnail-file input[type="file"]:file-selector-button {
     /* background-color: #F0F2F8; */
     background-color: #5AA5FF;
     color: white;

@@ -26,7 +26,8 @@
                 <input type="file" name="thumbnail" id="thumbnail-file">
              </div>
              <h5>(Upload a picture of the event on the community bulletin board)</h5> 
-
+         
+ 
                 <div class="thumbAi">
 
                     <button type="button" id="previewAi" class="thumbAi">
@@ -37,10 +38,10 @@
                  <div class="popup-overlay" id="preview-overlay">
                     <div class="thumbPreview" id="thumbPreview">
                         <span class="close" id="close-preview">&times;</span>
-                        <h7 class= gradient-text>Genarate Thumbnail with Artifiical Intelligence</h7>
+                        <h7 class= "gradient-text" >Genarate Thumbnail with Artifiical Intelligence</h7>
                         <p>Please type in a short description of the image you'd like to generate as your thumbnail.</p>
-                        <input  class="textbox" type="text" id="text-box" name="textbox"/>
-                           <button Class= "generate-thumbnail" id="generate-thumbnail">
+                        <input class="textbox" type="text" id="text-box" name="textbox"/>
+                           <button class="gradient-button" id="generate-thumbnail">
                             Generate Thumbnail</button>
                     </div>
                 </div>
@@ -163,8 +164,8 @@
 
 
 
-    <div id="previewModal">
-        <div class="preview-modal-content">
+    <div id= "previewModal">
+        <div class= "preview-modal-content" >
             <h2>Preview Your Event</h2>
             <div id="previewContent">
                 <!-- Image will be added here dynamically by JavaScript -->
@@ -230,6 +231,7 @@ closePreview.addEventListener('click', () => {
             previewButton.style.display='flex';
   
             if (form.checkValidity()) {
+                previewButton.style.display='flex',
                 previewContent.innerHTML = "";
                 
                 // Add image preview if file is selected
