@@ -1,8 +1,9 @@
 const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: "test.db",
-  // storage: "archive.db",
-});
+const config = require('./config/config.json')
+var env = process.env['NODE_ENV']
+if (!env) {
+  env = 'development'
+}
+const sequelize = new Sequelize(config[env]);
 
 module.exports = sequelize;
