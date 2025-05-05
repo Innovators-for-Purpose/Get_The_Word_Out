@@ -48,6 +48,9 @@ app.get("/", (req, res) => {
 app.get("/Create", (req, res) => {
   res.render("event");
 });
+app.get("/Edit",(req, res) => {
+  res.render("event");
+});
 
 app.get("/autofill", (req, res) =>{
   res.render("autofill")

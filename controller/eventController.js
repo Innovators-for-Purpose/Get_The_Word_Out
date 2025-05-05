@@ -80,18 +80,18 @@ exports.deleteEvent = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
-exports.editEvent = async (req, res) => {
-  try{
-    const { id, title,thumbnail,vid,description,location,venue,time,catagory,age,date } = req.body;
+/**exports.editEvent = async (req, res) => {
+  try {
+    const {id, title, thumbnail, vid, description, location, venue, time, catagory, age, date} = req.body;
     previewButton.addEventListener('click', (event) => {
       event.preventDefault();
 
       const previewFields = [
-        { label: 'Event Title', value: document.getElementsByName('title')[0].value },
-        { label: 'Event Description', value: document.getElementsByName('description')[0].value },
-        { label: 'Date', value: document.getElementsByName('date')[0].value },
-        { label: 'Time', value: document.getElementsByName('time')[0].value },
-        { label: 'Location', value: document.getElementsByName('location')[0].value },
+        {label: 'Event Title', value: document.getElementsByName('title')[0].value},
+        {label: 'Event Description', value: document.getElementsByName('description')[0].value},
+        {label: 'Date', value: document.getElementsByName('date')[0].value},
+        {label: 'Time', value: document.getElementsByName('time')[0].value},
+        {label: 'Location', value: document.getElementsByName('location')[0].value},
       ];
 
       if (form.checkValidity()) {
@@ -107,17 +107,17 @@ exports.editEvent = async (req, res) => {
         }
 
 
-          // {
-          //     label: 'Age Range',
-          //     value: ageRangeMap[document.getElementsByName('age')[0].value]
-          // },
-          // {
-          //     label: 'Category',
-          //     value: categoryMap[document.getElementsByName('category')[0].value]
-          // }
+        // {
+        //     label: 'Age Range',
+        //     value: ageRangeMap[document.getElementsByName('age')[0].value]
+        // },
+        // {
+        //     label: 'Category',
+        //     value: categoryMap[document.getElementsByName('category')[0].value]
+        // }
         ;
 
-        if ("0" in document.getElementsByName('thumbnail')[0].files){
+        if ("0" in document.getElementsByName('thumbnail')[0].files) {
           previewFields.push({
             label: 'Event Thumbnail',
             image: document.getElementsByName('thumbnail')[0].files[0],
@@ -145,7 +145,8 @@ exports.editEvent = async (req, res) => {
       }
     });
 
-
+}
+*/
 
 
 
