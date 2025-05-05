@@ -52,10 +52,10 @@ const sequelize = require("../setup.js");
       type: DataTypes.DATE,
       allowNull: false,
     },
-    tags: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-    }
+    // tags: {
+    //   type: DataTypes.TEXT,
+    //   allowNull: true,
+    // }
   });
 
   module.exports = Event;
