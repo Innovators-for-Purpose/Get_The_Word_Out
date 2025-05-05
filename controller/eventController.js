@@ -49,6 +49,8 @@ exports.createEvent = async (req, res) => {
       thumbnail = req.file.buffer;
     }
 
+    let tags = "hello,hi,bye";
+
     const event = await Event.create({
       thumbnail,
       title, 
@@ -60,7 +62,7 @@ exports.createEvent = async (req, res) => {
       category: 1, 
       age: 1, 
       date,
-      tags,
+      tags
     });
 
     res.status(201).json({ success: true, data: event, id: event.id });
