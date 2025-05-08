@@ -50,7 +50,7 @@
      </div>
     <div id="previewModal">
         <div class="preview-modal-content">
-            <h2>Preview Your Event</h2>
+            <h2>Edit Event</h2>
             <div id="previewContent">
 
             </div>
@@ -61,7 +61,9 @@
     </div>
 
         <script>
-          
+
+          const previewModal = document.getElementById('previewModal');
+
           function gotoEvent(eventId) {
             console.log('Going to event:', eventId);
             window.location.href = `/events/event/${eventId}`;
@@ -86,14 +88,12 @@
                         <strong>${field.label}:</strong>
                         <span>${field.value}</span>
                     `;
-                  console.log("got here");
-                  previewContent.innerHTML = "";
                   previewContent.appendChild(previewItem);
-                  console.log("got here 2");
               });
 
-              console.log( eventId,  eventTitle,eventLocation ,eventTime ,eventDescription);
+              previewModal.style.display = 'block';
           }
+
           function deleteEvent(eventId){
             fetch(`/events/delete-event`, {
               method: 'DELETE',
