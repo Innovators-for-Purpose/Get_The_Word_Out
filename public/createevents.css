@@ -23,14 +23,9 @@ body{
     flex-direction: column;
 }
 
-.h4{
-
-
-}
-
 .navLogo {
     font-size: 25px;
-    font-weight: 700;
+    font-weight: 700 ;
     padding-inline: 10px;
 
 }
@@ -41,22 +36,47 @@ body{
 }
 
 
+
+.h4{
+    text-align: center;
+    left: 90px ;
+
+}
+
+
+
+
 span{
     color: #5AA5FF;
 }
 
-textarea {
+textarea{
     border-style: solid;
     border-radius: 4px;
-    border: 2px solid #EAEAEC;
     box-sizing: border-box;
     padding: 9px 5px;
     font-family: Quicksand;
     font-size: 15px;
     font-weight: 650;
     resize: none;
+     ;
 }
 
+#generate-thumbnail{
+    border-style: none;
+    display: flex;
+    background: linear-gradient(90deg, rgba(0,212,255,1) 0%, rgba(90,61,255,1) 35%, rgba(9,9,121,1) 100%);
+    justify-content: center;
+    gap: 10px;
+    font-size: 15px;
+    width:500px;
+    height:45;
+    font-family: Quicksand;
+    color:white;
+    font-weight: 600px; 
+    
+    
+}
 
 label{
     font-family: Quicksand;
@@ -74,8 +94,8 @@ label{
     font-size: 18px;
     font-weight: 600;
     position:relative;
-    color: gray;
-    background-color: transparent ;
+    color: gray ;
+    background-color: transparent;
     left: 50px;
 
   
@@ -83,7 +103,16 @@ label{
 }
 
 
-
+.textbox {
+    width: 500px; 
+    padding: 10px;
+    margin-top: 100px;
+    margin-bottom: 200px;
+    border: 4px ;
+    height: 200px;
+    border-color: gray;
+   
+}
 
 .formBox {
     background-color: rgb(255, 255, 255);
@@ -189,6 +218,7 @@ label{
     width:500px;
     gap: 10px;
     background: (90deg, rgba(0,212,255,1) 0%, rgba(90,61,255,1) 35%, rgba(9,9,121,1) 100%);
+
 
 }
 .close {
