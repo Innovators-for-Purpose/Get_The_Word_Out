@@ -12,15 +12,18 @@ body, html {
 body{
     font-family: "quicksand", sans-serif;
     background: rgba(255, 255, 255, 0.8);
-    
-}
-
-.container{
-    /* padding-top: 170px; */
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+.container{
+    /* padding-top: 170px; */
+    /* display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; */
 }
 
 .navLogo {
@@ -50,6 +53,7 @@ textarea{
     font-size: 15px;
     font-weight: 650;
     resize: none;
+    border: 2px solid #EAEAEC;
 }
 
 #generate-thumbnail{
@@ -330,7 +334,7 @@ label{
     border-radius: 5px;
 }
 
-.thumbnail-file input[type="file"]:file-selector-button {
+.thumbnail-file input[type="file"]::file-selector-button {
     /* background-color: #F0F2F8; */
     background-color: #5AA5FF;
     color: white;
@@ -344,11 +348,11 @@ label{
 
 .textareas{
     width: 497px;
-    font-family: Quicksand;
+    /* font-family: Quicksand;
     font-size: 15px;
     font-weight: 650;
     border-radius: 1px;
-    border-style: solid;
+    border-style: solid; */
 }
 
 
