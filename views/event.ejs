@@ -163,8 +163,8 @@
 
 
 
-    <div id= "previewModal">
-        <div class= "preview-modal-content" >
+    <div id="previewModal">
+        <div class="preview-modal-content" >
             <h2>Preview Your Event</h2>
             <div id="previewContent">
                 <!-- Image will be added here dynamically by JavaScript -->
@@ -214,23 +214,22 @@
         
      previewAi.addEventListener('click', () => {
      previewOverlay.style.display = "flex";
-
+    });
      closePreview.addEventListener('click', () => {
     previewContent.innerHTML = ""; // Clear the preview
     previewOverlay.style.display = 'none';}) // Optionally hide the preview button
 
-    });
+
 
 
 
   
           //show popup
     
-          eventForm.addEventListener('click', (event) => {
-            previewButton.style.display='flex';
+          previewButton.addEventListener('click', (event) => {
+            event.preventDefault();
   
             if (eventForm.checkValidity()) {
-                previewButton.style.display='flex',
                 previewContent.innerHTML = "";
                 
                 // Add image preview if file is selected
@@ -280,8 +279,10 @@
                     previewContent.appendChild(previewItem);
                 });
 
+                previewModal.style.display = 'block';
+
             } else {
-                form.reportValidity();
+               eventForm.reportValidity();
             }
             });
 
@@ -291,14 +292,13 @@
         });
 
         confirmBtn.addEventListener('click', async () => {
-            const formData = new FormData(form);
+            const formData = new FormData(eventForm);
             
            try  {
                 const response = await fetch("/events/eventForm", {
                     method: "POST",
                     body: formData,
                 });
-                previewModal.style.display = 'block';
                 const result = await response.json();
                 
                 if (result.success) {
