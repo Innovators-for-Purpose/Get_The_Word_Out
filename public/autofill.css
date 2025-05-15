@@ -8,11 +8,6 @@ body, html {
 }
 
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
 .main{
     text-align: center;
@@ -24,12 +19,10 @@ body {
     justify-content: center;
 }
 
-.navLogo{
-    display: flex;
-    margin: -325px 0px 160px 50px;
+.navLogo {
     font-size: 25px;
     font-weight: 700;
-    position: relative;
+    padding-inline: 10px;
 
 }
 
