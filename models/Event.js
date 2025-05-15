@@ -52,13 +52,11 @@ const sequelize = require("../setup.js");
     date: {
       type: DataTypes.DATE,
       allowNull: false,
+    },
+    tags: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     }
   });
 
   module.exports = Event;
-
-
-
-
-
-

@@ -28,23 +28,22 @@
             <h5>(Upload a picture of the event on the community bulletin board)</h5>
             <div class="sects">
                 <label for="eventTitle">Event Title *</label><br>
-                <input name="title" id="eventTitle" class="textareas" value="a" required></input><br>
+                <input name="title" id="eventTitle" class="textareas" value="" required></input><br>
             </div>
 
             <div class="sects">
                 <label for="Description">Event Description *</label><br>
-                <textarea name="description" id="Description" required>a</textarea><br>
+                <textarea name="description" id="Description" required></textarea><br>
             </div>
 
             <div class="tags">
                 <label for="Tags" class="tags">Tags</label>
-                <input name="tags" id="tags" class="textareas" value="a" required></input><br>
+                <input name="tags" id="tags" class="textareas" value="" required></input><br>
             </div>
 
             <div class="location-div">
                 <label for="Location" class="locationLabel">Location</label><br>
-                <input name="location" id="Location" class="textareas" value="a"
-                       required></input><br>
+                <input name="location" id="Location" class="textareas" value="" required placeholder="Location, City, State, Zip Code"></input><br>
             </div>
 
             
@@ -203,6 +202,7 @@
                     { label: 'Date', value: document.getElementsByName('date')[0].value },
                     { label: 'Time', value: document.getElementsByName('time')[0].value },
                     { label: 'Location', value: document.getElementsByName('location')[0].value },
+                    { label: 'Tags', value: document.getElementsByName('tags')[0].value },
                     // { 
                     //     label: 'Age Range', 
                     //     value: ageRangeMap[document.getElementsByName('age')[0].value] 
