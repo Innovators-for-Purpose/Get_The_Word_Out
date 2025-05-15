@@ -83,6 +83,75 @@ exports.deleteEvent = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+/**exports.editEvent = async (req, res) => {
+  try {
+    const {id, title, thumbnail, vid, description, location, venue, time, catagory, age, date} = req.body;
+    previewButton.addEventListener('click', (event) => {
+      event.preventDefault();
+
+      const previewFields = [
+        {label: 'Event Title', value: document.getElementsByName('title')[0].value},
+        {label: 'Event Description', value: document.getElementsByName('description')[0].value},
+        {label: 'Date', value: document.getElementsByName('date')[0].value},
+        {label: 'Time', value: document.getElementsByName('time')[0].value},
+        {label: 'Location', value: document.getElementsByName('location')[0].value},
+      ];
+
+      if (form.checkValidity()) {
+        previewContent.innerHTML = "";
+
+        // Add image preview if file is selected
+        const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
+        if (thumbnailFile) {
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(thumbnailFile);
+          img.style.maxWidth = '200px'; // Optional: control preview size
+          previewContent.appendChild(img);
+        }
+
+
+        // {
+        //     label: 'Age Range',
+        //     value: ageRangeMap[document.getElementsByName('age')[0].value]
+        // },
+        // {
+        //     label: 'Category',
+        //     value: categoryMap[document.getElementsByName('category')[0].value]
+        // }
+        ;
+
+        if ("0" in document.getElementsByName('thumbnail')[0].files) {
+          previewFields.push({
+            label: 'Event Thumbnail',
+            image: document.getElementsByName('thumbnail')[0].files[0],
+            value: document.getElementsByName('thumbnail')[0].files[0].name,
+            size: document.getElementsByName('thumbnail')[0].files[0].size,
+            type: document.getElementsByName('thumbnail')[0].files[0].type
+          })
+        }
+        console.log(previewFields);
+
+        previewFields.forEach(field => {
+          const previewItem = document.createElement('div');
+
+          previewItem.classList.add('preview-item');
+          previewItem.innerHTML = `
+                        <strong>${field.label}:</strong>
+                        <span>${field.value}</span>
+                    `;
+          previewContent.appendChild(previewItem);
+        });
+
+        previewModal.style.display = 'block';
+      } else {
+        form.reportValidity();
+      }
+    });
+
+}
+*/
+
+
 
 
 

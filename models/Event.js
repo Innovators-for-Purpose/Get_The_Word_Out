@@ -16,6 +16,7 @@ const sequelize = require("../setup.js");
         return data ? `data:image/jpeg;base64,${data.toString('base64')}` : null;
       }
     },
+
     title: {
       type: DataTypes.STRING,
       allowNull: false,
