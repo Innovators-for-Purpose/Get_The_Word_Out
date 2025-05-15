@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="/autofill.css" />
   </head>
   <body>
+    <div class="navLogo">
+      <a href= "http://localhost:3000">
+         <p>GT<span class="word">W</span>O</p>
+      </a>
+    </div>
     <div class="main">
-      <div class="navLogo">
-        <a href= "http://localhost:3000">
-           <p>GT<span class="word">W</span>O</p>
-        </a>
-      </div>
       <div class="main-section">
         <div class="create-an-event">
             <div class="title">
@@ -40,3 +40,27 @@
     </script>
   </body>
 </html>
+
+
+
+
+div id="previewModal">
+        <div class="preview-modal-content">
+            <h2>Preview Your Event</h2>
+            <div id="previewContent">
+                <!-- Image will be added here dynamically by JavaScript -->
+            </div>
+            <div class="preview-actions">
+                <button id="goBackBtn ">Edit</button>
+                <button id="nextBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+    <script>
+
+
+
+const aiEvent= document.getElementById ;
+const previewButton= document.getElementById('Prie'); 
+const goBackBtn= document.getElementById('goBackbtn');
+const nextBtn=document.getElementById('nextBtn'); 

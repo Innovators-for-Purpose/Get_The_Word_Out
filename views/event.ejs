@@ -7,12 +7,13 @@
     <link rel="stylesheet" href="/createevents.css">
 </head>
 <body>
+    <div class="navLogo">
+      <a href= "http://localhost:3000">
+        <p>GT<span class="word">W</span>O</p>
+      </a>
+    </div>
 
-    <div class="container">
-
-        <div class="navLogo">
-            <p>GT<span class="word">W</span>O</p>
-        </div>
+  <div class="container">
 
     <div id="form">
 
@@ -24,27 +25,45 @@
              <div class="thumbnail-file">
                 <input type="file" name="thumbnail" id="thumbnail-file">
              </div>
+             <h5>(Upload a picture of the event on the community bulletin board)</h5> 
+         
+ 
+                <div class="thumbAi">
 
-            <h5>(Upload a picture of the event on the community bulletin board)</h5>
+                    <button type="button" id="previewAi" class="thumbAi">
+                        <h6>Generate Thumbnail with Artificial Intelligence</h6>
+                    </button>
+                </div>
+                
+                <div class="popup-overlay" id="preview-overlay">
+                    <div class="thumbPreview" id="thumbPreview">
+                        <span class="close" id="close-preview">&times;</span>
+                        <h7 class= "gradient-text" >Genarate Thumbnail with Artifiical Intelligence</h7>
+                        <p>Please type in a short description of the image you'd like to generate as your thumbnail.</p>
+                        <input class="textbox"  id="text-box" name="textbox"/>
+                        <button class="gradient-button" id="generate-thumbnail">Generate Thumbnail</button>
+                    </div>
+                </div>
+       
+
             <div class="sects">
                 <label for="eventTitle">Event Title *</label><br>
-                <input name="title" id="eventTitle" class="textareas" value="a" required></input><br>
+                <input name="title" id="eventTitle" class="textareas" value="" required></input><br>
             </div>
 
             <div class="sects">
                 <label for="Description">Event Description *</label><br>
-                <textarea name="description" id="Description" required>a</textarea><br>
+                <textarea name="description" id="Description" required></textarea><br>
             </div>
 
             <div class="tags">
                 <label for="Tags" class="tags">Tags</label>
-                <input name="tags" id="tags" class="textareas" value="a" required></input><br>
+                <input name="tags" id="tags" class="textareas" value="" required></input><br>
             </div>
 
             <div class="location-div">
                 <label for="Location" class="locationLabel">Location</label><br>
-                <input name="location" id="Location" class="textareas" value="a"
-                       required></input><br>
+                <input name="location" id="Location" class="textareas" value="" required placeholder="Location, City, State, Zip Code"></input><br>
             </div>
 
             
@@ -75,7 +94,7 @@
 
 
 
-    </div>
+   </div>
 
     
     <!-- <div id="form">
@@ -140,10 +159,12 @@
         </div>
     </div> -->
 
+        
+
 
 
     <div id="previewModal">
-        <div class="preview-modal-content">
+        <div class="preview-modal-content" >
             <h2>Preview Your Event</h2>
             <div id="previewContent">
                 <!-- Image will be added here dynamically by JavaScript -->
@@ -155,9 +176,18 @@
         </div>
     </div>
     <script>
+    
+    const previewOverlay = document.getElementById('preview-overlay');
+    const thumbPreview = document.getElementById('thumbPreview');
+    const previewAi = document.getElementById('previewAi');
+    const closePreview = document.getElementById('close-preview');
 
 
-        const form = document.getElementById('eventForm');
+
+
+
+
+        const eventForm = document.getElementById('eventForm');
         const previewButton = document.getElementById('previewButton');
         const previewModal = document.getElementById('previewModal');
         const previewContent = document.getElementById('previewContent');
@@ -181,11 +211,25 @@
         //     '4': 'Category 4'
         // };
 
+        
+     previewAi.addEventListener('click', () => {
+     previewOverlay.style.display = "flex";
+    });
+     closePreview.addEventListener('click', () => {
+    previewContent.innerHTML = ""; // Clear the preview
+    previewOverlay.style.display = 'none';}) // Optionally hide the preview button
+
+
+
+
+
+  
+          //show popup
     
-        previewButton.addEventListener('click', (event) => {
+          previewButton.addEventListener('click', (event) => {
             event.preventDefault();
   
-            if (form.checkValidity()) {
+            if (eventForm.checkValidity()) {
                 previewContent.innerHTML = "";
                 
                 // Add image preview if file is selected
@@ -203,6 +247,7 @@
                     { label: 'Date', value: document.getElementsByName('date')[0].value },
                     { label: 'Time', value: document.getElementsByName('time')[0].value },
                     { label: 'Location', value: document.getElementsByName('location')[0].value },
+                    { label: 'Tags', value: document.getElementsByName('tags')[0].value },
                     // { 
                     //     label: 'Age Range', 
                     //     value: ageRangeMap[document.getElementsByName('age')[0].value] 
@@ -236,10 +281,11 @@
                 });
 
                 previewModal.style.display = 'block';
+
             } else {
-                form.reportValidity();
+               eventForm.reportValidity();
             }
-        });
+            });
 
        
         editBtn.addEventListener('click', () => {
@@ -247,14 +293,13 @@
         });
 
         confirmBtn.addEventListener('click', async () => {
-            const formData = new FormData(form);
+            const formData = new FormData(eventForm);
             
-            try {
+           try  {
                 const response = await fetch("/events/eventForm", {
                     method: "POST",
                     body: formData,
                 });
-                
                 const result = await response.json();
                 
                 if (result.success) {

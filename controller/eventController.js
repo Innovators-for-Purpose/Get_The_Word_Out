@@ -42,12 +42,14 @@ exports.singleEvent = async (req, res) => {
 exports.createEvent = async (req, res) => {
   try {
 
-    const { title, description, location, time, category, age, date } = req.body;
+    const { title, description, location, time, category, age, date, tags } = req.body;
     
     let thumbnail = null;
     if (req.file) {
       thumbnail = req.file.buffer;
     }
+
+    // let tags = "hahaha tags here";
 
     const event = await Event.create({
       thumbnail,
@@ -59,7 +61,8 @@ exports.createEvent = async (req, res) => {
       time, 
       category: 1, 
       age: 1, 
-      date
+      date,
+      tags
     });
 
     res.status(201).json({ success: true, data: event, id: event.id });

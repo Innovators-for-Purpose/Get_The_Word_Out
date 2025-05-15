@@ -4,11 +4,24 @@ body, html {
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
+    background: rgba(255, 255, 255, 0.8);
+   
+
+}
+
+
+.navLogo {
+    font-size: 25px;
+    font-weight: 700;
+    padding-inline: 10px;
+
+}
+
+
+.navLogo a {
+    text-decoration: none !important;
+    color: black;
+    
 }
 
 body::before {
