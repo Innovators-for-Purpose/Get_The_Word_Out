@@ -12,15 +12,50 @@ app.set("views", "./views");
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use("/events/", eventRoutes);
-app.use("/login",userRoutes);
+app.use("/login", userRoutes);
+app.use("/signup", userRoutes);
 
-app.get("/", (rew, res) => {
-  res.render("index");
+
+// app.get("/", (req, res) => {
+//   res.render("login", {link_name: "/login"}, );
+// });
+
+app.get("/reset", (req, res) => {
+  res.render("reset");
 });
+
+app.get("/signup-page", (req, res) => {
+   res.render("signup");
+});
+
+app.get("/login-page", (req, res) => {
+  res.render("login");
+});
+app.get("/create-an-event", (req, res) => {
+  res.render("create-an-event");
+})
+
+
+app.get("/", (req, res) => {
+  res.render("index", {link_name: "/events"}, );
+});
+
+
+// app.get("/ajax", (req, res) => {
+//   console.log("Made it!")
+// });
 
 app.get("/Create", (req, res) => {
   res.render("event");
 });
+app.get("/Edit",(req, res) => {
+  res.render("event");
+});
+
+app.get("/autofill", (req, res) =>{
+  res.render("autofill")
+})
+
 
 app.listen(3000, () => {
   console.log("Server started on port 3000");
@@ -34,12 +69,11 @@ app.listen(3000, () => {
   }
 })();
 
+
+
 app.get('*', (_, res) => {
   res.status(404).send("Error 404; page not found")
 }); // Page not found error redirect
-
-
-
 
 
 

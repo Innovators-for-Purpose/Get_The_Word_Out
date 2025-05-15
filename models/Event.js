@@ -8,6 +8,15 @@ const sequelize = require("../setup.js");
       primaryKey: true,
       autoIncrement: true,
     },
+    thumbnail: {
+      type: DataTypes.BLOB,
+      allowNull: true,
+      get() {
+        const data = this.getDataValue('thumbnail');
+        return data ? `data:image/jpeg;base64,${data.toString('base64')}` : null;
+      }
+    },
+
     title: {
       type: DataTypes.STRING,
       allowNull: false,

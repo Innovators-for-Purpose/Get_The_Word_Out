@@ -3,68 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://use.typekit.net/mev6qqe.css">
-    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/createevents.css">
 </head>
 <body>
-    <div class="bg"></div>
+
+    <div class="container">
+
+        <div class="navLogo">
+            <p>GT<span class="word">W</span>O</p>
+        </div>
+
     <div id="form">
+
+        <form id="eventForm">
         <h1 id="currentPageTitle">Create An Event</h1>
         <div class="formBox">
-            <h4>Autofill with AI</h4>
-            <button id="button" class="uploadFileButton">Upload File</button>
+            <h4>Upload thumbnail of event</h4>
+            <!-- <button id="button" class="uploadFileButton">Browse File</button> -->
+             <div class="thumbnail-file">
+                <input type="file" name="thumbnail" id="thumbnail-file">
+             </div>
+
             <h5>(Upload a picture of the event on the community bulletin board)</h5>
-            <form id="eventForm">
+            <div class="sects">
                 <label for="eventTitle">Event Title *</label><br>
-                <textarea name="title" id="eventTitle" required></textarea><br>
+                <input name="title" id="eventTitle" class="textareas" value="a" required></input><br>
+            </div>
+
+            <div class="sects">
                 <label for="Description">Event Description *</label><br>
-                <textarea name="description" id="Description" required></textarea><br>
-                <label for="Date">Date *</label><br>
-                <input type="date" name="date" id="Date" required>
-                <label for="Time" class="timeLabel">Time *</label></br>
-                <input type="time" name="time" id="Time" required>
-                <label for="Location" class="locationLabel">Location *</label><br>
-                <textarea name="location" id="Location" required></textarea><br>
-                <label for="Age" class="ageRange">Age Range *</label><br>
-                <select name="age" id="Age">
-                    <option value="1"></option>
-                    <option value="2">age 5-10</option>
-                    <option value="3">age 10-15</option>
-                    <option value="4">age 15-18</option>
-                    <option value="5">age 18-30</option>
-                </select><br><br>
-                <label for="Category">Category *</label><br>
-                <select name="category" id="Category">
-                    <option value="0"></option>
-                    <option value="1">Category 1</option>
-                    <option value="2">Category 2</option>
-                    <option value="3">Category 3</option>
-                    <option value="4">Category 4</option>
-                </select><br>
-                <button type="submit" id="button" class="createEvent">Create Event</button>
+                <textarea name="description" id="Description" required>a</textarea><br>
+            </div>
+
+            <div class="tags">
+                <label for="Tags" class="tags">Tags</label>
+                <input name="tags" id="tags" class="textareas" value="a" required></input><br>
+            </div>
+
+            <div class="location-div">
+                <label for="Location" class="locationLabel">Location</label><br>
+                <input name="location" id="Location" class="textareas" value="a"
+                       required></input><br>
+            </div>
+
+            
+
+            <div class="times">
+
+                <div class="event-date">
+                    <label for="Date">Date</label><br>
+                    <input type="date" name="date" id="Date" required value="2025-01-16">
+                </div>
+
+                <div class="time-start">
+                    <label for="Time" class="timeLabel">Time Start</label></br>
+                    <input type="time" name="time" id="t-start" required value="17:10">
+                </div>
+
+                <div class="time-end">
+                    <label for="Time" class="timeLabel">Time End</label></br>
+                    <input type="time" name="time" id="t-end" required value="17:10">
+                </div>
+
+                
+            </div>
+                <button type="button" id="previewButton" class="createEvent">Continue</button>
             </form>
         </div>
     </div>
+
+
+
+    </div>
+
+    
+    <!-- <div id="form">
+        
+        <div class="hah">
+            <p>GT<span class="word">W</span>O</p>
+        </div>
+        
+
+        <form id="eventForm">
+        <h1 id="currentPageTitle">Create An Event</h1>
+        <div class="formBox">
+            <h4>Upload thumbnail of event</h4>
+             <div class="thumbnail-file">
+                <input type="file" name="thumbnail" id="thumbnail-file">
+             </div>
+
+            <h5>(Upload a picture of the event on the community bulletin board)</h5>
+            <div class="sects">
+                <label for="eventTitle">Event Title *</label><br>
+                <input name="title" id="eventTitle" class="textareas" value="a" required></input><br>
+            </div>
+
+            <div class="sects">
+                <label for="Description">Event Description *</label><br>
+                <textarea name="description" id="Description" required>a</textarea><br>
+            </div>
+
+            <div class="tags">
+                <label for="Tags" class="tags">Tags</label>
+                <input name="tags" id="tags" class="textareas" value="a" required></input><br>
+            </div>
+
+            <div class="location-div">
+                <label for="Location" class="locationLabel">Location</label><br>
+                <input name="location" id="Location" class="textareas" value="a" required></input><br>
+            </div>
+
+            
+
+            <div class="times">
+
+                <div class="event-date">
+                    <label for="Date">Date</label><br>
+                    <input type="date" name="date" id="Date" required value="2025-01-16">
+                </div>
+
+                <div class="time-start">
+                    <label for="Time" class="timeLabel">Time Start</label></br>
+                    <input type="time" name="time" id="t-start" required value="17:10">
+                </div>
+
+                <div class="time-end">
+                    <label for="Time" class="timeLabel">Time End</label></br>
+                    <input type="time" name="time" id="t-end" required value="17:10">
+                </div>
+
+                
+            </div>
+                <button type="button" id="previewButton" class="createEvent">Continue</button>
+            </form>
+        </div>
+    </div> -->
+
+
+
+    <div id="previewModal">
+        <div class="preview-modal-content">
+            <h2>Preview Your Event</h2>
+            <div id="previewContent">
+                <!-- Image will be added here dynamically by JavaScript -->
+            </div>
+            <div class="preview-actions">
+                <button id="editBtn">Edit</button>
+                <button id="confirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
     <script>
-        document.getElementById("eventForm").addEventListener("submit", async function(event) {
+
+
+        const form = document.getElementById('eventForm');
+        const previewButton = document.getElementById('previewButton');
+        const previewModal = document.getElementById('previewModal');
+        const previewContent = document.getElementById('previewContent');
+        const editBtn = document.getElementById('editBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+
+    
+        // const ageRangeMap = {
+        //     '1': 'Not Selected',
+        //     '2': 'age 5-10',
+        //     '3': 'age 10-15', 
+        //     '4': 'age 15-18',
+        //     '5': 'age 18-30'
+        // };
+
+        // const categoryMap = {
+        //     '0': 'Not Selected',
+        //     '1': 'Category 1',
+        //     '2': 'Category 2', 
+        //     '3': 'Category 3',
+        //     '4': 'Category 4'
+        // };
+
+    
+        previewButton.addEventListener('click', (event) => {
             event.preventDefault();
-            const formData = new FormData(event.target);
-            const formObject = {};
-            formData.forEach((value, key) => { formObject[key] = value; });
-            const response = await fetch("/events/eventForm", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formObject),
-            });
-            const result = await response.json();
-            if (result.success) {
-                console.log("Event created successfully:", result.data);
-                window.location.href = "/events";
+  
+            if (form.checkValidity()) {
+                previewContent.innerHTML = "";
+                
+                // Add image preview if file is selected
+                const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
+                if (thumbnailFile) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(thumbnailFile);
+                    img.style.maxWidth = '200px'; // Optional: control preview size
+                    previewContent.appendChild(img);
+                }
+              
+                const previewFields = [
+                    { label: 'Event Title', value: document.getElementsByName('title')[0].value },
+                    { label: 'Event Description', value: document.getElementsByName('description')[0].value },
+                    { label: 'Date', value: document.getElementsByName('date')[0].value },
+                    { label: 'Time', value: document.getElementsByName('time')[0].value },
+                    { label: 'Location', value: document.getElementsByName('location')[0].value },
+                    // { 
+                    //     label: 'Age Range', 
+                    //     value: ageRangeMap[document.getElementsByName('age')[0].value] 
+                    // },
+                    // { 
+                    //     label: 'Category', 
+                    //     value: categoryMap[document.getElementsByName('category')[0].value] 
+                    // }
+                ]; 
+
+                if ("0" in document.getElementsByName('thumbnail')[0].files){
+                    previewFields.push({
+                        label: 'Event Thumbnail',
+                        image: document.getElementsByName('thumbnail')[0].files[0],
+                        value: document.getElementsByName('thumbnail')[0].files[0].name,
+                        size: document.getElementsByName('thumbnail')[0].files[0].size,
+                        type: document.getElementsByName('thumbnail')[0].files[0].type
+                    })
+                }
+                console.log(previewFields);
+            
+                previewFields.forEach(field => {
+                    const previewItem = document.createElement('div');
+                
+                    previewItem.classList.add('preview-item');
+                    previewItem.innerHTML = `
+                        <strong>${field.label}:</strong>
+                        <span>${field.value}</span>
+                    `;
+                    previewContent.appendChild(previewItem);
+                });
+
+                previewModal.style.display = 'block';
             } else {
-                console.error("Error creating event:", result.error);
+                form.reportValidity();
             }
         });
+
+       
+        editBtn.addEventListener('click', () => {
+            previewModal.style.display = 'none';
+        });
+
+        confirmBtn.addEventListener('click', async () => {
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch("/events/eventForm", {
+                    method: "POST",
+                    body: formData,
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log("Event created successfully:", result.data);
+                    window.location.href = `/events/event/${result.id}`;
+                } else {
+                    console.error("Error creating event:", result.error);
+                    alert("Failed to create event. Please try again.");
+                }
+            } catch (error) {
+                console.error("Submission error:", error);
+                alert("An error occurred while submitting the event.");
+            }
+        });
+        
     </script>
 </body>
 </html>

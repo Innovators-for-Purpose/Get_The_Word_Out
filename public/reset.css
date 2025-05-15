@@ -1,0 +1,85 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Quicksand", system-ui;
+    background: url(images/bg.png);
+    background-size: cover;
+}
+
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.logo{
+    font-size: 20px;
+}
+
+span{
+    color: #5AA5FF;
+}
+
+.main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.resetHere{
+    background-color: rgb(255, 255, 255);
+    height: 100%;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    border: 2px solid #EAEAEC;
+    border-radius: 7px;
+}
+
+.resetHead{
+    font-size: 30px;
+    font-weight: 500;
+    margin: -2px;
+}
+
+.resetBottom input{
+    height: 35px;
+    width: 100%;
+    text-indent: 10px;
+    border: 2px solid #EAEAEC;
+    border-radius: 5px;
+    outline-color: #5AA5FF;
+}
+
+.resetBottom button{
+    height: 35px;
+    width: 102.5%;
+    background-color: #5AA5FF;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.fgPassword{
+    font-size: 14px;
+}
+
+.resetBottom{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.resetBottom a{
+    text-decoration: none;
+    color: #5AA5FF;
+}
+
