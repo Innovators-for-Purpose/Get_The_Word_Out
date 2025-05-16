@@ -1,12 +1,20 @@
 body, html {
     height: 100%;
     font-family: "Quicksand", system-ui;
+    
 }
 
 body {
     background: rgba(255, 255, 255, 0.8);
    
 
+}
+
+.bg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 
@@ -48,7 +56,7 @@ body::after {
     z-index: -1;
 }
 
-.navLogo {
+/* .navLogo {
     display: flex;
     position: fixed;
     z-index: 10px;
@@ -63,7 +71,7 @@ body::after {
     margin: -410px 650px 100px -570px;
     color: black;
    position:fixed;
-}
+} */
 
 .logo {
     font-size: 25px; /* Optional: Maintain visual consistency */
