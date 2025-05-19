@@ -52,9 +52,13 @@ app.get("/Edit",(req, res) => {
   res.render("event");
 });
 
+app.get("/edit", (req, res) => {
+  res.render("event");
+});
+
 app.get("/autofill", (req, res) =>{
   res.render("autofill")
-})
+});
 
 
 app.listen(3000, () => {
