@@ -169,7 +169,7 @@ h1 {
     background-color: rgba(0,0,0,0.5);
 }
 
-/*.preview-modal-content {
+.preview-modal-content {
     background-color: #fefefe;
     margin: 10% auto;
     padding: 20px;
@@ -205,4 +205,4 @@ h1 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-} */
+}
