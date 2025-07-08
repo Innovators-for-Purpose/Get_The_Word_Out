@@ -41,6 +41,14 @@ const sequelize = require("../setup.js");
       type: DataTypes.TIME,
       allowNull: false,
     },
+    startTime: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    endTime: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },    
     category: {
       type: DataTypes.ENUM('STEAM','Music','Art','Entertainment','Technology','Other'),
       allowNull: false,

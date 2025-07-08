@@ -42,7 +42,7 @@ exports.singleEvent = async (req, res) => {
 exports.createEvent = async (req, res) => {
   try {
 
-    const { title, description, location, time, category, age, date, tags } = req.body;
+    const { title, description, location, category, age, date, tags, startTime, endTime } = req.body;
     
     let thumbnail = null;
     if (req.file) {
@@ -58,12 +58,14 @@ exports.createEvent = async (req, res) => {
       description, 
       location, 
       venue: "venue", 
-      time, 
       category: 1, 
       age: 1, 
       date,
-      tags
+      tags,
+      startTime,
+      endTime
     });
+    
 
     res.status(201).json({ success: true, data: event, id: event.id });
 

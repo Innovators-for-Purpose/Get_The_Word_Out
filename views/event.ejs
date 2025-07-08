@@ -78,12 +78,12 @@
 
                 <div class="time-start">
                     <label for="Time" class="timeLabel">Time Start</label></br>
-                    <input type="time" name="time" id="t-start" required value="17:10">
+                    <input type="time" name="startTime" id="t-start" required value="17:10">
                 </div>
 
                 <div class="time-end">
                     <label for="Time" class="timeLabel">Time End</label></br>
-                    <input type="time" name="time" id="t-end" required value="17:10">
+                    <input type="time" name="endTime" id="t-end" required value="18:10">
                 </div>
 
                 
@@ -184,7 +184,7 @@
     const closePreview = document.getElementById('close-preview');
 
 
-
+        
 
 
 
@@ -228,94 +228,90 @@
           //show popup
     
           previewButton.addEventListener('click', (event) => {
-            event.preventDefault();
-  
-            if (eventForm.checkValidity()) {
-                previewContent.innerHTML = "";
-                
-                // Add image preview if file is selected
-                const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
-                if (thumbnailFile) {
-                    const img = document.createElement('img');
-                    img.src = URL.createObjectURL(thumbnailFile);
-                    img.style.maxWidth = '200px'; // Optional: control preview size
-                    previewContent.appendChild(img);
-                }
-              
-                const previewFields = [
-                    { label: 'Event Title', value: document.getElementsByName('title')[0].value },
-                    { label: 'Event Description', value: document.getElementsByName('description')[0].value },
-                    { label: 'Date', value: document.getElementsByName('date')[0].value },
-                    { label: 'Time', value: document.getElementsByName('time')[0].value },
-                    { label: 'Location', value: document.getElementsByName('location')[0].value },
-                    { label: 'Tags', value: document.getElementsByName('tags')[0].value },
-                    // { 
-                    //     label: 'Age Range', 
-                    //     value: ageRangeMap[document.getElementsByName('age')[0].value] 
-                    // },
-                    // { 
-                    //     label: 'Category', 
-                    //     value: categoryMap[document.getElementsByName('category')[0].value] 
-                    // }
-                ]; 
+    event.preventDefault();
 
-                if ("0" in document.getElementsByName('thumbnail')[0].files){
-                    previewFields.push({
-                        label: 'Event Thumbnail',
-                        image: document.getElementsByName('thumbnail')[0].files[0],
-                        value: document.getElementsByName('thumbnail')[0].files[0].name,
-                        size: document.getElementsByName('thumbnail')[0].files[0].size,
-                        type: document.getElementsByName('thumbnail')[0].files[0].type
-                    })
-                }
-                console.log(previewFields);
-            
-                previewFields.forEach(field => {
-                    const previewItem = document.createElement('div');
-                
-                    previewItem.classList.add('preview-item');
-                    previewItem.innerHTML = `
-                        <strong>${field.label}:</strong>
-                        <span>${field.value}</span>
-                    `;
-                    previewContent.appendChild(previewItem);
-                });
+    if (eventForm.checkValidity()) {
+        previewContent.innerHTML = "";
 
-                previewModal.style.display = 'block';
+        const previewFields = [
+            { label: 'Event Title', value: document.getElementsByName('title')[0].value },
+            { label: 'Event Description', value: document.getElementsByName('description')[0].value },
+            { label: 'Date', value: document.getElementsByName('date')[0].value },
+            { label: 'Time Start', value: document.getElementsByName('startTime')[0].value },
+            { label: 'Time End', value: document.getElementsByName('endTime')[0].value },
+            { label: 'Location', value: document.getElementsByName('location')[0].value },
+            { label: 'Tags', value: document.getElementsByName('tags')[0].value }
+        ];
 
-            } else {
-               eventForm.reportValidity();
-            }
+        // Add image preview if file is selected
+        const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
+        if (thumbnailFile) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(thumbnailFile);
+            img.style.maxWidth = '200px';
+            previewContent.appendChild(img);
+
+            previewFields.push({
+                label: 'Event Thumbnail',
+                value: thumbnailFile // This will now be correctly shown as .name
             });
+        }
 
        
-        editBtn.addEventListener('click', () => {
-            previewModal.style.display = 'none';
+        previewFields.forEach(function(field) {
+            const previewItem = document.createElement('div');
+            previewItem.classList.add('preview-item');
+
+            let displayValue = "";
+
+            if (field.label === "Event Thumbnail" && typeof field.value === "string") {
+                displayValue = field.value;
+            } else if (typeof field.value === "object" && field.value !== null && "name" in field.value) {
+                displayValue = field.value.name;
+            } else {
+                displayValue = field.value;
+            }
+
+            previewItem.innerHTML = `
+                <strong>${field.label}:</strong>
+                <span>${displayValue}</span>
+            `;
+            previewContent.appendChild(previewItem);
         });
 
-        confirmBtn.addEventListener('click', async () => {
-            const formData = new FormData(eventForm);
-            
-           try  {
-                const response = await fetch("/events/eventForm", {
-                    method: "POST",
-                    body: formData,
-                });
-                const result = await response.json();
-                
-                if (result.success) {
-                    console.log("Event created successfully:", result.data);
-                    window.location.href = `/events/event/${result.id}`;
-                } else {
-                    console.error("Error creating event:", result.error);
-                    alert("Failed to create event. Please try again.");
-                }
-            } catch (error) {
-                console.error("Submission error:", error);
-                alert("An error occurred while submitting the event.");
-            }
-        });
         
-    </script>
+        previewModal.style.display = 'block'; 
+    } else {
+        eventForm.reportValidity();
+    }
+            }); 
+
+            editBtn.addEventListener('click', () => {
+                previewModal.style.display = 'none';
+            });
+
+            confirmBtn.addEventListener('click', async () => {
+                const formData = new FormData(eventForm);
+
+                try {
+                    const response = await fetch("/events/eventForm", {
+                        method: "POST",
+                        body: formData,
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        console.log("Event created successfully:", result.data);
+                        window.location.href = `/events/event/${result.id}`;
+                    } else {
+                        console.error("Error creating event:", result.error);
+                        alert("Failed to create event. Please try again.");
+                    }
+                } catch (error) {
+                    console.error("Submission error:", error);
+                    alert("An error occurred while submitting the event.");
+                }
+            });
+</script>
 </body>
 </html>
