@@ -10,57 +10,63 @@ const gemini_model_vision = vertex_ai.getGenerativeModel({
 });
 
 
+
+
 async function getEventInfoFromGeminiVision(imageBuffer) {
-  const base64Image = imageBuffer.toString('base64');
-  const mimeType = 'image/jpeg'; // Assuming input is always JPEG, adjust if you handle other types
-
-  const prompt = `
-    You are an AI assistant designed to extract event details from an image of an event poster.
-    Identify the event's title, description, location (city, state, zip if available), venue, date, start time, end time, category, age suitability, and relevant tags.
-
-    If a field is not explicitly found, try to infer it based on context or leave it as null.
-    For date, provide in YYYY-MM-DD format (e.g., 2025-07-08).
-    For time, provide in HH:MM (24-hour) format (e.g., 18:00).
-    If multiple dates/times are mentioned, choose the primary event date/time.
-    For category, use broad terms like 'Music', 'Sports', 'Art', 'Food & Drink', 'Community', 'Education', 'Technology', 'Outdoor', 'Other'.
-    For age, use categories like 'All Ages', '18+', '21+', 'Family-Friendly', 'Kids', 'Teens', 'Adults'.
-    For tags, provide relevant keywords separated by commas (e.g., "concert, live music, rock").
-
-    Return the information strictly in a JSON format. Example:
-    {
-        "title": "Summer Music Festival",
-        "description": "A vibrant outdoor music festival featuring local bands and food vendors.",
-        "location": { "city": "Boston", "state": "MA", "zip": "02110" },
-        "venue": "Waterfront Park",
-        "date": "2025-08-15",
-        "startTime": "14:00",
-        "endTime": "22:00",
-        "category": "Music",
-        "age": "All Ages",
-        "tags": "festival, outdoor, music, summer"
-    }
-    `;
-
-  const request = {
-    contents: [
-      { role: 'user', parts: [
-          { text: prompt }, // DIRECTLY CONSTRUCTED TEXT PART
-          { inlineData: { mimeType: mimeType, data: base64Image } } // DIRECTLY CONSTRUCTED IMAGE PART
-        ]},
-    ],
-  };
-
   try {
-    const resp = await gemini_model_vision.generateContent(request);
-    let jsonString = resp.candidates[0].content.parts[0].text.trim();
-    if (jsonString.startsWith("```json")) jsonString = jsonString.substring("```json".length).trim();
-    if (jsonString.endsWith("```")) jsonString = jsonString.substring(0, jsonString.length - "```".length).trim();
-    return JSON.parse(jsonString);
-  } catch (error) {
-    console.error("Gemini Vision API or JSON parsing error:", error.message, error.response?.text || '');
-    return { error: "Failed to get AI response or parse JSON", raw_response: error.response?.text || error.message };
+
+    const base64Image = imageBuffer.toString('base64');
+    console.log("Base64 Image length:", base64Image.length);
+    console.log("Base64 Image start (first 50 chars):", base64Image.substring(0, 50));
+    const mimeType = 'image/jpeg';
+
+
+    const prompt = 'You are an AI assistant designed to extract event details from an image of an event poster. Identify the event\'s title, description, location (city, state, zip if available), venue, date, start time, and end time. If a field is not explicitly found, try to infer it based on context or leave it as null. For date, provide in YYYY-MM-DD format (e.g., 2023-07-08). For time, provide in HH:MM (24-hour) format (e.g., 18:00). If multiple dates/times are mentioned, choose the primary event date/time. For category, use broad terms like \'Music\', \'Sports\', \'Art\', \'Food & Drink\', \'Community\', \'Education\', \'Technology\' For age, use categories like \'All Ages\', \'18+\', \'21+\', \'Family-Friendly\', \'Kids\', \'Teens\', \'Adults\'.';
+
+    const modelParams = {
+      contents: [{
+        role: 'user',
+        parts: [
+          { inlineData: { mimeType: mimeType, data: base64Image } },
+          { text: prompt }
+        ],
+      }],
+    };
+
+    console.log("Sending image to Gemini Pro Vision for analysis...");
+
+
+    const result = await gemini_model_vision.generateContent(modelParams);
+
+
+    console.log("Gemini Vision raw successful response:", JSON.stringify(result.response, null, 2));
+
+
+    const responseText = result.response.candidates[0].content.parts[0].text;
+    console.log("AI extracted event data:", responseText);
+
+
+    let parsedData = {};
+    try {
+      parsedData = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Error parsing AI response text as JSON:", parseError.message);
+      console.error("Raw AI response text that failed to parse:", responseText);
+      throw new Error("AI response was not valid JSON after extraction.");
+    }
+
+    return parsedData;
+
+  }  catch (error) {
+
+  console.error('Full Gemini Vision API Error Object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+
+
+
+    throw new Error('Failed to get AI response or parse JSON');
   }
 }
+
 
 exports.getALLEvents = async (req, res) => {
   try {
