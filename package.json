@@ -1,12 +1,16 @@
 {
   "dependencies": {
+    "@google-cloud/vertexai": "^1.10.0",
+    "dotenv": "^17.2.0",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "gyp": "^0.5.0",
     "multer": "^2.0.1",
     "mysql2": "^3.11.0",
+    "node-fetch": "^3.3.2",
     "node-gyp": "^10.2.0",
     "nodemon": "^3.1.9",
+    "openai": "^5.8.3",
     "prebuild-install": "^7.1.2",
     "python": "^0.0.4",
     "sequelize": "^6.37.3",
@@ -32,6 +36,7 @@
   },
   "homepage": "https://github.com/Innovators-for-Purpose/Library_Helper-Events#readme",
   "devDependencies": {
+    "@types/node": "^24.0.11",
     "sequelize-cli": "^6.6.2"
   }
 }

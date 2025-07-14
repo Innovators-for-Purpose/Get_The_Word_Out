@@ -37,10 +37,6 @@ const sequelize = require("../setup.js");
       type: DataTypes.STRING,
       allowNull: false,
     },
-    time: {
-      type: DataTypes.TIME,
-      allowNull: false,
-    },
     startTime: {
       type: DataTypes.STRING,
       allowNull: false
