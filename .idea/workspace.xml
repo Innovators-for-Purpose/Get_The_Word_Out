@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="344842c3-7d5f-4d8e-b59e-f18c7d7132bd" name="Changes" comment="gedion is on new edit">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controller/eventController.js" beforeDir="false" afterPath="$PROJECT_DIR$/controller/eventController.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -101,7 +99,7 @@
       <workItem from="1741896305564" duration="59245000" />
       <workItem from="1746477729040" duration="8172000" />
       <workItem from="1752504692284" duration="3304000" />
-      <workItem from="1752509576510" duration="2902000" />
+      <workItem from="1752509576510" duration="14376000" />
     </task>
     <task id="LOCAL-00001" summary="gedion is on">
       <option name="closed" value="true" />
@@ -167,7 +165,23 @@
       <option name="project" value="LOCAL" />
       <updated>1752503011207</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="gedion is on new edit">
+      <option name="closed" value="true" />
+      <created>1752516875087</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1752516875087</updated>
+    </task>
+    <task id="LOCAL-00010" summary="gedion is on new edit">
+      <option name="closed" value="true" />
+      <created>1752601446157</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1752601446157</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
