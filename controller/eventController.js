@@ -1,7 +1,7 @@
 const Event = require("../models/Event.js");
 const { VertexAI } = require('@google-cloud/vertexai');
 
-const project = 'autofill-466017';
+const project = 'gen-lang-client-0981002154';
 const location = 'us-central-1';
 
 const vertex_ai = new VertexAI({ project: project, location: location });
