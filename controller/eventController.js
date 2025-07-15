@@ -1,16 +1,6 @@
 const Event = require("../models/Event.js");
-const { VertexAI } = require('@google-cloud/vertexai');
-
-const project = 'gen-lang-client-0981002154';
-const location = 'us-central-1';
-
-const vertex_ai = new VertexAI({ project: project, location: location });
-const gemini_model_vision = vertex_ai.getGenerativeModel({
-  model: 'gemini-pro-vision',
-});
-
-
-
+const { GoogleGenAI } =require("@google/genai");
+const ai = new GoogleGenAI({ apiKey: "" });
 
 async function getEventInfoFromGeminiVision(imageBuffer) {
   try {
@@ -23,7 +13,10 @@ async function getEventInfoFromGeminiVision(imageBuffer) {
 
     const prompt = 'You are an AI assistant designed to extract event details from an image of an event poster. Identify the event\'s title, description, location (city, state, zip if available), venue, date, start time, and end time. If a field is not explicitly found, try to infer it based on context or leave it as null. For date, provide in YYYY-MM-DD format (e.g., 2023-07-08). For time, provide in HH:MM (24-hour) format (e.g., 18:00). If multiple dates/times are mentioned, choose the primary event date/time. For category, use broad terms like \'Music\', \'Sports\', \'Art\', \'Food & Drink\', \'Community\', \'Education\', \'Technology\' For age, use categories like \'All Ages\', \'18+\', \'21+\', \'Family-Friendly\', \'Kids\', \'Teens\', \'Adults\'.';
 
-    const modelParams = {
+    console.log("Sending image to Gemini 2.5 Flash for analysis...");
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
       contents: [{
         role: 'user',
         parts: [
@@ -31,37 +24,23 @@ async function getEventInfoFromGeminiVision(imageBuffer) {
           { text: prompt }
         ],
       }],
-    };
+    });
 
-    console.log("Sending image to Gemini Pro Vision for analysis...");
-
-
-    const result = await gemini_model_vision.generateContent(modelParams);
-
-
-    console.log("Gemini Vision raw successful response:", JSON.stringify(result.response, null, 2));
-
-
-    const responseText = result.response.candidates[0].content.parts[0].text;
-    console.log("AI extracted event data:", responseText);
-
+    console.log("AI extracted event data:", response.text);
 
     let parsedData = {};
     try {
-      parsedData = JSON.parse(responseText);
+      parsedData = JSON.parse(response.text);
     } catch (parseError) {
       console.error("Error parsing AI response text as JSON:", parseError.message);
-      console.error("Raw AI response text that failed to parse:", responseText);
       throw new Error("AI response was not valid JSON after extraction.");
     }
 
     return parsedData;
 
-  }  catch (error) {
+  } catch (error) {
 
-  console.error('Full Gemini Vision API Error Object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
-
-
+    console.error('Full Gemini API Error Object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
 
     throw new Error('Failed to get AI response or parse JSON');
   }
