@@ -1,13 +1,21 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const eventController = require("../controller/eventController.js");
-const upload = require('../config/multerConfig');
+const eventController = require('../controller/eventController');
+const multer = require('multer');
 
-router.get("/", eventController.getALLEvents);
-router.post("/event",eventController.singleEvent);
-router.post("/eventForm", upload.single('thumbnail'), eventController.createEvent);
-router.get("/event/:id", eventController.getEventDetails);
-router.get("/event/:id", eventController.getEventDetails);
-router.delete("/delete-event", eventController.deleteEvent)
+const upload = multer({ storage: multer.memoryStorage() });
+
+router.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] Event Router: ${req.method} ${req.url}`);
+    next();
+});
+
+router.post('/create', upload.single('thumbnail'), eventController.createEvent);
+
+router.get('/', eventController.getALLEvents);
+router.get('/:id', eventController.getEventDetails);
+router.post("/singleEvent", eventController.singleEvent);
+router.post("/event/:id", eventController.getEventDetails);
+router.delete("/delete-event", eventController.deleteEvent);
 
 module.exports = router;

@@ -1,4 +1,50 @@
 const Event = require("../models/Event.js");
+const { GoogleGenAI } =require("@google/genai");
+const ai = new GoogleGenAI({ apiKey: "" });
+
+async function getEventInfoFromGeminiVision(imageBuffer) {
+  try {
+
+    const base64Image = imageBuffer.toString('base64');
+    console.log("Base64 Image length:", base64Image.length);
+    console.log("Base64 Image start (first 50 chars):", base64Image.substring(0, 50));
+    const mimeType = 'image/jpeg';
+
+
+    const prompt = 'You are an AI assistant designed to extract event details from an image of an event poster. Identify the event\'s title, description, location (city, state, zip if available), venue, date, start time, and end time. If a field is not explicitly found, try to infer it based on context or leave it as null. For date, provide in YYYY-MM-DD format (e.g., 2023-07-08). For time, provide in HH:MM (24-hour) format (e.g., 18:00). If multiple dates/times are mentioned, choose the primary event date/time. For category, use broad terms like \'Music\', \'Sports\', \'Art\', \'Food & Drink\', \'Community\', \'Education\', \'Technology\' For age, use categories like \'All Ages\', \'18+\', \'21+\', \'Family-Friendly\', \'Kids\', \'Teens\', \'Adults\'.';
+
+    console.log("Sending image to Gemini 2.5 Flash for analysis...");
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{
+        role: 'user',
+        parts: [
+          { inlineData: { mimeType: mimeType, data: base64Image } },
+          { text: prompt }
+        ],
+      }],
+    });
+
+    console.log("AI extracted event data:", response.text);
+
+    let parsedData = {};
+    try {
+      parsedData = JSON.parse(response.text);
+    } catch (parseError) {
+      console.error("Error parsing AI response text as JSON:", parseError.message);
+      throw new Error("AI response was not valid JSON after extraction.");
+    }
+
+    return parsedData;
+
+  } catch (error) {
+
+    console.error('Full Gemini API Error Object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+
+    throw new Error('Failed to get AI response or parse JSON');
+  }
+}
 
 
 exports.getALLEvents = async (req, res) => {
@@ -10,7 +56,6 @@ exports.getALLEvents = async (req, res) => {
     res.status(500).json({ success: false, error: "Server Error" });
   }
 }
-
 
 exports.getEventDetails = async (req, res) => {
   try {
@@ -40,33 +85,80 @@ exports.singleEvent = async (req, res) => {
 };
 
 exports.createEvent = async (req, res) => {
-  try {
+  console.log("--- createEvent function started ---"); // LOG 1: Function entry
+  console.log("req.file status:", req.file ? "File exists" : "No file found"); // LOG 2: Check req.file directly
+  console.log("req.body content:", req.body); // LOG 3: Check req.body
 
-    const { title, description, location, time, category, age, date } = req.body;
-    
+  try { // Outer try-catch
+    const { title, description, location, category, age, date, tags, startTime, endTime } = req.body;
     let thumbnail = null;
-    if (req.file) {
-      thumbnail = req.file.buffer;
+    let aiEventData = {};
+
+    if (!req.file) {
+      console.log("No file uploaded. Returning 400.");
+      return res.status(400).json({ success: false, error: "No image provided for AI analysis. Please upload an image." });
     }
 
+    thumbnail = req.file.buffer;
+    console.log("Thumbnail buffer available. Size:", thumbnail.length, "bytes.");
+
+    try { // Inner try-catch for AI processing
+      console.log("Sending image to Gemini Pro Vision for analysis...");
+      aiEventData = await getEventInfoFromGeminiVision(thumbnail);
+      console.log("AI extracted event data:", aiEventData);
+
+      if (aiEventData.error) {
+        console.error("Gemini Vision returned an error (from AI data):", aiEventData.error);
+        return res.status(500).json({ success: false, error: "AI processing failed: " + aiEventData.error });
+      }
+
+    } catch (aiProcessingError) {
+      console.error("Caught error during AI processing (Gemini Vision API call):", aiProcessingError.message);
+      if (aiProcessingError.message.includes('Authentication') || aiProcessingError.message.includes('permission') || aiProcessingError.message.includes('forbidden')) {
+        console.error("HIGH SUSPICION: Authentication/Permission issue with Google Cloud credentials.");
+        console.error("Please verify GOOGLE_APPLICATION_CREDENTIALS environment variable and Service Account roles.");
+      }
+      return res.status(500).json({ success: false, error: "AI analysis failed unexpectedly: " + aiProcessingError.message });
+    }
+
+    const finalTitle = aiEventData.title || title;
+    const finalDescription = aiEventData.description || description;
+    const finalLocation = aiEventData.location && (aiEventData.location.city || aiEventData.location.state || aiEventData.location.zip)
+        ? `${aiEventData.location.city || ''}${aiExtractedEventData.location.state ? ', ' + aiExtractedEventData.location.state : ''}${aiExtractedEventData.location.zip ? ' ' + aiExtractedEventData.location.zip : ''}`.trim()
+        : (location || null);
+    const finalVenue = aiEventData.venue || null;
+    const finalCategory = aiEventData.category || category;
+    const finalAge = aiEventData.age || age;
+    const finalTags = aiEventData.tags || tags;
+
+    const finalDate = aiEventData.date ? new Date(aiEventData.date) : (date ? new Date(date) : null);
+    const finalStartTime = aiEventData.startTime ? new Date(`2000-01-01T${aiEventData.startTime}:00`) : (startTime ? new Date(`2000-01-01T${startTime}:00`) : null);
+    const finalEndTime = aiEventData.endTime ? new Date(`2000-01-01T${aiExtractedEventData.endTime}:00`) : (endTime ? new Date(`2000-01-01T${endTime}:00`) : null);
+
+    console.log("Attempting to create event in DB with final data.");
     const event = await Event.create({
       thumbnail,
-      title, 
+      title: finalTitle,
       uid: 1,
-      description, 
-      location, 
-      venue: "venue", 
-      time, 
-      category: 1, 
-      age: 1, 
-      date
+      description: finalDescription,
+      location: finalLocation,
+      venue: finalVenue,
+      category: finalCategory,
+      age: finalAge,
+      date: finalDate,
+      tags: finalTags,
+      startTime: finalStartTime,
+      endTime: finalEndTime
     });
+    console.log("Event created in DB successfully. ID:", event.id);
 
     res.status(201).json({ success: true, data: event, id: event.id });
 
-  } catch (error) {
-    console.error("Error creating event in controller:", error);
-    res.status(500).json({ success: false, error: "Server Error" });
+  } catch (outerError) {
+    console.error("--- FATAL ERROR IN createEvent function ---");
+    console.error("Error details:", outerError.message);
+    console.error("Error stack:", outerError.stack);
+    res.status(500).json({ success: false, error: "Server Error: " + outerError.message });
   }
 };
 
@@ -80,76 +172,3 @@ exports.deleteEvent = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
-/**exports.editEvent = async (req, res) => {
-  try {
-    const {id, title, thumbnail, vid, description, location, venue, time, catagory, age, date} = req.body;
-    previewButton.addEventListener('click', (event) => {
-      event.preventDefault();
-
-      const previewFields = [
-        {label: 'Event Title', value: document.getElementsByName('title')[0].value},
-        {label: 'Event Description', value: document.getElementsByName('description')[0].value},
-        {label: 'Date', value: document.getElementsByName('date')[0].value},
-        {label: 'Time', value: document.getElementsByName('time')[0].value},
-        {label: 'Location', value: document.getElementsByName('location')[0].value},
-      ];
-
-      if (form.checkValidity()) {
-        previewContent.innerHTML = "";
-
-        // Add image preview if file is selected
-        const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
-        if (thumbnailFile) {
-          const img = document.createElement('img');
-          img.src = URL.createObjectURL(thumbnailFile);
-          img.style.maxWidth = '200px'; // Optional: control preview size
-          previewContent.appendChild(img);
-        }
-
-
-        // {
-        //     label: 'Age Range',
-        //     value: ageRangeMap[document.getElementsByName('age')[0].value]
-        // },
-        // {
-        //     label: 'Category',
-        //     value: categoryMap[document.getElementsByName('category')[0].value]
-        // }
-        ;
-
-        if ("0" in document.getElementsByName('thumbnail')[0].files) {
-          previewFields.push({
-            label: 'Event Thumbnail',
-            image: document.getElementsByName('thumbnail')[0].files[0],
-            value: document.getElementsByName('thumbnail')[0].files[0].name,
-            size: document.getElementsByName('thumbnail')[0].files[0].size,
-            type: document.getElementsByName('thumbnail')[0].files[0].type
-          })
-        }
-        console.log(previewFields);
-
-        previewFields.forEach(field => {
-          const previewItem = document.createElement('div');
-
-          previewItem.classList.add('preview-item');
-          previewItem.innerHTML = `
-                        <strong>${field.label}:</strong>
-                        <span>${field.value}</span>
-                    `;
-          previewContent.appendChild(previewItem);
-        });
-
-        previewModal.style.display = 'block';
-      } else {
-        form.reportValidity();
-      }
-    });
-
-}
-*/
-
-
-
-
-
-

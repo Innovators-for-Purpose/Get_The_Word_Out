@@ -8,12 +8,6 @@ body, html {
 }
 
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .main{
     text-align: center;
     background: rgba(255, 255, 255, 0.8);
@@ -22,16 +16,13 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    
 }
 
 .navLogo{
-    display: flex;
-    margin: -325px 0px 160px 50px;
     font-size: 25px;
     font-weight: 700;
-    position: relative;
-
-
+   padding-inline: 10px;
 }
 
 
@@ -52,12 +43,54 @@ span{
 .create-an-event{
     display: flex;
     flex-direction: column;
-    background-color: white;
+    background-color: white  ;
     display: inline-block;
     width: 350px;
     padding-bottom: 30px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     border-radius: 10px;
+}
+
+.thumbAi{
+    order: none;  
+    outline: none;  
+    padding: 10px 20px;  
+    background-color: none ;  
+    color: rgb(115, 115, 115); 
+    font-size: 16px;  
+    border-radius: 8px; 
+    cursor: pointer; 
+   
+}
+
+.popup-overlay {
+    display: none; /* Hide by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it’s above other content */
+}
+
+/*.textbox {
+    width: 300px; 
+    padding: 10px;
+    margin-top: 100px;
+    margin-bottom: 200px;
+    border-radius: 4px;
+    border: 3px solid #2c2b2b;
+}*/
+
+.close {
+    font-size: 24px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
 }
 
 .fill-methods{

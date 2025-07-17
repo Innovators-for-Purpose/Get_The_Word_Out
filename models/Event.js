@@ -37,10 +37,14 @@ const sequelize = require("../setup.js");
       type: DataTypes.STRING,
       allowNull: false,
     },
-    time: {
-      type: DataTypes.TIME,
-      allowNull: false,
+    startTime: {
+      type: DataTypes.STRING,
+      allowNull: false
     },
+    endTime: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },    
     category: {
       type: DataTypes.ENUM('STEAM','Music','Art','Entertainment','Technology','Other'),
       allowNull: false,
@@ -52,13 +56,11 @@ const sequelize = require("../setup.js");
     date: {
       type: DataTypes.DATE,
       allowNull: false,
+    },
+    tags: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     }
   });
 
   module.exports = Event;
-
-
-
-
-
-
