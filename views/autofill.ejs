@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Autofill Event</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +43,7 @@
 
 <div id="previewModal">
     <div class="preview-modal-content">
-        <span class="close-button" onclick="document.getElementById('previewModal').style.display='none';">&times;</span>
+        <span class="next-button" onclick="document.getElementById('previewModal').style.display='none';">&times;</span>
         <h3>Preview Event Details</h3>
         <div id="previewContent">
         </div>
@@ -65,16 +65,16 @@
         const editBtn = document.getElementById('editBtn');
         const confirmBtn = document.getElementById('confirmBtn');
 
-        let aiExtractedEventData = {}; // Variable to hold AI data
+        let aiExtractedEventData = {};
 
-        // --- AI Autofill Logic (triggered by autofillButton) ---
+
         autofillButton.addEventListener('click', async (event) => {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
 
             const imageFile = thumbnailFileInput.files[0];
             if (!imageFile) {
                 alert("Please select an image file to autofill.");
-                return; // STOP EXECUTION HERE IF NO FILE
+                return;
             }
 
             const formData = new FormData();
@@ -84,7 +84,7 @@
             autofillButton.disabled = true;
 
             let aiErrorMessage = '';
-            aiExtractedEventData = {}; // Clear previous AI data
+            aiExtractedEventData = {};
 
             try {
                 const response = await fetch('/events/create', {
@@ -96,7 +96,7 @@
 
                 if (response.ok && result.success) {
                     console.log("AI extracted data:", result.data);
-                    aiExtractedEventData = result.data; // Store AI data
+                    aiExtractedEventData = result.data;
                     alert("Event fields auto-filled successfully! Review and click 'Confirm & Create'.");
                 } else {
                     console.error("Server responded with error during AI autofill:", result.error || "Unknown error");
@@ -109,19 +109,19 @@
                 aiErrorMessage = "Network error: " + error.message;
                 alert("An error occurred during AI autofill: " + aiErrorMessage + "\nPreview will show empty or incomplete fields.");
             } finally {
-                // Always reset button state
+
                 autofillButton.textContent = 'Autofill with AI';
                 autofillButton.disabled = false;
 
-                // --- NOW, POPULATE AND SHOW THE PREVIEW MODAL (AFTER ATTEMPT) ---
-                previewContent.innerHTML = ""; // Clear previous preview content
+
+                previewContent.innerHTML = "";
 
                 const previewFields = [
                     { label: 'Event Title', value: aiExtractedEventData.title || '' },
                     { label: 'Event Description', value: aiExtractedEventData.description || '' },
                     { label: 'Date', value: aiExtractedEventData.date ? new Date(aiExtractedEventData.date).toISOString().split('T')[0] : '' },
-                    { label: 'Time Start', value: aiExtractedEventData.startTime ? new Date(aiExtractedEventData.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '' },
-                    { label: 'Time End', value: aiExtractedEventData.endTime ? new Date(aiExtractedEventData.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '' },
+                    { label: 'Time Start', value: aiExtractedEventData.startTime || '' },
+                    { label: 'Time End', value: aiExtractedEventData.endTime || '' },
                     { label: 'Location', value: aiExtractedEventData.location || '' },
                     { label: 'Category', value: aiExtractedEventData.category || '' },
                     { label: 'Age Suitability', value: aiExtractedEventData.age || '' },
@@ -147,10 +147,9 @@
             }
         });
 
-        // --- Preview Modal Action Buttons ---
+
         editBtn.addEventListener('click', () => {
-            previewModal.style.display = 'none'; // Hide modal
-            // User would typically be redirected to a manual edit page here
+            previewModal.style.display = 'none';
             alert("To edit, please proceed to the 'Create An Event' page and fill fields manually, or try autofill again with a different image.");
         });
 
@@ -158,7 +157,7 @@
             previewModal.style.display = 'none'; // Hide modal
 
             const imageFile = thumbnailFileInput.files[0];
-            const finalFormData = new FormData();
+            const finalFormData = new FormData(eventForm);
 
             if (imageFile) {
                 finalFormData.append('thumbnail', imageFile);
@@ -171,37 +170,41 @@
                     finalFormData.append(key, aiExtractedEventData[key]);
                 }
             }
-            // Add hardcoded uid, venue, category, age as per your eventController.createEvent if needed
-            finalFormData.append('uid', '1'); // Example: Hardcoding uid
-            finalFormData.append('venue', 'venue'); // Example: Hardcoding venue
-            finalFormData.append('category', '1'); // Example: Hardcoding category
-            finalFormData.append('age', '1'); // Example: Hardcoding age
+            finalFormData.append('thumbnail');
+            finalFormData.append('description', aiExtractedEventData[key].description);
+            finalFormData.append('location', aiExtractedEventData.location);
+            finalFormData.append('uid', '1');
+            finalFormData.append('venue', 'venue');
+            finalFormData.append('category', aiExtractedEventData.category);
+            finalFormData.append('age', aiExtractedEventData.age);
+            finalFormData.append('tags', aiExtractedEventData);
+            finalFormData.append('startTime', aiExtractedEventData.startTime);
+            finalFormData.append('endTime', aiExtractedEventData.endTime);
+            finalFormData.append('date', aiExtractedEventData.date);
 
             try {
-                const response = await fetch('/events/create', {
+                const response = await fetch("/events/eventForm", {
                     method: 'POST',
-                    body: finalFormData,
+                    body: FormData,
                 });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
+                if (result.success) {
                     console.log("Event created successfully:", result.data);
-                    alert("Event created successfully!");
                     window.location.href = `/events/event/${result.id}`;
                 } else {
                     console.error("Error creating event:", result.error);
-                    alert("Failed to create event: " + (result.error || "Unknown error"));
+                    alert("Failed to create event. Please try again.");
                 }
+
+
             } catch (error) {
                 console.error("Final submission error:", error);
                 alert("An error occurred while submitting the event.");
             }
         });
 
-        const closeButton = document.querySelector('.close-button');
-        if (closeButton) {
-            closeButton.addEventListener('click', () => {
+        const nextButton = document.querySelector('.next-button');
+        if (nextButton) {
+            nextButton.addEventListener('click', () => {
                 previewModal.style.display = 'none';
             });
         }

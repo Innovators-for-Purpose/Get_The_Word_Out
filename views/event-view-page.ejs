@@ -24,7 +24,7 @@
                 </div>
 
                 <div class="event-flyer">
-                    <img src="<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
+                    <<img src="/images/<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
                 </div>
 
                 <div class="timeNdescription">
@@ -48,13 +48,13 @@
 
                                 <div class="time-related" style="line-height: 1px;">
                                     <div class="month-year">
-                                        <p class="time-date"><%= event.date.toLocaleString('default', {month: 'long'}) %></p>
-                                        <p class="time-date"><%= event.date.getDate() %></p>
-                                        <p class="time-date"><%= event.date.getFullYear() %></p>
+                                        <p class="time-date"><%= new Date(event.date).toLocaleString('default', {month: 'long'}) %></p>
+                                        <p class="time-date"><%= new Date(event.date).getDate() %></p>
+                                        <p class="time-date"><%= new Date(event.date).getFullYear() %></p>
                                     </div>
         
                                     <div class="time">
-                                        <p class="time-date"><%= event.startTime %> <%event.endTime %></p>
+                                        <p class="time-date"><%= event.startTime %> - <%= event.endTime %></p>
                                     </div>
                                 </div>
                                 
