@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../setup.js");
 
+
 const Event = sequelize.define('event', {
   id: {
     type: DataTypes.INTEGER,
@@ -8,7 +9,7 @@ const Event = sequelize.define('event', {
     autoIncrement: true,
   },
   thumbnail: {
-    type: DataTypes.STRING,
+    type: DataTypes.BLOB,
     allowNull: true,
 
   },

@@ -1,17 +1,11 @@
 const Event = require("../models/Event.js");
 const { GoogleGenAI } = require("@google/genai");
-const path = require('path');
-const fs = require('fs');
 
+const ai = new GoogleGenAI({ apiKey:"AIzaSyBrqrCbjVXIkSCXYnTRTXiNjRzwkaZT5Q8"});
 
-const ai = new GoogleGenAI({ apiKey: AIzaSyDR4s4yOiGvgJwPhv9ZHNjW3evu66yvwww });
-
-async function getEventInfoFromGeminiVision(imageBuffer,mimeType) {
+async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
   try {
     const base64Image = imageBuffer.toString('base64');
-    console.log("Base64 Image length:", base64Image.length);
-    console.log("Base64 Image start (first 50 chars):", base64Image.substring(0, 50));
-    //const mimeType = 'image/jpeg';
 
     const prompt = `
     You are an AI assistant designed to extract event details from an image of an event poster.
@@ -37,10 +31,9 @@ async function getEventInfoFromGeminiVision(imageBuffer,mimeType) {
     }
     `;
 
-    console.log("Sending image to Gemini for analysis...");
 
     const result = await ai.models.generateContent({
-      model: "gemini-1.5-flash", // Using gemini-1.5-flash as previously recommended for speed/cost
+      model: "gemini-2.5-flash",
       contents: [{
         role: 'user',
         parts: [
@@ -50,12 +43,21 @@ async function getEventInfoFromGeminiVision(imageBuffer,mimeType) {
       }],
     });
 
-    const aiResponseText = result.response.text();
+    // CRITICAL FIX: Directly access content from candidates array
+    let aiResponseText;
+    if (result && result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
+      aiResponseText = result.candidates[0].content.parts[0].text;
+    } else {
+      console.error("Gemini API response structure unexpected. Could not find text in candidates.");
+      console.error("Full Gemini API result object (unexpected structure):", JSON.stringify(result, null, 2));
+      throw new Error("Gemini API call failed: Unexpected response structure from model.");
+    }
+    // END CRITICAL FIX
+
     console.log("AI raw response text:", aiResponseText);
 
     let parsedData = {};
     try {
-      // Attempt to find and parse JSON within markdown fences
       const jsonStartIndex = aiResponseText.indexOf('```json');
       const jsonEndIndex = aiResponseText.lastIndexOf('```');
 
@@ -63,13 +65,11 @@ async function getEventInfoFromGeminiVision(imageBuffer,mimeType) {
         const jsonString = aiResponseText.substring(jsonStartIndex + '```json'.length, jsonEndIndex).trim();
         parsedData = JSON.parse(jsonString);
       } else {
-
         console.warn("AI response did not contain expected '```json' markdown block. Attempting direct JSON parse.");
         parsedData = JSON.parse(aiResponseText);
       }
     } catch (parseError) {
       console.error("Error parsing AI response text as JSON:", parseError.message);
-
       const cleanedText = aiResponseText.replace(/```json\n|\n```/g, '').trim();
       try {
         parsedData = JSON.parse(cleanedText);
@@ -82,68 +82,43 @@ async function getEventInfoFromGeminiVision(imageBuffer,mimeType) {
     return parsedData;
 
   } catch (error) {
-    console.error('Full Gemini API Error Object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    console.error('Full Gemini API Error Object (from catch block):', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     throw new Error('Failed to get AI response or parse JSON: ' + error.message);
   }
 }
-
-
-function parseEventDate(dateString) {
-  if (!dateString) {
-    return null;
-  }
-
-  const cleanedDateString = String(dateString) // Ensure it's a string
-      .trim()
-      .replace(/(\d+)(st|nd|rd|th)/g, '$1'); // e.g., "20th" -> "20"
-
-  let parsedDate = null;
-
-
-  if (cleanedDateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    parsedDate = new Date(cleanedDateString + 'T00:00:00');
-  }
-
-  else if (cleanedDateString.match(/^\d{2}-\d{2}$/)) {
-    const currentYear = new Date().getFullYear();
-    parsedDate = new Date(`${currentYear}-${cleanedDateString}T00:00:00`);
-  }
-
-  else {
-    try {
-      parsedDate = new Date(cleanedDateString);
-    } catch (e) {
-      console.warn(`Error trying to parse date string "${cleanedDateString}":`, e.message);
-      parsedDate = null;
-    }
-  }
-
-
-  if (parsedDate && !isNaN(parsedDate.getTime())) {
-    return parsedDate.toISOString().split('T')[0];
-  }
-
-  console.warn(`Failed to parse and format date string "${dateString}" (cleaned: "${cleanedDateString}") to YYYY-MM-DD.`);
-  return null;
-}
-
 
 exports.getAutofillPreview = async (req, res) => {
   console.log("--- getAutofillPreview function started ---");
   console.log("req.file status:", req.file ? "File exists (size: " + req.file.size + " bytes)" : "No file found");
 
   try {
-    if (!req.file || !req.file.buffer) { // Ensure buffer exists
+    if (!req.file || !req.file.buffer) {
       return res.status(400).json({ success: false, error: "No image file uploaded for autofill preview." });
     }
 
-    const thumbnailBuffer = req.file.buffer; // Get the image buffer for AI
+    const thumbnailBuffer = req.file.buffer;
+    const thumbnailMimeType = req.file.mimetype;
     console.log("Sending image to Gemini for analysis (for preview)...");
 
-    const aiData = await getEventInfoFromGeminiVision(thumbnailBuffer); // Perform AI analysis
+    const aiData = await getEventInfoFromGeminiVision(thumbnailBuffer , thumbnailMimeType);
     console.log("AI extracted data for preview (raw AI output):", aiData);
 
-    res.status(200).json({ success: true, data: aiData }); // Send AI data back to frontend
+    if (aiData.date) {
+      const parsedDate = new Date(aiData.date);
+      if (!isNaN(parsedDate.getTime())) {
+        aiData.date = parsedDate.toISOString().split('T')[0];
+      } else {
+        console.warn(`[getAutofillPreview] AI returned unparseable date: "${aiData.date}". Setting to null.`);
+        aiData.date = null;
+      }
+    } else {
+      aiData.date = null;
+    }
+
+    aiData.startTime = aiData.startTime || null;
+    aiData.endTime = aiData.endTime || null;
+
+    res.status(200).json({ success: true, data: aiData });
 
   } catch (error) {
     console.error("--- ERROR IN getAutofillPreview function ---");
@@ -153,99 +128,122 @@ exports.getAutofillPreview = async (req, res) => {
   }
 };
 
-
 exports.createEvent = async (req, res) => {
   console.log("--- createEvent function started ---");
   console.log("req.file status:", req.file ? "File exists (size: " + req.file.size + " bytes)" : "No file found");
   console.log("req.body content:", req.body);
 
-  let thumbnailFilename = null; // Initialize here
+  let thumbnailData = null;
 
   try {
-
-    if (req.file && req.file.buffer) { // Check if a file was uploaded and has content
-
-      const uniqueFilename = `${Date.now()}-${req.file.originalname}`;
-
-
-      const uploadDir = path.join(__dirname, '../public/images'); // <--- CORRECTED TO 'image'
-      const uploadPath = path.join(uploadDir, uniqueFilename);     // Full path including filename
-
-      // 3. Ensure the directory exists. Create it recursively if it doesn't.
-      fs.mkdirSync(uploadDir, { recursive: true });
-      console.log(`Ensured directory exists: ${uploadDir}`);
-
-      // 4. Manually save the buffer (file content) to disk
-      fs.writeFileSync(uploadPath, req.file.buffer);
-      console.log(`Thumbnail saved to: ${uploadPath}`);
-
-      // 5. Store this generated filename for the database
-      thumbnailFilename = uniqueFilename;
+    if (req.file && req.file.buffer) {
+      thumbnailData = req.file.buffer;
+      console.log("Thumbnail buffer received for DB storage.");
     }
-    // --- END: MANUAL FILE SAVING LOGIC ---
+    else{
+      console.log("No image file uploaded");
+    }
 
-    const { title, description, location, venue, category, age, date, tags, startTime, endTime, uid } = req.body;
+    const {
+      title,
+      description,
+      location,
+      venue,
+      category,
+      age,
+      date,
+      startTime,
+      endTime,
+      tags,
+      uid
+    } = req.body;
 
-    // --- Date Parsing: Corrected to handle Date object or null ---
+    const finalTitle = title || "Untitled Event";
+    const finalDescription = description || "No description provided.";
+    const finalVenue = venue || "To Be Determined";
+    const finalUid = uid || 1;
+
+    let finalLocation = "Unknown Location";
+    if (typeof location === 'object' && location !== null) {
+      if (location.city || location.state || location.zip) {
+        finalLocation = `${location.city || ''}${location.state ? ', ' + location.state : ''}${location.zip ? ' ' + location.zip : ''}`.trim();
+      }
+    } else if (location) {
+      finalLocation = location;
+    }
+
     let finalDate = null;
     if (date) {
       try {
-        const parsed = new Date(date); // Attempt to create Date object
-        if (!isNaN(parsed.getTime())) { // Check if it's a valid date
-          finalDate = parsed; // Store as Date object
+        const parsed = new Date(date);
+        if (!isNaN(parsed.getTime())) {
+          finalDate = parsed.toISOString().split('T')[0];
         } else {
-          console.warn(`[createEvent] Invalid date string received: "${date}". Storing as null.`);
+          console.warn(`[createEvent] Invalid date string received: "${date}". Defaulting to current date.`);
+          finalDate = new Date().toISOString().split('T')[0];
         }
       } catch (e) {
         console.error(`[createEvent] Error parsing date "${date}":`, e.message);
+        finalDate = new Date().toISOString().split('T')[0];
       }
+    } else {
+      console.warn(`[createEvent] Date not provided. Defaulting to current date.`);
+      finalDate = new Date().toISOString().split('T')[0];
     }
 
-    // Ensure values are null if not provided, for notNull violation handling
-    const finalStartTime = startTime || null;
-    const finalEndTime = endTime || null;
-    const finalUid = uid || 1;
-    const finalTitle = title || null; // Added for not null violation if title is required
-    const finalDescription = description || null; // Added for not null violation if description is required
-    const finalVenue = venue || null;
-    const finalCategory = category || null;
-    const finalAge = age || null; // Age can be null if not provided
-    const finalTags = (tags && Array.isArray(tags)) ? tags : (tags ? [tags] : null); // Ensure tags is an array or null
+    const finalStartTime = startTime || "00:00";
+    const finalEndTime = endTime || "23:59";
 
-    // Handle location, which might come as an object from AI or a string from manual input
-    const finalLocation = typeof location === 'object' && location !== null && (location.city || location.state || location.zip)
-        ? `${location.city || ''}${location.state ? ', ' + location.state : ''}${location.zip ? ' ' + location.zip : ''}`.trim()
-        : (location || null);
+    const categoryMap = {
+      "STEAM": "STEAM", "Music": "Music", "Art": "Art",
+      "Entertainment": "Entertainment", "Technology": "Technology",
+      "Conference": "Technology",
+      "Community Service": "Other"
+    };
+    const finalCategory = categoryMap[category] || "Other";
+
+    const ageMap = {
+      "Kids/1-7": "Kids/1-7", "Pre-teen/7-12": "Pre-teen/7-12", "Teen/13-17": "Teen/13-17",
+      "Young Adults/18-25": "Young Adults/18-25", "Adults/25-65": "Adults/25-65", "Senior/65+": "Senior/65+",
+      "All Ages": "Adults/25-65",
+      "18+": "Young Adults/18-25",
+      "N/A": "Adults/25-65"
+    };
+    const finalAge = ageMap[age] || "Adults/25-65";
+
+    const finalTags = (tags && Array.isArray(tags)) ? tags : (tags ? [tags] : null);
 
     console.log("Attempting to create event in DB with final data:");
     console.log({
-      thumbnail: thumbnailFilename, // THIS WILL NOW BE YOUR GENERATED FILENAME
+      thumbnail: thumbnailData ? 'BUFFER_EXISTS' : null,
       title: finalTitle,
       uid: finalUid,
       description: finalDescription,
       location: finalLocation,
       venue: finalVenue,
-      category: finalCategory,
-      age: finalAge,
-      date: finalDate, // Now a Date object or null
-      tags: finalTags, // Now an array or null
-      startTime: finalStartTime,
-      endTime: finalEndTime
-    });
-
-    const event = await Event.create({
-      thumbnail: thumbnailFilename,
-      title: finalTitle,
-      uid: finalUid,
-      description: finalDescription,
-      location: finalLocation,
-      venue: finalVenue,
+      time: finalStartTime,
       category: finalCategory,
       age: finalAge,
       date: finalDate,
       tags: finalTags,
       startTime: finalStartTime,
       endTime: finalEndTime
+    });
+
+    const event = await Event.create({
+      thumbnail: thumbnailData,
+      title: finalTitle,
+      uid: finalUid,
+      description: finalDescription,
+      location: finalLocation,
+      venue: finalVenue,
+      time: finalStartTime,
+      category: finalCategory,
+      age: finalAge,
+      date: finalDate,
+      tags: finalTags,
+      startTime: finalStartTime,
+      endTime: finalEndTime,
     });
 
     console.log("Event created in DB successfully. ID:", event.id);
@@ -256,19 +254,9 @@ exports.createEvent = async (req, res) => {
     console.error("--- FATAL ERROR IN createEvent function ---");
     console.error("Error details:", outerError.message);
     console.error("Error stack:", outerError.stack);
-
-    if (thumbnailFilename && fs.existsSync(path.join(__dirname, '../public/images', thumbnailFilename))) {
-      try {
-        fs.unlinkSync(path.join(__dirname, '../public/images', thumbnailFilename));
-        console.warn(`Cleaned up partially saved file: ${thumbnailFilename}`);
-      } catch (cleanupError) {
-        console.error(`Error cleaning up file ${thumbnailFilename}:`, cleanupError.message);
-      }
-    }
     res.status(500).json({ success: false, error: "Server Error: " + outerError.message });
   }
 };
-
 
 exports.getALLEvents = async (req, res) => {
   try {
@@ -278,7 +266,7 @@ exports.getALLEvents = async (req, res) => {
     console.error("Failed to fetch events:", error);
     res.status(500).json({ success: false, error: "Server Error" });
   }
-};
+}
 
 exports.getEventDetails = async (req, res) => {
   try {

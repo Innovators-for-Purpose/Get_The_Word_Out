@@ -20,11 +20,13 @@
     <div class="main-section">
         <div class="create-an-event">
             <div class="title">
+                <form id="eventForm" method="POST" action="/events/eventForm" enctype="multipart/form-data">
+
                 <p id="title-head">Autofill With AI</p>
                 <p id="title-desc">Upload a picture of the event on the community bulletin board.</p>
             </div>
 
-            <form id="autofillForm" action="/events/create" method="POST" enctype="multipart/form-data">
+
                 <div class="fill-methods">
                     <div class="method">
                         <label for="eventImageInput">Choose File</label>
@@ -43,7 +45,7 @@
 
 <div id="previewModal">
     <div class="preview-modal-content">
-        <span class="next-button" onclick="document.getElementById('previewModal').style.display='none';">&times;</span>
+        <span class="close-button" onclick="document.getElementById('previewModal').style.display='none';">&times;</span>
         <h3>Preview Event Details</h3>
         <div id="previewContent">
         </div>
@@ -67,7 +69,6 @@
 
         let aiExtractedEventData = {};
 
-
         autofillButton.addEventListener('click', async (event) => {
             event.preventDefault();
 
@@ -87,7 +88,8 @@
             aiExtractedEventData = {};
 
             try {
-                const response = await fetch('/events/create', {
+                // IMPORTANT: Change the fetch URL to your AI autofill endpoint
+                const response = await fetch('/events/autofill-preview', { // <-- CORRECTED URL
                     method: 'POST',
                     body: formData,
                 });
@@ -109,32 +111,41 @@
                 aiErrorMessage = "Network error: " + error.message;
                 alert("An error occurred during AI autofill: " + aiErrorMessage + "\nPreview will show empty or incomplete fields.");
             } finally {
-
                 autofillButton.textContent = 'Autofill with AI';
                 autofillButton.disabled = false;
 
+                previewContent.innerHTML = ""; // Clear previous content
 
-                previewContent.innerHTML = "";
-
-                const previewFields = [
-                    { label: 'Event Title', value: aiExtractedEventData.title || '' },
-                    { label: 'Event Description', value: aiExtractedEventData.description || '' },
-                    { label: 'Date', value: aiExtractedEventData.date ? new Date(aiExtractedEventData.date).toISOString().split('T')[0] : '' },
-                    { label: 'Time Start', value: aiExtractedEventData.startTime || '' },
-                    { label: 'Time End', value: aiExtractedEventData.endTime || '' },
-                    { label: 'Location', value: aiExtractedEventData.location || '' },
-                    { label: 'Category', value: aiExtractedEventData.category || '' },
-                    { label: 'Age Suitability', value: aiExtractedEventData.age || '' },
-                    { label: 'Tags', value: aiExtractedEventData.tags || '' }
-                ];
-
+                // Create and display the image in the preview
                 if (imageFile) {
                     const img = document.createElement('img');
                     img.src = URL.createObjectURL(imageFile);
                     img.style.maxWidth = '200px';
                     previewContent.appendChild(img);
-                    previewFields.unshift({ label: 'Event Thumbnail', value: imageFile.name });
                 }
+
+                // Prepare fields for display, including the image name
+                const previewFields = [
+                    { label: 'Event Thumbnail', value: imageFile ? imageFile.name : 'N/A' }, // Add thumbnail display
+                    { label: 'Event Title', value: aiExtractedEventData.title || '' },
+                    { label: 'Event Description', value: aiExtractedEventData.description || '' },
+                    { label: 'Date', value: aiExtractedEventData.date || '' }, // Date should already be YYYY-MM-DD from controller for display
+                    { label: 'Time Start', value: aiExtractedEventData.startTime || '' },
+                    { label: 'Time End', value: aiExtractedEventData.endTime || '' },
+                    {
+                        label: 'Location',
+                        value: aiExtractedEventData.location
+                            ? (typeof aiExtractedEventData.location === 'object'
+                                ? `${aiExtractedEventData.location.city || ''}${aiExtractedEventData.location.state ? ', ' + aiExtractedEventData.location.state : ''}${aiExtractedEventData.location.zip ? ' ' + aiExtractedEventData.location.zip : ''}`.trim()
+                                : aiExtractedEventData.location)
+                            : ''
+                    },
+                    { label: 'Venue', value: aiExtractedEventData.venue || '' }, // Add venue
+                    { label: 'Category', value: aiExtractedEventData.category || '' },
+                    { label: 'Age Suitability', value: aiExtractedEventData.ageSuitability || '' }, // Use ageSuitability from AI
+                    { label: 'Tags', value: (aiExtractedEventData.tags && Array.isArray(aiExtractedEventData.tags)) ? aiExtractedEventData.tags.join(', ') : '' }
+                ];
+
 
                 previewFields.forEach(function(field) {
                     const previewItem = document.createElement('div');
@@ -147,64 +158,77 @@
             }
         });
 
-
         editBtn.addEventListener('click', () => {
             previewModal.style.display = 'none';
             alert("To edit, please proceed to the 'Create An Event' page and fill fields manually, or try autofill again with a different image.");
+
         });
 
         confirmBtn.addEventListener('click', async () => {
-            previewModal.style.display = 'none'; // Hide modal
+            previewModal.style.display = 'none';
 
             const imageFile = thumbnailFileInput.files[0];
-            const finalFormData = new FormData(eventForm);
+            const finalFormData = new FormData();
 
             if (imageFile) {
                 finalFormData.append('thumbnail', imageFile);
+            } else {
+                alert("No image selected for event creation. Please select an image.");
+                return;
             }
 
-            for (const key in aiExtractedEventData) {
-                if (key === 'location' && typeof aiExtractedEventData[key] === 'object' && aiExtractedEventData[key] !== null) {
-                    finalFormData.append('location', `${aiExtractedEventData[key].city || ''}${aiExtractedEventData[key].state ? ', ' + aiExtractedEventData[key].state : ''}${aiExtractedEventData[key].zip ? ' ' + aiExtractedEventData[key].zip : ''}`.trim());
-                } else if (aiExtractedEventData[key] !== null && aiExtractedEventData[key] !== undefined) {
-                    finalFormData.append(key, aiExtractedEventData[key]);
-                }
+
+            finalFormData.append('title', aiExtractedEventData.title || '');
+            finalFormData.append('description', aiExtractedEventData.description || '');
+
+            // Flatten location object for server if AI returns object
+            if (aiExtractedEventData.location && typeof aiExtractedEventData.location === 'object') {
+                finalFormData.append('location', `${aiExtractedEventData.location.city || ''}${aiExtractedEventData.location.state ? ', ' + aiExtractedEventData.location.state : ''}${aiExtractedEventData.location.zip ? ' ' + aiExtractedEventData.location.zip : ''}`.trim());
+            } else {
+                finalFormData.append('location', aiExtractedEventData.location || '');
             }
-            finalFormData.append('thumbnail');
-            finalFormData.append('description', aiExtractedEventData[key].description);
-            finalFormData.append('location', aiExtractedEventData.location);
-            finalFormData.append('uid', '1');
-            finalFormData.append('venue', 'venue');
-            finalFormData.append('category', aiExtractedEventData.category);
-            finalFormData.append('age', aiExtractedEventData.age);
-            finalFormData.append('tags', aiExtractedEventData);
-            finalFormData.append('startTime', aiExtractedEventData.startTime);
-            finalFormData.append('endTime', aiExtractedEventData.endTime);
-            finalFormData.append('date', aiExtractedEventData.date);
+
+            finalFormData.append('venue', aiExtractedEventData.venue || '');
+            finalFormData.append('category', aiExtractedEventData.category || '');
+            finalFormData.append('age', aiExtractedEventData.ageSuitability || ''); // Use ageSuitability from AI
+            finalFormData.append('date', aiExtractedEventData.date || ''); // Date should be YYYY-MM-DD
+            finalFormData.append('startTime', aiExtractedEventData.startTime || '');
+            finalFormData.append('endTime', aiExtractedEventData.endTime || '');
+
+            // Handle tags array
+            if (aiExtractedEventData.tags && Array.isArray(aiExtractedEventData.tags)) {
+                aiExtractedEventData.tags.forEach(tag => finalFormData.append('tags[]', tag)); // Append as array
+            } else {
+                finalFormData.append('tags', ''); // Send empty if no tags or not an array
+            }
+
+            finalFormData.append('uid', '1'); // Assuming a default UID for now
 
             try {
-                const response = await fetch("/events/eventForm", {
+                const response = await fetch("/events/eventForm", { // Submit to the main event creation endpoint
                     method: 'POST',
-                    body: FormData,
+                    body: finalFormData, // Use finalFormData
                 });
-                if (result.success) {
-                    console.log("Event created successfully:", result.data);
+
+                const result = await response.json(); // Parse response after it's received
+
+                if (response.ok && result.success) { // Check response.ok in addition to result.success
+                    console.log("Event created successfully:", result.event); // Log the created event data
+                    alert("Event created successfully!");
                     window.location.href = `/events/event/${result.id}`;
                 } else {
-                    console.error("Error creating event:", result.error);
-                    alert("Failed to create event. Please try again.");
+                    console.error("Error creating event:", result.error || "Unknown server error.");
+                    alert("Failed to create event: " + (result.error || "Unknown error."));
                 }
-
-
             } catch (error) {
                 console.error("Final submission error:", error);
-                alert("An error occurred while submitting the event.");
+                alert("An error occurred while submitting the event: " + error.message);
             }
         });
 
-        const nextButton = document.querySelector('.next-button');
-        if (nextButton) {
-            nextButton.addEventListener('click', () => {
+        const closeButton = document.querySelector('.close-button');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
                 previewModal.style.display = 'none';
             });
         }
