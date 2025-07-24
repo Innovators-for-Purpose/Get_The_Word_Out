@@ -17,17 +17,18 @@
 
       <form id="eventForm" method="POST" action="/events/eventForm" enctype="multipart/form-data">
 
-        <form id="eventForm">
+
         <h1 id="currentPageTitle">Create An Event</h1>
         <div class="formBox">
             <h4>Upload thumbnail of event</h4>
             <!-- <button id="button" class="uploadFileButton">Browse File</button> -->
-             <div class="thumbnail-file">
+            <div class="thumbnail-file">
                 <input type="file" name="thumbnail" id="thumbnail-file">
-             </div>
-             <h5>(Upload a picture of the event on the community bulletin board)</h5> 
-         
- 
+                <div id="ai-thumbnail-display"></div>
+            </div>
+             <h5>(Upload a picture of the event on the community bulletin board)</h5>
+
+
                 <div class="thumbAi">
 
                     <button type="button" id="previewAi" class="thumbAi-btn">
@@ -35,17 +36,9 @@
                         <h6 class = "button-text">Generate Thumbnail with Artificial Intelligence</h6>
                     </button>
                 </div>
-                
-                <div class="popup-overlay" id="preview-overlay">
-                    <div class="thumbPreview" id="thumbPreview">
-                        <span class="close" id="close-preview">&times;</span>
-                        <h7 class= "gradient-text" >Genarate Thumbnail with Artifiical Intelligence</h7>
-                        <p>Please type in a short description of the image you'd like to generate as your thumbnail.</p>
-                        <input class="textbox"  id="text-box" name="textbox"/>
-                        <button class="gradient-button" id="generate-thumbnail">Generate Thumbnail</button>
-                    </div>
-                </div>
-       
+
+
+
 
             <div class="sects">
                 <label for="eventTitle">Event Title *</label><br>
@@ -67,7 +60,7 @@
                 <input name="location" id="Location" class="textareas" value="" required placeholder="Location, City, State, Zip Code"></input><br>
             </div>
 
-            
+
 
             <div class="times">
 
@@ -86,81 +79,26 @@
                     <input type="time" name="endTime" id="t-end" required value="17:10">
                 </div>
 
-                
+
             </div>
                 <button type="button" id="previewButton" class="createEvent">Continue</button>
             </form>
+
+          </div>
         </div>
     </div>
+    <div class="popup-overlay" id="preview-overlay">
+        <div class="thumbPreview" id="thumbPreview">
+            <span class="close" id="close-preview">&times;</span>
+            <h7 class= "gradient-text" > Genarate Thumbnail with Artifiical Intelligence</h7>
+            <p>Please type in a short description of the image you'd like to generate as your thumbnail.</p>
+            <input class="textbox"  id="textbox" name="textbox"/>
+            <button class="gradient-button" id="generate-thumbnail">Generate Thumbnail</button>
+        </div>
 
 
 
    </div>
-
-    
-    <!-- <div id="form">
-        
-        <div class="hah">
-            <p>GT<span class="word">W</span>O</p>
-        </div>
-        
-
-        <form id="eventForm">
-        <h1 id="currentPageTitle">Create An Event</h1>
-        <div class="formBox">
-            <h4>Upload thumbnail of event</h4>
-             <div class="thumbnail-file">
-                <input type="file" name="thumbnail" id="thumbnail-file">
-             </div>
-
-            <h5>(Upload a picture of the event on the community bulletin board)</h5>
-            <div class="sects">
-                <label for="eventTitle">Event Title *</label><br>
-                <input name="title" id="eventTitle" class="textareas" value="a" required></input><br>
-            </div>
-
-            <div class="sects">
-                <label for="Description">Event Description *</label><br>
-                <textarea name="description" id="Description" required>a</textarea><br>
-            </div>
-
-            <div class="tags">
-                <label for="Tags" class="tags">Tags</label>
-                <input name="tags" id="tags" class="textareas" value="a" required></input><br>
-            </div>
-
-            <div class="location-div">
-                <label for="Location" class="locationLabel">Location</label><br>
-                <input name="location" id="Location" class="textareas" value="a" required></input><br>
-            </div>
-
-            
-
-            <div class="times">
-
-                <div class="event-date">
-                    <label for="Date">Date</label><br>
-                    <input type="date" name="date" id="Date" required value="2025-01-16">
-                </div>
-
-                <div class="time-start">
-                    <label for="Time" class="timeLabel">Time Start</label></br>
-                    <input type="time" name="time" id="t-start" required value="17:10">
-                </div>
-
-                <div class="time-end">
-                    <label for="Time" class="timeLabel">Time End</label></br>
-                    <input type="time" name="time" id="t-end" required value="17:10">
-                </div>
-
-                
-            </div>
-                <button type="button" id="previewButton" class="createEvent">Continue</button>
-            </form>
-        </div>
-    </div> -->
-
-        
 
 
 
@@ -177,29 +115,25 @@
         </div>
     </div>
     <script>
-    
+
     const previewOverlay = document.getElementById('preview-overlay');
     const thumbPreview = document.getElementById('thumbPreview');
     const previewAi = document.getElementById('previewAi');
     const closePreview = document.getElementById('close-preview');
-
-
-        
-
-
-
+    const generateThumbnail = document.getElementById('generate-thumbnail');
+    const textbox = document.getElementById('textbox');
         const eventForm = document.getElementById('eventForm');
         const previewButton = document.getElementById('previewButton');
         const previewModal = document.getElementById('previewModal');
         const previewContent = document.getElementById('previewContent');
         const editBtn = document.getElementById('editBtn');
         const confirmBtn = document.getElementById('confirmBtn');
-
-    
+    const thumbnailFileDiv = document.querySelector('.thumbnail-file');
+    const aiThumbnailDisplay = document.getElementById('ai-thumbnail-display');
         // const ageRangeMap = {
         //     '1': 'Not Selected',
         //     '2': 'age 5-10',
-        //     '3': 'age 10-15', 
+        //     '3': 'age 10-15',
         //     '4': 'age 15-18',
         //     '5': 'age 18-30'
         // };
@@ -207,26 +141,91 @@
         // const categoryMap = {
         //     '0': 'Not Selected',
         //     '1': 'Category 1',
-        //     '2': 'Category 2', 
+        //     '2': 'Category 2',
         //     '3': 'Category 3',
         //     '4': 'Category 4'
         // };
 
-        
+
+
      previewAi.addEventListener('click', () => {
      previewOverlay.style.display = "flex";
     });
+    // event.ejs JavaScript <script> block
+
+
+
+    generateThumbnail.addEventListener('click', async () => {
+        const description = textbox.value.trim();
+        if (!description) {
+            alert("Please provide a description for the AI to generate a thumbnail.");
+            generateThumbnail.textContent = 'Generate Thumbnail';
+            generateThumbnail.disabled = false;
+            return;
+        }
+        generateThumbnail.textContent = 'Generating...';
+        generateThumbnail.disabled = true;
+        console.log("Attempting to generate thumbnail with description:", description);
+        let result = null;
+        try {
+            const response = await fetch(`/events/generateThumbnail`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ description: description })
+            });
+            if (!response.ok) {
+                let errorDetails = "Unknown server error.";
+                try {
+                    const errorData = await response.json();
+                    errorDetails = errorData.error || errorDetails;
+                } catch (jsonError) {
+                    errorDetails = response.statusText;
+                }
+                throw new Error(`AI generation failed: ${response.status} - ${errorDetails}`);
+            }
+            result = await response.json();
+            if (result.success && result.imageData) {
+                document.getElementById('thumbnail-file').style.display = 'none';
+                aiThumbnailDisplay.innerHTML = '';
+                const generatedImg = document.createElement('img');
+                generatedImg.src = `data:${result.mimeType};base664,${result.imageData}`;
+                generatedImg.style.maxWidth = '100%';
+                generatedImg.style.height = 'auto';
+                generatedImg.style.display = 'block';
+                generatedImg.style.border = '1px solid red';
+                generatedImg.style.minHeight = '100px';
+                generatedImg.style.backgroundColor = '#f0f0f0';
+                aiThumbnailDisplay.appendChild(generatedImg);
+                sessionStorage.setItem('generatedAiThumbnailData', JSON.stringify({
+                    data: result.imageData,
+                    mime: result.mimeType
+                }));
+                alert("AI Thumbnail generated successfully!");
+                previewOverlay.style.display = 'none';
+            } else {
+                alert("Failed to generate AI Thumbnail: " + (result.error || "Server indicated failure."));
+            }
+        } catch (error) {
+            console.error("Error during AI thumbnail generation request:", error);
+            alert(error.message);
+        } finally {
+            generateThumbnail.textContent = 'Generate Thumbnail';
+            generateThumbnail.disabled = false;
+        }
+    });
+
      closePreview.addEventListener('click', () => {
-    previewContent.innerHTML = ""; // Clear the preview
-    previewOverlay.style.display = 'none';}) // Optionally hide the preview button
+    previewContent.innerHTML = "";
+    previewOverlay.style.display = 'none';})
+
+    /*generateThumbnail.addEventListener('click', async (event) => {
+        event.preventDefault();
+    });
+    */
 
 
-
-
-
-  
-          //show popup
-    
           previewButton.addEventListener('click', (event) => {
     event.preventDefault();
 
@@ -257,7 +256,7 @@
             });
         }
 
-       
+
         previewFields.forEach(function(field) {
             const previewItem = document.createElement('div');
             previewItem.classList.add('preview-item');
@@ -279,12 +278,12 @@
             previewContent.appendChild(previewItem);
         });
 
-        
-        previewModal.style.display = 'block'; 
+
+        previewModal.style.display = 'block';
     } else {
         eventForm.reportValidity();
     }
-            }); 
+            });
 
             editBtn.addEventListener('click', () => {
                 previewModal.style.display = 'none';

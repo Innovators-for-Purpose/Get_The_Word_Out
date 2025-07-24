@@ -11,7 +11,10 @@ const Event = sequelize.define('event', {
   thumbnail: {
     type: DataTypes.BLOB,
     allowNull: true,
-
+    get() {
+      const data = this.getDataValue('thumbnail');
+      return data ? `data:image/jpeg;base64,${data.toString('base64')}` : null;
+    }
   },
   title: {
     type: DataTypes.STRING,
