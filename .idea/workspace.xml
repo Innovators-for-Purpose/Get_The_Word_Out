@@ -4,14 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="344842c3-7d5f-4d8e-b59e-f18c7d7132bd" name="Changes" comment="gedion is on new edit">
+    <list default="true" id="344842c3-7d5f-4d8e-b59e-f18c7d7132bd" name="Changes" comment="creaye new genereateaithumnail function add new router and event listen on event.ejs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controller/eventController.js" beforeDir="false" afterPath="$PROJECT_DIR$/controller/eventController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/Event.js" beforeDir="false" afterPath="$PROJECT_DIR$/models/Event.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/eventRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/eventRoutes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/createevents.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/createevents.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.db" beforeDir="false" afterPath="$PROJECT_DIR$/test.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/autofill.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/autofill.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/event-list.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event-list.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/event-view-page.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event-view-page.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/event.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event.ejs" afterDir="false" />
     </list>
@@ -21,6 +22,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="mugdha" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -62,7 +68,7 @@
     "Node.js.index.js.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "mugdha",
+    "git-widget-placeholder": "Final",
     "last_opened_file_path": "/Users/ifpa/WebstormProjects/Library_Helper-Events",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -110,7 +116,7 @@
       <workItem from="1752504692284" duration="3304000" />
       <workItem from="1752509576510" duration="14376000" />
       <workItem from="1752774754410" duration="34073000" />
-      <workItem from="1753230891964" duration="33082000" />
+      <workItem from="1753230891964" duration="61501000" />
     </task>
     <task id="LOCAL-00001" summary="gedion is on">
       <option name="closed" value="true" />
@@ -208,7 +214,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753294233987</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="creaye new genereateaithumnail function add new router and event listen on event.ejs">
+      <option name="closed" value="true" />
+      <created>1753384509419</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1753384509419</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -243,6 +257,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="gedion is on" />
     <MESSAGE value="gedion is on new edit" />
-    <option name="LAST_COMMIT_MESSAGE" value="gedion is on new edit" />
+    <MESSAGE value="creaye new genereateaithumnail function add new router and event listen on event.ejs" />
+    <option name="LAST_COMMIT_MESSAGE" value="creaye new genereateaithumnail function add new router and event listen on event.ejs" />
   </component>
 </project>

@@ -349,6 +349,7 @@ label{
     border-radius: 5px;
 }
 
+
 .thumbnail-file input[type="file"]::file-selector-button {
     /* background-color: #F0F2F8; */
     background-color: #5AA5FF;

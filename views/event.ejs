@@ -21,7 +21,7 @@
         <h1 id="currentPageTitle">Create An Event</h1>
         <div class="formBox">
             <h4>Upload thumbnail of event</h4>
-            <!-- <button id="button" class="uploadFileButton">Browse File</button> -->
+
             <div class="thumbnail-file">
                 <input type="file" name="thumbnail" id="thumbnail-file">
                 <div id="ai-thumbnail-display"></div>
@@ -128,7 +128,7 @@
         const previewContent = document.getElementById('previewContent');
         const editBtn = document.getElementById('editBtn');
         const confirmBtn = document.getElementById('confirmBtn');
-    const thumbnailFileDiv = document.querySelector('.thumbnail-file');
+    const thumbnailFileDiv = document.querySelector('thumbnail-file');
     const aiThumbnailDisplay = document.getElementById('ai-thumbnail-display');
         // const ageRangeMap = {
         //     '1': 'Not Selected',
@@ -190,7 +190,7 @@
                 document.getElementById('thumbnail-file').style.display = 'none';
                 aiThumbnailDisplay.innerHTML = '';
                 const generatedImg = document.createElement('img');
-                generatedImg.src = `data:${result.mimeType};base664,${result.imageData}`;
+                generatedImg.src = `data:${result.mimeType};base64,${result.imageData}`;
                 generatedImg.style.maxWidth = '100%';
                 generatedImg.style.height = 'auto';
                 generatedImg.style.display = 'block';
@@ -220,10 +220,6 @@
     previewContent.innerHTML = "";
     previewOverlay.style.display = 'none';})
 
-    /*generateThumbnail.addEventListener('click', async (event) => {
-        event.preventDefault();
-    });
-    */
 
 
           previewButton.addEventListener('click', (event) => {
@@ -243,18 +239,26 @@
         ];
 
 
-        const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
-        if (thumbnailFile) {
+        const generatedAiThumbnailData = sessionStorage.getItem('generatedAiThumbnailData');
+        if (generatedAiThumbnailData) {
+            const { data, mime } = JSON.parse(generatedAiThumbnailData);
             const img = document.createElement('img');
-            img.src = URL.createObjectURL(thumbnailFile);
+            img.src = `data:${mime};base64,${data}`;
             img.style.maxWidth = '200px';
             previewContent.appendChild(img);
+            previewFields.push({ label: 'Event Thumbnail (AI Generated)', value: 'Displayed above' });
+        } else {
 
-            previewFields.push({
-                label: 'Event Thumbnail',
-                value: thumbnailFile
-            });
+            const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
+            if (thumbnailFile) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(thumbnailFile);
+                img.style.maxWidth = '200px';
+                previewContent.appendChild(img);
+                previewFields.push({ label: 'Event Thumbnail', value: thumbnailFile.name });
+            }
         }
+
 
 
         previewFields.forEach(function(field) {

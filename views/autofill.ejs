@@ -114,9 +114,9 @@
                 autofillButton.textContent = 'Autofill with AI';
                 autofillButton.disabled = false;
 
-                previewContent.innerHTML = ""; // Clear previous content
+                previewContent.innerHTML = "";
 
-                // Create and display the image in the preview
+
                 if (imageFile) {
                     const img = document.createElement('img');
                     img.src = URL.createObjectURL(imageFile);
@@ -124,12 +124,12 @@
                     previewContent.appendChild(img);
                 }
 
-                // Prepare fields for display, including the image name
+
                 const previewFields = [
-                    { label: 'Event Thumbnail', value: imageFile ? imageFile.name : 'N/A' }, // Add thumbnail display
+                    { label: 'Event Thumbnail', value: imageFile ? imageFile.name : 'N/A' },
                     { label: 'Event Title', value: aiExtractedEventData.title || '' },
                     { label: 'Event Description', value: aiExtractedEventData.description || '' },
-                    { label: 'Date', value: aiExtractedEventData.date || '' }, // Date should already be YYYY-MM-DD from controller for display
+                    { label: 'Date', value: aiExtractedEventData.date || '' },
                     { label: 'Time Start', value: aiExtractedEventData.startTime || '' },
                     { label: 'Time End', value: aiExtractedEventData.endTime || '' },
                     {
@@ -140,9 +140,9 @@
                                 : aiExtractedEventData.location)
                             : ''
                     },
-                    { label: 'Venue', value: aiExtractedEventData.venue || '' }, // Add venue
+                    { label: 'Venue', value: aiExtractedEventData.venue || '' },
                     { label: 'Category', value: aiExtractedEventData.category || '' },
-                    { label: 'Age Suitability', value: aiExtractedEventData.ageSuitability || '' }, // Use ageSuitability from AI
+                    { label: 'Age Suitability', value: aiExtractedEventData.ageSuitability || '' },
                     { label: 'Tags', value: (aiExtractedEventData.tags && Array.isArray(aiExtractedEventData.tags)) ? aiExtractedEventData.tags.join(', ') : '' }
                 ];
 
@@ -154,7 +154,7 @@
                     previewContent.appendChild(previewItem);
                 });
 
-                previewModal.style.display = 'flex'; // Show the modal
+                previewModal.style.display = 'flex';
             }
         });
 
@@ -181,7 +181,7 @@
             finalFormData.append('title', aiExtractedEventData.title || '');
             finalFormData.append('description', aiExtractedEventData.description || '');
 
-            // Flatten location object for server if AI returns object
+
             if (aiExtractedEventData.location && typeof aiExtractedEventData.location === 'object') {
                 finalFormData.append('location', `${aiExtractedEventData.location.city || ''}${aiExtractedEventData.location.state ? ', ' + aiExtractedEventData.location.state : ''}${aiExtractedEventData.location.zip ? ' ' + aiExtractedEventData.location.zip : ''}`.trim());
             } else {
@@ -190,30 +190,29 @@
 
             finalFormData.append('venue', aiExtractedEventData.venue || '');
             finalFormData.append('category', aiExtractedEventData.category || '');
-            finalFormData.append('age', aiExtractedEventData.ageSuitability || ''); // Use ageSuitability from AI
-            finalFormData.append('date', aiExtractedEventData.date || ''); // Date should be YYYY-MM-DD
+            finalFormData.append('age', aiExtractedEventData.ageSuitability || '');
+            finalFormData.append('date', aiExtractedEventData.date || '');
             finalFormData.append('startTime', aiExtractedEventData.startTime || '');
             finalFormData.append('endTime', aiExtractedEventData.endTime || '');
 
-            // Handle tags array
+
             if (aiExtractedEventData.tags && Array.isArray(aiExtractedEventData.tags)) {
-                aiExtractedEventData.tags.forEach(tag => finalFormData.append('tags[]', tag)); // Append as array
+                aiExtractedEventData.tags.forEach(tag => finalFormData.append('tags[]', tag));
             } else {
-                finalFormData.append('tags', ''); // Send empty if no tags or not an array
+                finalFormData.append('tags', '');
             }
 
-            finalFormData.append('uid', '1'); // Assuming a default UID for now
+            finalFormData.append('uid', '1');
 
             try {
-                const response = await fetch("/events/eventForm", { // Submit to the main event creation endpoint
+                const response = await fetch("/events/eventForm", {
                     method: 'POST',
-                    body: finalFormData, // Use finalFormData
+                    body: finalFormData,
                 });
 
-                const result = await response.json(); // Parse response after it's received
-
-                if (response.ok && result.success) { // Check response.ok in addition to result.success
-                    console.log("Event created successfully:", result.event); // Log the created event data
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    console.log("Event created successfully:", result.event);
                     alert("Event created successfully!");
                     window.location.href = `/events/event/${result.id}`;
                 } else {

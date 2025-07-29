@@ -1,8 +1,22 @@
 const Event = require("../models/Event.js");
 const { GoogleGenAI } = require("@google/genai");
+const fs = require("fs");
+const http = require("http");
 
 const ai = new GoogleGenAI({ apiKey:"AIzaSyBrqrCbjVXIkSCXYnTRTXiNjRzwkaZT5Q8"});
 console.log("Does ai have getGenerativeModel?", typeof ai.getGenerativeModel);
+
+const { PredictionServiceClient } = require('@google-cloud/aiplatform');
+const { helpers } = require('@google-cloud/aiplatform');
+
+const projectID = 'autofill-466017';
+const Location = 'us-central1';
+
+const clientOptions = {
+  apiEndpoint: `${Location}-aiplatform.googleapis.com`,
+
+};
+const predictionServiceClient = new PredictionServiceClient(clientOptions);
 
 async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
   try {
@@ -97,44 +111,107 @@ exports.generateAiThumbnail = async (req, res) => {
   }
 
   try {
-    const userPrompt = `Generate a very concise, detailed, and visually descriptive prompt for an image generation AI, based on the following event description. Focus on key visual elements, colors, mood, and style. The image should be suitable for an event flyer thumbnail.
+    const userPrompt = `Generate a very concise, detailed descriptive prompt for an image generation AI, based on the following event description. Focus on key text elements, colors, mood, and style and . the image is flyer and has all the elements provided(eg.Ai Summit,boston, 9pm to 3am ,july 25, #transformingai).
 
 Event Description: "${description}"
 
-Example Output: "Vibrant community fair with diverse people laughing, colorful banners, sun shining, food stalls, and balloons in a park. Warm, inviting atmosphere, bright lighting, realistic style."`;
 
+    Example Output: ""A professional and modern flyer for a business technology conference. 
+    The dominant color scheme is deep blue and white, with a subtle background image of a city skyline from an elevated perspective, blurred to keep focus on the text.
+    Key Text Elements (Prominently displayed, bold, and in a clean, sans-serif font):
+    "TECH ROUND" (large, white, at the top)"2029" (extremely large, white, central, overlapping the background slightly)
+    
+    "THE LATEST IN BUSINESS GROWTH TECHNOLOGY  " (smaller, white, right-aligned next to "2029")
+    
+    Sub-sections (on solid blue background blocks with white text):nBlock 1 (below main title): 
+    "The year's biggest business technology conference is back for the 6th time! Discover new technologies for growing your business. Meet industry leaders and make lasting business connections!" 
+    (Smaller, clear text)Block 2 (central, largest): "Tuesday April 6 - Friday April 9" (large, bold) and "9AM-7PM DAILY" (slightly smaller, bold) Block 3 (lower):
+     "REGISTRATION:" (bold) and "$500 PER PERSON" (very large, bold).Block 4 (bottom): "The Elliot House Hotel" "216 Gladwell Boulevard" "Crested Butte, Colorado" (Standard text, left-aligned).
+     Smallest text at the very bottom: "Register @ eventlite.com/techround | facebook.com/techround | techround@events.com"`;
     console.log(`Sending text prompt to Gemini 2.5 Flash for image description: "${description}"`);
 
-    // --- THIS IS THE CRUCIAL CORRECTION ---
-    // Directly await the call to ai.models.generateContent and store its result
-    const result = await ai.models.generateContent({
+
+    const geminiResult = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{
         role: 'user',
-        parts: [{ text: userPrompt }] // Pass the constructed userPrompt here
+        parts: [{ text: userPrompt }]
       }],
     });
-    // --- END OF CRUCIAL CORRECTION ---
-
-    // The rest of your response processing logic
-    let aiGeneratedImagePrompt;
-    if (result && result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
-      aiGeneratedImagePrompt = result.candidates[0].content.parts[0].text;
-    } else {
-      console.error("Gemini API response structure unexpected. Could not find text in candidates for image prompt generation.");
-      console.error("Full Gemini API result object (unexpected structure):", JSON.stringify(result, null, 2));
-      throw new Error("Gemini API call failed: Unexpected response structure from model for image prompt.");
+    let aiGeneratedImagePrompt = null;
+    if (geminiResult && geminiResult.candidates && geminiResult.candidates.length > 0 && geminiResult.candidates[0].content && geminiResult.candidates[0].content.parts && geminiResult.candidates[0].content.parts.length > 0 && geminiResult.candidates[0].content.parts[0].text) {
+      aiGeneratedImagePrompt = geminiResult.candidates[0].content.parts[0].text;
     }
+
+
+    if (!aiGeneratedImagePrompt) {
+      console.error("Gemini API response structure unexpected. Could not find text prompt for image generation.");
+      throw new Error("Gemini API call failed: Unexpected response structure from model for text prompt.");
+    }
+
 
     console.log("Gemini generated image prompt:", aiGeneratedImagePrompt);
 
-    const dummyBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
-    const mimeType = 'image/png';
+    console.log("Sending prompt to Vertex AI Imagen for image generation...");
 
-    res.status(200).json({ success: true, imageData: dummyBase64, mimeType: mimeType, aiPrompt: aiGeneratedImagePrompt });
+    const endpoint = `projects/${projectID}/locations/${Location}/publishers/google/models/imagen-4.0-generate-preview-06-06`;// For Imagen 2
+
+    const instance = helpers.toValue({
+      prompt: aiGeneratedImagePrompt,
+
+    });
+
+    const parameters = helpers.toValue({
+      sampleCount: 1,
+      aspectRatio: "1:1",
+    });
+
+    const request = {
+      endpoint,
+      instances: [instance],
+      parameters,
+    };
+
+    const [response] = await predictionServiceClient.predict(request);
+
+    let generatedImgBase64 = null;
+    let generatedImgMimeType = null;
+
+    if (response.predictions && response.predictions.length > 0) {
+      const prediction = helpers.fromValue(response.predictions[0]);
+      if (prediction.bytesBase64Encoded) {
+        generatedImgBase64 = prediction.bytesBase64Encoded;
+        generatedImgMimeType = 'image/png';
+      }
+    }
+     const imagebuffer = fs.readFileSync(generatedImgBase64);
+     const server = http.createServer((req, res) => {
+       if (req.url === '/public/images/') {
+         res.writeHead(200, {'Content-Type': 'image/jpeg'});
+         res.end(imagebuffer);
+       }
+     });
+     server.listen(3000,() =>{
+       console.log("images at public/images")
+         });
+
+
+
+    if (generatedImgBase64) {
+      console.log("Vertex AI Imagen image generated successfully!");
+      res.status(200).json({
+        success: true,
+        imageData: generatedImgBase64,
+        mimeType: generatedImgMimeType,
+        aiPrompt: aiGeneratedImagePrompt
+      });
+    } else {
+      console.error("Vertex AI Imagen did not return an image. Full response:", JSON.stringify(response, null, 2));
+      res.status(500).json({ success: false, error: 'Vertex AI Imagen did not return an image.', details: "No image data found in Vertex AI response." });
+    }
 
   } catch (error) {
-    console.error('Error during Gemini API call for image prompt or dummy image part:', error);
+    console.error('Full Error during AI image generation process (Vertex AI):', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     res.status(500).json({ success: false, error: 'Server error during AI thumbnail generation.', details: error.message });
   }
 };
