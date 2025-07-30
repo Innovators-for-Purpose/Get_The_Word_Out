@@ -6,8 +6,14 @@
   <component name="ChangeListManager">
     <list default="true" id="344842c3-7d5f-4d8e-b59e-f18c7d7132bd" name="Changes" comment="gedion is on new edit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controller/eventController.js" beforeDir="false" afterPath="$PROJECT_DIR$/controller/eventController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/Event.js" beforeDir="false" afterPath="$PROJECT_DIR$/models/Event.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/eventRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/eventRoutes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.db" beforeDir="false" afterPath="$PROJECT_DIR$/test.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/autofill.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/autofill.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/event-list.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event-list.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/event-view-page.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event-view-page.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/event.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event.ejs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,30 +52,38 @@
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;JavaScript Debug.eventForm.html.executor&quot;: &quot;Debug&quot;,
-    &quot;JavaScript Debug.index.html.executor&quot;: &quot;Run&quot;,
-    &quot;Node.js.eventController.js.executor&quot;: &quot;Debug&quot;,
-    &quot;Node.js.index.js.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;gedion&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JavaScript Debug.eventForm.html.executor": "Debug",
+    "JavaScript Debug.index.html.executor": "Run",
+    "Node.js.eventController.js.executor": "Debug",
+    "Node.js.index.js.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "mugdha",
+    "last_opened_file_path": "/Users/ifpa/WebstormProjects/Library_Helper-Events",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;JSON&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JSON"
     ]
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -78,6 +92,9 @@
     </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="StructureViewState">
+    <option name="selectedTab" value="HTML" />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="344842c3-7d5f-4d8e-b59e-f18c7d7132bd" name="Changes" comment="" />
@@ -90,6 +107,10 @@
       <workItem from="1741295101649" duration="13573000" />
       <workItem from="1741896305564" duration="59245000" />
       <workItem from="1746477729040" duration="8172000" />
+      <workItem from="1752504692284" duration="3304000" />
+      <workItem from="1752509576510" duration="14376000" />
+      <workItem from="1752774754410" duration="34073000" />
+      <workItem from="1753230891964" duration="33082000" />
     </task>
     <task id="LOCAL-00001" summary="gedion is on">
       <option name="closed" value="true" />
@@ -147,11 +168,54 @@
       <option name="project" value="LOCAL" />
       <updated>1746480340373</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="gedion is on new edit">
+      <option name="closed" value="true" />
+      <created>1752503011207</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1752503011207</updated>
+    </task>
+    <task id="LOCAL-00009" summary="gedion is on new edit">
+      <option name="closed" value="true" />
+      <created>1752516875087</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1752516875087</updated>
+    </task>
+    <task id="LOCAL-00010" summary="gedion is on new edit">
+      <option name="closed" value="true" />
+      <created>1752601446157</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1752601446157</updated>
+    </task>
+    <task id="LOCAL-00011" summary="gedion is on new edit">
+      <option name="closed" value="true" />
+      <created>1753208086585</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1753208086585</updated>
+    </task>
+    <task id="LOCAL-00012" summary="gedion is on new edit">
+      <option name="closed" value="true" />
+      <created>1753294233987</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1753294233987</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.env" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
