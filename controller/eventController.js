@@ -1,7 +1,7 @@
 const Event = require("../models/Event.js");
 const { GoogleGenAI } = require("@google/genai");
-const fs = require("fs");
-const http = require("http");
+const multer = require('multer'); // Import multer
+const upload = multer(); // Initialize multer for memory storage
 
 const ai = new GoogleGenAI({ apiKey:"AIzaSyBrqrCbjVXIkSCXYnTRTXiNjRzwkaZT5Q8"});
 console.log("Does ai have getGenerativeModel?", typeof ai.getGenerativeModel);
@@ -14,7 +14,6 @@ const Location = 'us-central1';
 
 const clientOptions = {
   apiEndpoint: `${Location}-aiplatform.googleapis.com`,
-
 };
 const predictionServiceClient = new PredictionServiceClient(clientOptions);
 
@@ -46,7 +45,6 @@ async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
     }
     `;
 
-
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{
@@ -58,7 +56,6 @@ async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
       }],
     });
 
-
     let aiResponseText;
     if (result && result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
       aiResponseText = result.candidates[0].content.parts[0].text;
@@ -67,7 +64,6 @@ async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
       console.error("Full Gemini API result object (unexpected structure):", JSON.stringify(result, null, 2));
       throw new Error("Gemini API call failed: Unexpected response structure from model.");
     }
-
 
     console.log("AI raw response text:", aiResponseText);
 
@@ -116,15 +112,15 @@ exports.generateAiThumbnail = async (req, res) => {
 Event Description: "${description}"
 
 
-    Example Output: ""A professional and modern flyer for a business technology conference. 
+    Example Output: ""A professional and modern flyer for a business technology conference.
     The dominant color scheme is deep blue and white, with a subtle background image of a city skyline from an elevated perspective, blurred to keep focus on the text.
     Key Text Elements (Prominently displayed, bold, and in a clean, sans-serif font):
     "TECH ROUND" (large, white, at the top)"2029" (extremely large, white, central, overlapping the background slightly)
-    
+
     "THE LATEST IN BUSINESS GROWTH TECHNOLOGY  " (smaller, white, right-aligned next to "2029")
-    
-    Sub-sections (on solid blue background blocks with white text):nBlock 1 (below main title): 
-    "The year's biggest business technology conference is back for the 6th time! Discover new technologies for growing your business. Meet industry leaders and make lasting business connections!" 
+
+    Sub-sections (on solid blue background blocks with white text):nBlock 1 (below main title):
+    "The year's biggest business technology conference is back for the 6th time! Discover new technologies for growing your business. Meet industry leaders and make lasting business connections!"
     (Smaller, clear text)Block 2 (central, largest): "Tuesday April 6 - Friday April 9" (large, bold) and "9AM-7PM DAILY" (slightly smaller, bold) Block 3 (lower):
      "REGISTRATION:" (bold) and "$500 PER PERSON" (very large, bold).Block 4 (bottom): "The Elliot House Hotel" "216 Gladwell Boulevard" "Crested Butte, Colorado" (Standard text, left-aligned).
      Smallest text at the very bottom: "Register @ eventlite.com/techround | facebook.com/techround | techround@events.com"`;
@@ -181,21 +177,9 @@ Event Description: "${description}"
       const prediction = helpers.fromValue(response.predictions[0]);
       if (prediction.bytesBase64Encoded) {
         generatedImgBase64 = prediction.bytesBase64Encoded;
-        generatedImgMimeType = 'image/png';
+        generatedImgMimeType = 'image/png'; // Imagen 2 typically outputs PNGs
       }
     }
-     const imagebuffer = fs.readFileSync(generatedImgBase64);
-     const server = http.createServer((req, res) => {
-       if (req.url === '/public/images/') {
-         res.writeHead(200, {'Content-Type': 'image/jpeg'});
-         res.end(imagebuffer);
-       }
-     });
-     server.listen(3000,() =>{
-       console.log("images at public/images")
-         });
-
-
 
     if (generatedImgBase64) {
       console.log("Vertex AI Imagen image generated successfully!");
@@ -215,6 +199,7 @@ Event Description: "${description}"
     res.status(500).json({ success: false, error: 'Server error during AI thumbnail generation.', details: error.message });
   }
 };
+
 exports.getAutofillPreview = async (req, res) => {
   console.log("--- getAutofillPreview function started ---");
   console.log("req.file status:", req.file ? "File exists (size: " + req.file.size + " bytes)" : "No file found");
@@ -258,18 +243,20 @@ exports.getAutofillPreview = async (req, res) => {
 
 exports.createEvent = async (req, res) => {
   console.log("--- createEvent function started ---");
-  console.log("req.file status:", req.file ? "File exists (size: " + req.file.size + " bytes)" : "No file found");
+  console.log("req.file status:", req.file ? `File exists (size: ${req.file.size} bytes, mimetype: ${req.file.mimetype})` : "No file found");
   console.log("req.body content:", req.body);
 
-  let thumbnailData = null;
+  let thumbnailBuffer = null;
+  let thumbnailMimeType = null;
 
   try {
+    // Multer populates req.file when a file is uploaded
     if (req.file && req.file.buffer) {
-      thumbnailData = req.file.buffer;
-      console.log("Thumbnail buffer received for DB storage.");
-    }
-    else{
-      console.log("No image file uploaded");
+      thumbnailBuffer = req.file.buffer; // Store the binary buffer
+      thumbnailMimeType = req.file.mimetype; // Store the MIME type
+      console.log(`[createEvent] Thumbnail buffer and mimetype received for DB storage. MimeType: ${thumbnailMimeType}`);
+    } else {
+      console.log("[createEvent] No image file uploaded via multer for this event creation.");
     }
 
     const {
@@ -343,7 +330,8 @@ exports.createEvent = async (req, res) => {
 
     console.log("Attempting to create event in DB with final data:");
     console.log({
-      thumbnail: thumbnailData ? 'BUFFER_EXISTS' : null,
+      thumbnailData: thumbnailBuffer ? 'BUFFER_EXISTS' : null,
+      thumbnailMimeType: thumbnailMimeType,
       title: finalTitle,
       uid: finalUid,
       description: finalDescription,
@@ -359,7 +347,8 @@ exports.createEvent = async (req, res) => {
     });
 
     const event = await Event.create({
-      thumbnail: thumbnailData,
+      thumbnailData: thumbnailBuffer,    // Save the buffer to the new field
+      thumbnailMimeType: thumbnailMimeType, // Save the MIME type to the new field
       title: finalTitle,
       uid: finalUid,
       description: finalDescription,
@@ -401,13 +390,17 @@ exports.getEventDetails = async (req, res) => {
     const { id } = req.params;
     const event = await Event.findByPk(id);
     if (event) {
+      console.log(`[getEventDetails] Fetched event ID ${id}. Thumbnail URL available: ${!!event.thumbnailUrl}`); // Check if thumbnailUrl is present
       res.render("event-view-page", { event });
     } else {
+      // Corrected error handling: ensure 'error' view exists or send JSON
+      console.warn(`[getEventDetails] Event ID ${id} not found.`);
+      // You should have an 'error.ejs' file in your views directory for this to work
       res.status(404).render("error", { message: "Event not found" });
     }
   } catch (error) {
     console.error("Error getting event details in controller:", error);
-    res.status(500).render("error", { message: "Server Error" });
+    res.status(500).render("error", { message: "Server Error: " + error.message }); // Added error message for clarity
   }
 };
 

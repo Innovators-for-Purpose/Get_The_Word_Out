@@ -2,276 +2,91 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/fontawesome.min.css" integrity="sha512-v8QQ0YQ3H4K6Ic3PJkym91KoeNT5S3PnDKvqnwqFD1oiqIl653crGZplPdU5KKtHjO0QKcQ2aUlQZYjHczkmGw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="/viewpage.css">
 
 <html>
-    <head></head>
-    <body>
-        <div class="navLogo">
-            <a href= "http://localhost:3000">
-            <p>GT<span class="word">W</span>O</p>
-            </a>
+<head></head>
+<body>
+<div class="navLogo">
+    <a href= "http://localhost:3000">
+        <p>GT<span class="word">W</span>O</p>
+    </a>
+</div>
+<div class="bg"></div>
+<div class="evnetInformation">
+    </a>
+
+    <div class="container">
+
+        <div class="eventT">
+            <h2 class="eventTitle"><%= event.title %></h2>
         </div>
-            <div class="bg"></div>
-              <div class="evnetInformation">
-                <!-- <img src="" alt=""> -->
-            </a>
 
-            <div class="container">
+        <div class="event-flyer">
+            <img src="<%= event.thumbnailUrl %>" alt="thumbnail" class="thumbnail-image">
+        </div>
 
-                <div class="eventT">
-                    <h2 class="eventTitle"><%= event.title %></h2>
+        <div class="timeNdescription">
+
+            <div class="loc-date-time-container">
+                <div class="loc">
+                    <div class="loc-logo-name">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="20" style="margin-right: 5px;"><path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
+                        <p>Location</p>
+                    </div>
+                    <div class="loc-ejs"><p class="location"><%= event.location %></p></div>
                 </div>
 
-                <div class="event-flyer">
-                    <img src="<%= event.thumbnail %>" alt="thumbnail" class="thumbnail-image">
-                </div>
 
-                <div class="timeNdescription">
+                <div class="date-time-container">
 
-                    <div class="loc-date-time-container">
-                        <div class="loc">
-                            <div class="loc-logo-name">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" height="20" style="margin-right: 5px;"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
-                                <p>Location</p>
-                            </div>
-                            <div class="loc-ejs"><p class="location"><%= event.location %></p></div>
+                    <div class="date-symbol" style="display: flex; align-items: center; gap: 5px;", >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" height="20"><path d="M184 48l144 0c4.4 0 8 3.6 8 8l0 40L176 96l0-40c0-4.4 3.6-8 8-8zm-56 8l0 40L64 96C28.7 96 0 124.7 0 160l0 96 192 0 160 0 8.2 0c32.3-39.1 81.1-64 135.8-64c5.4 0 10.7 .2 16 .7l0-32.7c0-35.3-28.7-64-64-64l-64 0 0-40c0-30.9-25.1-56-56-56L184 0c-30.9 0-56 25.1-56 56zM320 352l-96 0c-17.7 0-32-14.3-32-32l0-32L0 288 0 416c0 35.3 28.7 64 64 64l296.2 0C335.1 449.6 320 410.5 320 368c0-5.4 .2-10.7 .7-16l-.7 0zm320 16a144 144 0 1 0 -288 0 144 144 0 1 0 288 0zM496 288c8.8 0 16 7.2 16 16l0 48 32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-48 0c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16z"/></svg>
+                        <p style="font-size: 11.7px;">Date & Time</p>
+                    </div>
+
+                    <div class="time-related" style="line-height: 1px;">
+                        <div class="month-year">
+                            <p class="time-date"><%= new Date(event.date).toLocaleString('default', {month: 'long'}) %></p>
+                            <p class="time-date"><%= new Date(event.date).getDate() %></p>
+                            <p class="time-date"><%= new Date(event.date).getFullYear() %></p>
                         </div>
-    
-    
-                            <div class="date-time-container">
 
-                                <div class="date-symbol" style="display: flex; align-items: center; gap: 5px;", >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" height="20"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M184 48l144 0c4.4 0 8 3.6 8 8l0 40L176 96l0-40c0-4.4 3.6-8 8-8zm-56 8l0 40L64 96C28.7 96 0 124.7 0 160l0 96 192 0 160 0 8.2 0c32.3-39.1 81.1-64 135.8-64c5.4 0 10.7 .2 16 .7l0-32.7c0-35.3-28.7-64-64-64l-64 0 0-40c0-30.9-25.1-56-56-56L184 0c-30.9 0-56 25.1-56 56zM320 352l-96 0c-17.7 0-32-14.3-32-32l0-32L0 288 0 416c0 35.3 28.7 64 64 64l296.2 0C335.1 449.6 320 410.5 320 368c0-5.4 .2-10.7 .7-16l-.7 0zm320 16a144 144 0 1 0 -288 0 144 144 0 1 0 288 0zM496 288c8.8 0 16 7.2 16 16l0 48 32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-48 0c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16z"/></svg>
-                                    <p style="font-size: 11.7px;">Date & Time</p>
-                                </div>
-
-                                <div class="time-related" style="line-height: 1px;">
-                                    <div class="month-year">
-                                        <p class="time-date"><%= new Date(event.date).toLocaleString('default', {month: 'long'}) %></p>
-                                        <p class="time-date"><%= new Date(event.date).getDate() %></p>
-                                        <p class="time-date"><%= new Date(event.date).getFullYear() %></p>
-                                    </div>
-        
-                                    <div class="time">
-                                        <p class="time-date"><%= event.startTime %> - <%= event.endTime %></p>
-                                    </div>
-                                </div>
-                                
-    
-                            </div>
+                        <div class="time">
+                            <p class="time-date"><%= event.startTime %> - <%= event.endTime %></p>
+                        </div>
                     </div>
-                    
-                    <div class="description">
-                        <p class="eventDescription"><%= event.description %></p>
-                    </div>
-                
 
-                <!-- <p class="date"><%= event.tags %></p> -->
-                <!-- <p class="date">event.tags</p> -->
-                <p class="date"><%= event.tags %></p>
 
-                    <!-- <p class="age"><%= event.age%></p> -->
-                    <!-- <p class="category"><%= event.category%></p> -->
-
-                    <div class="goBack">
-                        
-                        <button id="goback">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="20px"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
-                            <p>Go Back</p>
-                        </a></button>
-                    </div>
                 </div>
             </div>
 
-          </div>
-            
-        <script>
-        </script>
-    </body>
+            <div class="description">
+                <p class="eventDescription"><%= event.description %></p>
+            </div>
 
 
-    <style>
+            <p class="date"><%= event.tags %></p>
 
-        body, html {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: "Quicksand", system-ui;
-            background: url(/images/bg.png);
-            background-size: cover;
-        }
+            <div class="goBack">
 
+                <button id="goback">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" height="20px"><path d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
+                    <p>Go Back</p>
+                    </a></button>
+            </div>
+        </div>
+    </div>
 
-        body {
-            background: rgba(255, 255, 255, 0.8);
-        } 
-                
+</div>
+</body>
 
-        .navLogo {
-     font-size: 25px;
-     font-weight: 700;
-     padding-inline: 10px;
-}
+<script>
+    const goback = document.getElementById("goback");
+    goback.addEventListener("click", gobackk)
 
-.navLogo a {
-   text-decoration: none !important;
-   color: black;
-
-   
-}
-
-        .container{
-            margin-top: -250px;
-            background-color: rgb(255, 255, 255);
-            padding: 200px 50px 50px 50px;
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-            border-radius: 20px;
-        }
-
-        span{
-            color: #5AA5FF;
-        }
-
-      
-
-        .eventTitle{
-            background: #5AA5FF;
-            padding: 10px 50px 10px 50px;
-            color: white;
-            border-radius: 5px;
-            margin-top: -150px;
-            text-transform: uppercase;
-            box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .evnetInformation{
-            height: 100%;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-            margin-top: 300px;
-        }
-
-        .timeNdescription{
-            /* height: 100%; */
-            width: 500px;
-            /* background: rgba(0, 0, 0, 0.431); */
-            /* border-radius: 6px; */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset; */
-        }
-        
-
-        .description{
-            background: rgb(255, 255, 255);
-            width: 440px;
-            margin: 5px;
-            padding: 5px 20px 5px 20px;
-            text-align: left;
-            border-radius: 5px;
-        }
-        .date{
-            background: rgb(255, 255, 255);
-            width: 440px;
-            margin: 0px 0px 10px 0px;
-            padding: 5px 20px 5px 20px;
-            text-align: center;
-            border-radius: 5px;
-        }
-
-        .thumbnail-image{
-            height: 70px;
-            width: 160px;
-            object-fit: cover;
-        }
-
-        .thumbnail-image{
-            height: 150px;
-            width: 500px;
-            margin: -10px 0px 5px 0px;
-            border-radius: 20px 20px 20px 20px;
-        }
-
-        .time-date {
-            font-size: 15px;
-        }
-
-        .month-year{
-            display: flex;
-            flex-direction: row;
-        }
-
-        .loc-date-time-container{
-            display: flex;
-            flex-direction: row;
-            gap: 100px;
-            justify-content: space-between;
-        }
-
-        .month-year{
-            gap: 10px;
-        }
-
-        .loc-logo-name{
-            display: flex;
-            flex-direction: row;
-            font-size: 15px;
-            align-items: center;
-            margin-bottom: -20px;
-        }
-
-        .loc{
-            display: flex;
-            flex-direction: column;
-        }
-
-        .date-time-container{
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            line-height: 15px;
-        }
-
-        .loc-date-time-container{
-            display: flex;
-            flex-direction: row;
-            gap: 180px;
-            margin: 20px;
-        }
-
-        .goBack{
-            margin: 10px;
-        }
-
-        .goBack button{
-            height: 50px;
-            width: 200px;
-            background-color: white;
-            border: 2px #5AA5FF solid;
-            color: #5AA5FF;
-            border-radius: 10px;
-            font-size: 20px;
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-
-        }
-
-    </style>
-
-    <script>
-        const goback = document.getElementById("goback");
-        goback.addEventListener("click", gobackk)
-
-        function gobackk(){
-            window.location.href = "/events"
-        }
-    </script>
+    function gobackk(){
+        window.location.href = "/events"
+    }
+</script>
 </html>

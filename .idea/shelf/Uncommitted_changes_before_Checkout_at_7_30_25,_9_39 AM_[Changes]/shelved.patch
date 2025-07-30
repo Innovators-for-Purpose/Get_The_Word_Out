@@ -1,0 +1,480 @@
+Index: controller/eventController.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>const Event = require(\"../models/Event.js\");\nconst { GoogleGenAI } = require(\"@google/genai\");\nconst fs = require(\"fs\");\nconst http = require(\"http\");\n\nconst ai = new GoogleGenAI({ apiKey:\"AIzaSyBrqrCbjVXIkSCXYnTRTXiNjRzwkaZT5Q8\"});\nconsole.log(\"Does ai have getGenerativeModel?\", typeof ai.getGenerativeModel);\n\nconst { PredictionServiceClient } = require('@google-cloud/aiplatform');\nconst { helpers } = require('@google-cloud/aiplatform');\n\nconst projectID = 'autofill-466017';\nconst Location = 'us-central1';\n\nconst clientOptions = {\n  apiEndpoint: `${Location}-aiplatform.googleapis.com`,\n\n};\nconst predictionServiceClient = new PredictionServiceClient(clientOptions);\n\nasync function getEventInfoFromGeminiVision(imageBuffer, mimeType) {\n  try {\n    const base64Image = imageBuffer.toString('base64');\n\n    const prompt = `\n    You are an AI assistant designed to extract event details from an image of an event poster.\n    Your response must be a JSON object with the following exact keys and data types.\n    If a field is not present or cannot be determined, provide null for its value.\n    Do NOT include any additional text or formatting outside the JSON.\n\n    {\n        \"title\": \"string or null\",\n        \"description\": \"string or null\",\n        \"location\": {\n            \"city\": \"string or null\",\n            \"state\": \"string or null\",\n            \"zip\": \"string or null\"\n        },\n        \"venue\": \"string or null\",\n        \"date\": \"YYYY-MM-DD string or (eg. Thursday ,20th ) or null\",\n        \"startTime\": \"HH:MM (24-hour) string or null\",\n        \"endTime\": \"HH:MM (24-hour) string or null\",\n        \"category\": \"string or null\",\n        \"ageSuitability\": \"string (e.g., 'All Ages', '18+', 'Adults') or null\",\n        \"tags\": \"array of strings or null\"\n    }\n    `;\n\n\n    const result = await ai.models.generateContent({\n      model: \"gemini-2.5-flash\",\n      contents: [{\n        role: 'user',\n        parts: [\n          { inlineData: { mimeType: mimeType, data: base64Image } },\n          { text: prompt }\n        ],\n      }],\n    });\n\n\n    let aiResponseText;\n    if (result && result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {\n      aiResponseText = result.candidates[0].content.parts[0].text;\n    } else {\n      console.error(\"Gemini API response structure unexpected. Could not find text in candidates.\");\n      console.error(\"Full Gemini API result object (unexpected structure):\", JSON.stringify(result, null, 2));\n      throw new Error(\"Gemini API call failed: Unexpected response structure from model.\");\n    }\n\n\n    console.log(\"AI raw response text:\", aiResponseText);\n\n    let parsedData = {};\n    try {\n      const jsonStartIndex = aiResponseText.indexOf('```json');\n      const jsonEndIndex = aiResponseText.lastIndexOf('```');\n\n      if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonEndIndex > jsonStartIndex) {\n        const jsonString = aiResponseText.substring(jsonStartIndex + '```json'.length, jsonEndIndex).trim();\n        parsedData = JSON.parse(jsonString);\n      } else {\n        console.warn(\"AI response did not contain expected '```json' markdown block. Attempting direct JSON parse.\");\n        parsedData = JSON.parse(aiResponseText);\n      }\n    } catch (parseError) {\n      console.error(\"Error parsing AI response text as JSON:\", parseError.message);\n      const cleanedText = aiResponseText.replace(/```json\\n|\\n```/g, '').trim();\n      try {\n        parsedData = JSON.parse(cleanedText);\n      } catch (reparseError) {\n        console.error(\"Failed to re-parse cleaned AI response as JSON:\", reparseError.message);\n        throw new Error(\"AI response was not valid JSON and could not be cleaned.\");\n      }\n    }\n\n    return parsedData;\n\n  } catch (error) {\n    console.error('Full Gemini API Error Object (from catch block):', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));\n    throw new Error('Failed to get AI response or parse JSON: ' + error.message);\n  }\n}\n\nexports.generateAiThumbnail = async (req, res) => {\n  console.log(\"Thumbnail Generation started!\");\n  const { description } = req.body;\n\n  if (!description) {\n    return res.status(400).json({ success: false, error: 'Description is required for AI thumbnail generation.' });\n  }\n\n  try {\n    const userPrompt = `Generate a very concise, detailed descriptive prompt for an image generation AI, based on the following event description. Focus on key text elements, colors, mood, and style and . the image is flyer and has all the elements provided(eg.Ai Summit,boston, 9pm to 3am ,july 25, #transformingai).\n\nEvent Description: \"${description}\"\n\n\n    Example Output: \"\"A professional and modern flyer for a business technology conference. \n    The dominant color scheme is deep blue and white, with a subtle background image of a city skyline from an elevated perspective, blurred to keep focus on the text.\n    Key Text Elements (Prominently displayed, bold, and in a clean, sans-serif font):\n    \"TECH ROUND\" (large, white, at the top)\"2029\" (extremely large, white, central, overlapping the background slightly)\n    \n    \"THE LATEST IN BUSINESS GROWTH TECHNOLOGY  \" (smaller, white, right-aligned next to \"2029\")\n    \n    Sub-sections (on solid blue background blocks with white text):nBlock 1 (below main title): \n    \"The year's biggest business technology conference is back for the 6th time! Discover new technologies for growing your business. Meet industry leaders and make lasting business connections!\" \n    (Smaller, clear text)Block 2 (central, largest): \"Tuesday April 6 - Friday April 9\" (large, bold) and \"9AM-7PM DAILY\" (slightly smaller, bold) Block 3 (lower):\n     \"REGISTRATION:\" (bold) and \"$500 PER PERSON\" (very large, bold).Block 4 (bottom): \"The Elliot House Hotel\" \"216 Gladwell Boulevard\" \"Crested Butte, Colorado\" (Standard text, left-aligned).\n     Smallest text at the very bottom: \"Register @ eventlite.com/techround | facebook.com/techround | techround@events.com\"`;\n    console.log(`Sending text prompt to Gemini 2.5 Flash for image description: \"${description}\"`);\n\n\n    const geminiResult = await ai.models.generateContent({\n      model: \"gemini-2.5-flash\",\n      contents: [{\n        role: 'user',\n        parts: [{ text: userPrompt }]\n      }],\n    });\n    let aiGeneratedImagePrompt = null;\n    if (geminiResult && geminiResult.candidates && geminiResult.candidates.length > 0 && geminiResult.candidates[0].content && geminiResult.candidates[0].content.parts && geminiResult.candidates[0].content.parts.length > 0 && geminiResult.candidates[0].content.parts[0].text) {\n      aiGeneratedImagePrompt = geminiResult.candidates[0].content.parts[0].text;\n    }\n\n\n    if (!aiGeneratedImagePrompt) {\n      console.error(\"Gemini API response structure unexpected. Could not find text prompt for image generation.\");\n      throw new Error(\"Gemini API call failed: Unexpected response structure from model for text prompt.\");\n    }\n\n\n    console.log(\"Gemini generated image prompt:\", aiGeneratedImagePrompt);\n\n    console.log(\"Sending prompt to Vertex AI Imagen for image generation...\");\n\n    const endpoint = `projects/${projectID}/locations/${Location}/publishers/google/models/imagen-4.0-generate-preview-06-06`;// For Imagen 2\n\n    const instance = helpers.toValue({\n      prompt: aiGeneratedImagePrompt,\n\n    });\n\n    const parameters = helpers.toValue({\n      sampleCount: 1,\n      aspectRatio: \"1:1\",\n    });\n\n    const request = {\n      endpoint,\n      instances: [instance],\n      parameters,\n    };\n\n    const [response] = await predictionServiceClient.predict(request);\n\n    let generatedImgBase64 = null;\n    let generatedImgMimeType = null;\n\n    if (response.predictions && response.predictions.length > 0) {\n      const prediction = helpers.fromValue(response.predictions[0]);\n      if (prediction.bytesBase64Encoded) {\n        generatedImgBase64 = prediction.bytesBase64Encoded;\n        generatedImgMimeType = 'image/png';\n      }\n    }\n     const imagebuffer = fs.readFileSync(generatedImgBase64);\n     const server = http.createServer((req, res) => {\n       if (req.url === '/public/images/') {\n         res.writeHead(200, {'Content-Type': 'image/jpeg'});\n         res.end(imagebuffer);\n       }\n     });\n     server.listen(3000,() =>{\n       console.log(\"images at public/images\")\n         });\n\n\n\n    if (generatedImgBase64) {\n      console.log(\"Vertex AI Imagen image generated successfully!\");\n      res.status(200).json({\n        success: true,\n        imageData: generatedImgBase64,\n        mimeType: generatedImgMimeType,\n        aiPrompt: aiGeneratedImagePrompt\n      });\n    } else {\n      console.error(\"Vertex AI Imagen did not return an image. Full response:\", JSON.stringify(response, null, 2));\n      res.status(500).json({ success: false, error: 'Vertex AI Imagen did not return an image.', details: \"No image data found in Vertex AI response.\" });\n    }\n\n  } catch (error) {\n    console.error('Full Error during AI image generation process (Vertex AI):', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));\n    res.status(500).json({ success: false, error: 'Server error during AI thumbnail generation.', details: error.message });\n  }\n};\nexports.getAutofillPreview = async (req, res) => {\n  console.log(\"--- getAutofillPreview function started ---\");\n  console.log(\"req.file status:\", req.file ? \"File exists (size: \" + req.file.size + \" bytes)\" : \"No file found\");\n\n  try {\n    if (!req.file || !req.file.buffer) {\n      return res.status(400).json({ success: false, error: \"No image file uploaded for autofill preview.\" });\n    }\n\n    const thumbnailBuffer = req.file.buffer;\n    const thumbnailMimeType = req.file.mimetype;\n    console.log(\"Sending image to Gemini for analysis (for preview)...\");\n\n    const aiData = await getEventInfoFromGeminiVision(thumbnailBuffer , thumbnailMimeType);\n    console.log(\"AI extracted data for preview (raw AI output):\", aiData);\n\n    if (aiData.date) {\n      const parsedDate = new Date(aiData.date);\n      if (!isNaN(parsedDate.getTime())) {\n        aiData.date = parsedDate.toISOString().split('T')[0];\n      } else {\n        console.warn(`[getAutofillPreview] AI returned unparseable date: \"${aiData.date}\". Setting to null.`);\n        aiData.date = null;\n      }\n    } else {\n      aiData.date = null;\n    }\n\n    aiData.startTime = aiData.startTime || null;\n    aiData.endTime = aiData.endTime || null;\n\n    res.status(200).json({ success: true, data: aiData });\n\n  } catch (error) {\n    console.error(\"--- ERROR IN getAutofillPreview function ---\");\n    console.error(\"Error details:\", error.message);\n    console.error(\"Error stack:\", error.stack);\n    res.status(500).json({ success: false, error: \"AI Autofill Preview Error: \" + error.message });\n  }\n};\n\nexports.createEvent = async (req, res) => {\n  console.log(\"--- createEvent function started ---\");\n  console.log(\"req.file status:\", req.file ? \"File exists (size: \" + req.file.size + \" bytes)\" : \"No file found\");\n  console.log(\"req.body content:\", req.body);\n\n  let thumbnailData = null;\n\n  try {\n    if (req.file && req.file.buffer) {\n      thumbnailData = req.file.buffer;\n      console.log(\"Thumbnail buffer received for DB storage.\");\n    }\n    else{\n      console.log(\"No image file uploaded\");\n    }\n\n    const {\n      title,\n      description,\n      location,\n      venue,\n      category,\n      age,\n      date,\n      startTime,\n      endTime,\n      tags,\n      uid\n    } = req.body;\n\n    const finalTitle = title || \"Untitled Event\";\n    const finalDescription = description || \"No description provided.\";\n    const finalVenue = venue || \"To Be Determined\";\n    const finalUid = uid || 1;\n\n    let finalLocation = \"Unknown Location\";\n    if (typeof location === 'object' && location !== null) {\n      if (location.city || location.state || location.zip) {\n        finalLocation = `${location.city || ''}${location.state ? ', ' + location.state : ''}${location.zip ? ' ' + location.zip : ''}`.trim();\n      }\n    } else if (location) {\n      finalLocation = location;\n    }\n\n    let finalDate = null;\n    if (date) {\n      try {\n        const parsed = new Date(date);\n        if (!isNaN(parsed.getTime())) {\n          finalDate = parsed.toISOString().split('T')[0];\n        } else {\n          console.warn(`[createEvent] Invalid date string received: \"${date}\". Defaulting to current date.`);\n          finalDate = new Date().toISOString().split('T')[0];\n        }\n      } catch (e) {\n        console.error(`[createEvent] Error parsing date \"${date}\":`, e.message);\n        finalDate = new Date().toISOString().split('T')[0];\n      }\n    } else {\n      console.warn(`[createEvent] Date not provided. Defaulting to current date.`);\n      finalDate = new Date().toISOString().split('T')[0];\n    }\n\n    const finalStartTime = startTime || \"00:00\";\n    const finalEndTime = endTime || \"23:59\";\n\n    const categoryMap = {\n      \"STEAM\": \"STEAM\", \"Music\": \"Music\", \"Art\": \"Art\",\n      \"Entertainment\": \"Entertainment\", \"Technology\": \"Technology\",\n      \"Conference\": \"Technology\",\n      \"Community Service\": \"Other\"\n    };\n    const finalCategory = categoryMap[category] || \"Other\";\n\n    const ageMap = {\n      \"Kids/1-7\": \"Kids/1-7\", \"Pre-teen/7-12\": \"Pre-teen/7-12\", \"Teen/13-17\": \"Teen/13-17\",\n      \"Young Adults/18-25\": \"Young Adults/18-25\", \"Adults/25-65\": \"Adults/25-65\", \"Senior/65+\": \"Senior/65+\",\n      \"All Ages\": \"Adults/25-65\",\n      \"18+\": \"Young Adults/18-25\",\n      \"N/A\": \"Adults/25-65\"\n    };\n    const finalAge = ageMap[age] || \"Adults/25-65\";\n\n    const finalTags = (tags && Array.isArray(tags)) ? tags : (tags ? [tags] : null);\n\n    console.log(\"Attempting to create event in DB with final data:\");\n    console.log({\n      thumbnail: thumbnailData ? 'BUFFER_EXISTS' : null,\n      title: finalTitle,\n      uid: finalUid,\n      description: finalDescription,\n      location: finalLocation,\n      venue: finalVenue,\n      time: finalStartTime,\n      category: finalCategory,\n      age: finalAge,\n      date: finalDate,\n      tags: finalTags,\n      startTime: finalStartTime,\n      endTime: finalEndTime\n    });\n\n    const event = await Event.create({\n      thumbnail: thumbnailData,\n      title: finalTitle,\n      uid: finalUid,\n      description: finalDescription,\n      location: finalLocation,\n      venue: finalVenue,\n      time: finalStartTime,\n      category: finalCategory,\n      age: finalAge,\n      date: finalDate,\n      tags: finalTags,\n      startTime: finalStartTime,\n      endTime: finalEndTime,\n    });\n\n    console.log(\"Event created in DB successfully. ID:\", event.id);\n\n    res.status(201).json({ success: true, event: event.toJSON(), id: event.id });\n\n  } catch (outerError) {\n    console.error(\"--- FATAL ERROR IN createEvent function ---\");\n    console.error(\"Error details:\", outerError.message);\n    console.error(\"Error stack:\", outerError.stack);\n    res.status(500).json({ success: false, error: \"Server Error: \" + outerError.message });\n  }\n};\n\nexports.getALLEvents = async (req, res) => {\n  try {\n    const events = await Event.findAll();\n    res.render('event-list', { events: events });\n  } catch (error) {\n    console.error(\"Failed to fetch events:\", error);\n    res.status(500).json({ success: false, error: \"Server Error\" });\n  }\n}\n\nexports.getEventDetails = async (req, res) => {\n  try {\n    const { id } = req.params;\n    const event = await Event.findByPk(id);\n    if (event) {\n      res.render(\"event-view-page\", { event });\n    } else {\n      res.status(404).render(\"error\", { message: \"Event not found\" });\n    }\n  } catch (error) {\n    console.error(\"Error getting event details in controller:\", error);\n    res.status(500).render(\"error\", { message: \"Server Error\" });\n  }\n};\n\nexports.singleEvent = async (req, res) => {\n  try {\n    const { id } = req.body;\n    console.log(req.body);\n    const event = await Event.findAll({where: {id: id}});\n    res.status(201).json({ success: true, event});\n  } catch (error) {\n    console.error(\"Error getting event data in controller:\", error);\n    res.status(500).json({ success: false, error: \"Server Error\" });\n  }\n};\n\nexports.deleteEvent = async (req, res) => {\n  try {\n    const { id } = req.body;\n    await Event.destroy({where: {id: id}});\n    res.status(202).json({ success: true });\n  } catch (error) {\n    console.error(\"Error deleting event in controller:\", error);\n    res.status(500).json({ success: false, error: error.message });\n  }\n};
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/controller/eventController.js b/controller/eventController.js
+--- a/controller/eventController.js	(revision d48860a3ee621e27aebcef2caf1bcc27f53f8528)
++++ b/controller/eventController.js	(date 1753882759195)
+@@ -1,7 +1,7 @@
+ const Event = require("../models/Event.js");
+ const { GoogleGenAI } = require("@google/genai");
+-const fs = require("fs");
+-const http = require("http");
++//const fs = require("fs");
++//const http = require("http");
+ 
+ const ai = new GoogleGenAI({ apiKey:"AIzaSyBrqrCbjVXIkSCXYnTRTXiNjRzwkaZT5Q8"});
+ console.log("Does ai have getGenerativeModel?", typeof ai.getGenerativeModel);
+@@ -184,18 +184,6 @@
+         generatedImgMimeType = 'image/png';
+       }
+     }
+-     const imagebuffer = fs.readFileSync(generatedImgBase64);
+-     const server = http.createServer((req, res) => {
+-       if (req.url === '/public/images/') {
+-         res.writeHead(200, {'Content-Type': 'image/jpeg'});
+-         res.end(imagebuffer);
+-       }
+-     });
+-     server.listen(3000,() =>{
+-       console.log("images at public/images")
+-         });
+-
+-
+ 
+     if (generatedImgBase64) {
+       console.log("Vertex AI Imagen image generated successfully!");
+Index: views/event.ejs
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"UTF-8\">\n    <link rel=\"stylesheet\" href=\"https://use.typekit.net/mev6qqe.css\">\n    <link href=\"https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"/createevents.css\">\n</head>\n<body>\n    <div class=\"navLogo\">\n      <a href= \"http://localhost:3000\">\n        <p>GT<span class=\"word\">W</span>O</p>\n      </a>\n    </div>\n\n  <div class=\"container\">\n\n      <form id=\"eventForm\" method=\"POST\" action=\"/events/eventForm\" enctype=\"multipart/form-data\">\n\n\n        <h1 id=\"currentPageTitle\">Create An Event</h1>\n        <div class=\"formBox\">\n            <h4>Upload thumbnail of event</h4>\n\n            <div class=\"thumbnail-file\">\n                <input type=\"file\" name=\"thumbnail\" id=\"thumbnail-file\">\n                <div id=\"ai-thumbnail-display\"></div>\n            </div>\n             <h5>(Upload a picture of the event on the community bulletin board)</h5>\n\n\n                <div class=\"thumbAi\">\n\n                    <button type=\"button\" id=\"previewAi\" class=\"thumbAi-btn\">\n                        <img src=\"images/generate-thumbnail.png\" alt=\"ai\" height = \"30\" class=\"generate-thumbnail\">\n                        <h6 class = \"button-text\">Generate Thumbnail with Artificial Intelligence</h6>\n                    </button>\n                </div>\n\n\n\n\n            <div class=\"sects\">\n                <label for=\"eventTitle\">Event Title *</label><br>\n                <input name=\"title\" id=\"eventTitle\" class=\"textareas\" value=\"\" required></input><br>\n            </div>\n\n            <div class=\"sects\">\n                <label for=\"Description\">Event Description *</label><br>\n                <textarea name=\"description\" id=\"Description\" required></textarea><br>\n            </div>\n\n            <div class=\"tags\">\n                <label for=\"Tags\" class=\"tags\">Tags</label>\n                <input name=\"tags\" id=\"tags\" class=\"textareas\" value=\"\" required></input><br>\n            </div>\n\n            <div class=\"location-div\">\n                <label for=\"Location\" class=\"locationLabel\">Location</label><br>\n                <input name=\"location\" id=\"Location\" class=\"textareas\" value=\"\" required placeholder=\"Location, City, State, Zip Code\"></input><br>\n            </div>\n\n\n\n            <div class=\"times\">\n\n                <div class=\"event-date\">\n                    <label for=\"Date\">Date</label><br>\n                    <input type=\"date\" name=\"date\" id=\"Date\" required value=\"2025-01-16\">\n                </div>\n\n                <div class=\"time-start\">\n                    <label for=\"Time\" class=\"timeLabel\">Time Start</label></br>\n                    <input type=\"time\" name=\"startTime\" id=\"t-start\" required value=\"17:10\">\n                </div>\n\n                <div class=\"time-end\">\n                    <label for=\"Time\" class=\"timeLabel\">Time End</label></br>\n                    <input type=\"time\" name=\"endTime\" id=\"t-end\" required value=\"17:10\">\n                </div>\n\n\n            </div>\n                <button type=\"button\" id=\"previewButton\" class=\"createEvent\">Continue</button>\n            </form>\n\n          </div>\n        </div>\n    </div>\n    <div class=\"popup-overlay\" id=\"preview-overlay\">\n        <div class=\"thumbPreview\" id=\"thumbPreview\">\n            <span class=\"close\" id=\"close-preview\">&times;</span>\n            <h7 class= \"gradient-text\" > Genarate Thumbnail with Artifiical Intelligence</h7>\n            <p>Please type in a short description of the image you'd like to generate as your thumbnail.</p>\n            <input class=\"textbox\"  id=\"textbox\" name=\"textbox\"/>\n            <button class=\"gradient-button\" id=\"generate-thumbnail\">Generate Thumbnail</button>\n        </div>\n\n\n\n   </div>\n\n\n\n    <div id=\"previewModal\">\n        <div class=\"preview-modal-content\" >\n            <h2>Preview Your Event</h2>\n            <div id=\"previewContent\">\n                <!-- Image will be added here dynamically by JavaScript -->\n            </div>\n            <div class=\"preview-actions\">\n                <button id=\"editBtn\">Edit</button>\n                <button id=\"confirmBtn\">Confirm</button>\n            </div>\n        </div>\n    </div>\n    <script>\n\n    const previewOverlay = document.getElementById('preview-overlay');\n    const thumbPreview = document.getElementById('thumbPreview');\n    const previewAi = document.getElementById('previewAi');\n    const closePreview = document.getElementById('close-preview');\n    const generateThumbnail = document.getElementById('generate-thumbnail');\n    const textbox = document.getElementById('textbox');\n        const eventForm = document.getElementById('eventForm');\n        const previewButton = document.getElementById('previewButton');\n        const previewModal = document.getElementById('previewModal');\n        const previewContent = document.getElementById('previewContent');\n        const editBtn = document.getElementById('editBtn');\n        const confirmBtn = document.getElementById('confirmBtn');\n    const thumbnailFileDiv = document.querySelector('thumbnail-file');\n    const aiThumbnailDisplay = document.getElementById('ai-thumbnail-display');\n        // const ageRangeMap = {\n        //     '1': 'Not Selected',\n        //     '2': 'age 5-10',\n        //     '3': 'age 10-15',\n        //     '4': 'age 15-18',\n        //     '5': 'age 18-30'\n        // };\n\n        // const categoryMap = {\n        //     '0': 'Not Selected',\n        //     '1': 'Category 1',\n        //     '2': 'Category 2',\n        //     '3': 'Category 3',\n        //     '4': 'Category 4'\n        // };\n\n\n\n     previewAi.addEventListener('click', () => {\n     previewOverlay.style.display = \"flex\";\n    });\n    // event.ejs JavaScript <script> block\n\n\n\n    generateThumbnail.addEventListener('click', async () => {\n        const description = textbox.value.trim();\n        if (!description) {\n            alert(\"Please provide a description for the AI to generate a thumbnail.\");\n            generateThumbnail.textContent = 'Generate Thumbnail';\n            generateThumbnail.disabled = false;\n            return;\n        }\n        generateThumbnail.textContent = 'Generating...';\n        generateThumbnail.disabled = true;\n        console.log(\"Attempting to generate thumbnail with description:\", description);\n        let result = null;\n        try {\n            const response = await fetch(`/events/generateThumbnail`, {\n                method: 'POST',\n                headers: {\n                    'Content-Type': 'application/json'\n                },\n                body: JSON.stringify({ description: description })\n            });\n            if (!response.ok) {\n                let errorDetails = \"Unknown server error.\";\n                try {\n                    const errorData = await response.json();\n                    errorDetails = errorData.error || errorDetails;\n                } catch (jsonError) {\n                    errorDetails = response.statusText;\n                }\n                throw new Error(`AI generation failed: ${response.status} - ${errorDetails}`);\n            }\n            result = await response.json();\n            if (result.success && result.imageData) {\n                document.getElementById('thumbnail-file').style.display = 'none';\n                aiThumbnailDisplay.innerHTML = '';\n                const generatedImg = document.createElement('img');\n                generatedImg.src = `data:${result.mimeType};base64,${result.imageData}`;\n                generatedImg.style.maxWidth = '100%';\n                generatedImg.style.height = 'auto';\n                generatedImg.style.display = 'block';\n                generatedImg.style.border = '1px solid red';\n                generatedImg.style.minHeight = '100px';\n                generatedImg.style.backgroundColor = '#f0f0f0';\n                aiThumbnailDisplay.appendChild(generatedImg);\n                sessionStorage.setItem('generatedAiThumbnailData', JSON.stringify({\n                    data: result.imageData,\n                    mime: result.mimeType\n                }));\n                alert(\"AI Thumbnail generated successfully!\");\n                previewOverlay.style.display = 'none';\n            } else {\n                alert(\"Failed to generate AI Thumbnail: \" + (result.error || \"Server indicated failure.\"));\n            }\n        } catch (error) {\n            console.error(\"Error during AI thumbnail generation request:\", error);\n            alert(error.message);\n        } finally {\n            generateThumbnail.textContent = 'Generate Thumbnail';\n            generateThumbnail.disabled = false;\n        }\n    });\n\n     closePreview.addEventListener('click', () => {\n    previewContent.innerHTML = \"\";\n    previewOverlay.style.display = 'none';})\n\n\n\n          previewButton.addEventListener('click', (event) => {\n    event.preventDefault();\n\n    if (eventForm.checkValidity()) {\n        previewContent.innerHTML = \"\";\n\n        const previewFields = [\n            { label: 'Event Title', value: document.getElementsByName('title')[0].value },\n            { label: 'Event Description', value: document.getElementsByName('description')[0].value },\n            { label: 'Date', value: document.getElementsByName('date')[0].value },\n            { label: 'Time Start', value: document.getElementsByName('startTime')[0].value },\n            { label: 'Time End', value: document.getElementsByName('endTime')[0].value },\n            { label: 'Location', value: document.getElementsByName('location')[0].value },\n            { label: 'Tags', value: document.getElementsByName('tags')[0].value }\n        ];\n\n\n        const generatedAiThumbnailData = sessionStorage.getItem('generatedAiThumbnailData');\n        if (generatedAiThumbnailData) {\n            const { data, mime } = JSON.parse(generatedAiThumbnailData);\n            const img = document.createElement('img');\n            img.src = `data:${mime};base64,${data}`;\n            img.style.maxWidth = '200px';\n            previewContent.appendChild(img);\n            previewFields.push({ label: 'Event Thumbnail (AI Generated)', value: 'Displayed above' });\n        } else {\n\n            const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];\n            if (thumbnailFile) {\n                const img = document.createElement('img');\n                img.src = URL.createObjectURL(thumbnailFile);\n                img.style.maxWidth = '200px';\n                previewContent.appendChild(img);\n                previewFields.push({ label: 'Event Thumbnail', value: thumbnailFile.name });\n            }\n        }\n\n\n\n        previewFields.forEach(function(field) {\n            const previewItem = document.createElement('div');\n            previewItem.classList.add('preview-item');\n\n            let displayValue = \"\";\n\n            if (field.label === \"Event Thumbnail\" && typeof field.value === \"string\") {\n                displayValue = field.value;\n            } else if (typeof field.value === \"object\" && field.value !== null && \"name\" in field.value) {\n                displayValue = field.value.name;\n            } else {\n                displayValue = field.value;\n            }\n\n            previewItem.innerHTML = `\n                <strong>${field.label}:</strong>\n                <span>${displayValue}</span>\n            `;\n            previewContent.appendChild(previewItem);\n        });\n\n\n        previewModal.style.display = 'block';\n    } else {\n        eventForm.reportValidity();\n    }\n            });\n\n            editBtn.addEventListener('click', () => {\n                previewModal.style.display = 'none';\n            });\n\n            confirmBtn.addEventListener('click', async () => {\n                const formData = new FormData(eventForm);\n\n                try {\n                    const response = await fetch(\"/events/eventForm\", {\n                        method: \"POST\",\n                        body: formData,\n                    });\n                    const result = await response.json();\n\n                    if (result.success) {\n                        console.log(\"Event created successfully:\", result.data);\n                        window.location.href = `/events/event/${result.id}`;\n                    } else {\n                        console.error(\"Error creating event:\", result.error);\n                        alert(\"Failed to create event. Please try again.\");\n                    }\n                } catch (error) {\n                    console.error(\"Submission error:\", error);\n                    alert(\"An error occurred while submitting the event.\");\n                }\n            });\n</script>\n</body>\n</html>\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/views/event.ejs b/views/event.ejs
+--- a/views/event.ejs	(revision d48860a3ee621e27aebcef2caf1bcc27f53f8528)
++++ b/views/event.ejs	(date 1753882452543)
+@@ -7,35 +7,35 @@
+     <link rel="stylesheet" href="/createevents.css">
+ </head>
+ <body>
+-    <div class="navLogo">
+-      <a href= "http://localhost:3000">
++<div class="navLogo">
++    <a href= "http://localhost:3000">
+         <p>GT<span class="word">W</span>O</p>
+-      </a>
+-    </div>
++    </a>
++</div>
+ 
+-  <div class="container">
++<div class="container">
+ 
+-      <form id="eventForm" method="POST" action="/events/eventForm" enctype="multipart/form-data">
++    <form id="eventForm" method="POST" action="/events/eventForm" enctype="multipart/form-data">
+ 
+ 
+         <h1 id="currentPageTitle">Create An Event</h1>
+         <div class="formBox">
+             <h4>Upload thumbnail of event</h4>
+ 
+-            <div class="thumbnail-file">
++            <div id="thumbnail-file" class="thumbnail-file">
+                 <input type="file" name="thumbnail" id="thumbnail-file">
+                 <div id="ai-thumbnail-display"></div>
+             </div>
+-             <h5>(Upload a picture of the event on the community bulletin board)</h5>
++            <h5>(Upload a picture of the event on the community bulletin board)</h5>
+ 
+ 
+-                <div class="thumbAi">
++            <div class="thumbAi">
+ 
+-                    <button type="button" id="previewAi" class="thumbAi-btn">
+-                        <img src="images/generate-thumbnail.png" alt="ai" height = "30" class="generate-thumbnail">
+-                        <h6 class = "button-text">Generate Thumbnail with Artificial Intelligence</h6>
+-                    </button>
+-                </div>
++                <button type="button" id="previewAi" class="thumbAi-btn">
++                    <img src="images/generate-thumbnail.png" alt="ai" height = "30" class="generate-thumbnail">
++                    <h6 class = "button-text">Generate Thumbnail with Artificial Intelligence</h6>
++                </button>
++            </div>
+ 
+ 
+ 
+@@ -81,40 +81,41 @@
+ 
+ 
+             </div>
+-                <button type="button" id="previewButton" class="createEvent">Continue</button>
+-            </form>
++            <button type="button" id="previewButton" class="createEvent">Continue</button>
++
+ 
+-          </div>
+-        </div>
+-    </div>
+-    <div class="popup-overlay" id="preview-overlay">
+-        <div class="thumbPreview" id="thumbPreview">
+-            <span class="close" id="close-preview">&times;</span>
+-            <h7 class= "gradient-text" > Genarate Thumbnail with Artifiical Intelligence</h7>
+-            <p>Please type in a short description of the image you'd like to generate as your thumbnail.</p>
+-            <input class="textbox"  id="textbox" name="textbox"/>
+-            <button class="gradient-button" id="generate-thumbnail">Generate Thumbnail</button>
+-        </div>
++</div>
++    </form>
++</div>
++</div>
++<div class="popup-overlay" id="preview-overlay">
++    <div class="thumbPreview" id="thumbPreview">
++        <span class="close" id="close-preview">&times;</span>
++        <h7 class= "gradient-text" > Genarate Thumbnail with Artifiical Intelligence</h7>
++        <p>Please type in a short description of the image you'd like to generate as your thumbnail.</p>
++        <input class="textbox"  id="textbox" name="textbox"/>
++        <button class="gradient-button" id="generate-thumbnail">Generate Thumbnail</button>
++    </div>
+ 
+ 
+ 
+-   </div>
++</div>
+ 
+ 
+ 
+-    <div id="previewModal">
+-        <div class="preview-modal-content" >
+-            <h2>Preview Your Event</h2>
+-            <div id="previewContent">
+-                <!-- Image will be added here dynamically by JavaScript -->
+-            </div>
+-            <div class="preview-actions">
+-                <button id="editBtn">Edit</button>
+-                <button id="confirmBtn">Confirm</button>
+-            </div>
+-        </div>
+-    </div>
+-    <script>
++<div id="previewModal">
++    <div class="preview-modal-content" >
++        <h2>Preview Your Event</h2>
++        <div id="previewContent">
++            <!-- Image will be added here dynamically by JavaScript -->
++        </div>
++        <div class="preview-actions">
++            <button id="editBtn">Edit</button>
++            <button id="confirmBtn">Confirm</button>
++        </div>
++    </div>
++</div>
++<script>
+ 
+     const previewOverlay = document.getElementById('preview-overlay');
+     const thumbPreview = document.getElementById('thumbPreview');
+@@ -122,34 +123,34 @@
+     const closePreview = document.getElementById('close-preview');
+     const generateThumbnail = document.getElementById('generate-thumbnail');
+     const textbox = document.getElementById('textbox');
+-        const eventForm = document.getElementById('eventForm');
+-        const previewButton = document.getElementById('previewButton');
+-        const previewModal = document.getElementById('previewModal');
+-        const previewContent = document.getElementById('previewContent');
+-        const editBtn = document.getElementById('editBtn');
+-        const confirmBtn = document.getElementById('confirmBtn');
+-    const thumbnailFileDiv = document.querySelector('thumbnail-file');
++    const eventForm = document.getElementById('eventForm');
++    const previewButton = document.getElementById('previewButton');
++    const previewModal = document.getElementById('previewModal');
++    const previewContent = document.getElementById('previewContent');
++    const editBtn = document.getElementById('editBtn');
++    const confirmBtn = document.getElementById('confirmBtn');
++    const thumbnailFileDiv = document.querySelector('.thumbnail-file');
+     const aiThumbnailDisplay = document.getElementById('ai-thumbnail-display');
+-        // const ageRangeMap = {
+-        //     '1': 'Not Selected',
+-        //     '2': 'age 5-10',
+-        //     '3': 'age 10-15',
+-        //     '4': 'age 15-18',
+-        //     '5': 'age 18-30'
+-        // };
++    // const ageRangeMap = {
++    //     '1': 'Not Selected',
++    //     '2': 'age 5-10',
++    //     '3': 'age 10-15',
++    //     '4': 'age 15-18',
++    //     '5': 'age 18-30'
++    // };
+ 
+-        // const categoryMap = {
+-        //     '0': 'Not Selected',
+-        //     '1': 'Category 1',
+-        //     '2': 'Category 2',
+-        //     '3': 'Category 3',
+-        //     '4': 'Category 4'
+-        // };
++    // const categoryMap = {
++    //     '0': 'Not Selected',
++    //     '1': 'Category 1',
++    //     '2': 'Category 2',
++    //     '3': 'Category 3',
++    //     '4': 'Category 4'
++    // };
+ 
+ 
+ 
+-     previewAi.addEventListener('click', () => {
+-     previewOverlay.style.display = "flex";
++    previewAi.addEventListener('click', () => {
++        previewOverlay.style.display = "flex";
+     });
+     // event.ejs JavaScript <script> block
+ 
+@@ -216,105 +217,105 @@
+         }
+     });
+ 
+-     closePreview.addEventListener('click', () => {
+-    previewContent.innerHTML = "";
+-    previewOverlay.style.display = 'none';})
++    closePreview.addEventListener('click', () => {
++        previewContent.innerHTML = "";
++        previewOverlay.style.display = 'none';})
+ 
+ 
+ 
+-          previewButton.addEventListener('click', (event) => {
+-    event.preventDefault();
++    previewButton.addEventListener('click', (event) => {
++        event.preventDefault();
+ 
+-    if (eventForm.checkValidity()) {
+-        previewContent.innerHTML = "";
++        if (eventForm.checkValidity()) {
++            previewContent.innerHTML = "";
+ 
+-        const previewFields = [
+-            { label: 'Event Title', value: document.getElementsByName('title')[0].value },
+-            { label: 'Event Description', value: document.getElementsByName('description')[0].value },
+-            { label: 'Date', value: document.getElementsByName('date')[0].value },
+-            { label: 'Time Start', value: document.getElementsByName('startTime')[0].value },
+-            { label: 'Time End', value: document.getElementsByName('endTime')[0].value },
+-            { label: 'Location', value: document.getElementsByName('location')[0].value },
+-            { label: 'Tags', value: document.getElementsByName('tags')[0].value }
+-        ];
++            const previewFields = [
++                { label: 'Event Title', value: document.getElementsByName('title')[0].value },
++                { label: 'Event Description', value: document.getElementsByName('description')[0].value },
++                { label: 'Date', value: document.getElementsByName('date')[0].value },
++                { label: 'Time Start', value: document.getElementsByName('startTime')[0].value },
++                { label: 'Time End', value: document.getElementsByName('endTime')[0].value },
++                { label: 'Location', value: document.getElementsByName('location')[0].value },
++                { label: 'Tags', value: document.getElementsByName('tags')[0].value }
++            ];
+ 
+ 
+-        const generatedAiThumbnailData = sessionStorage.getItem('generatedAiThumbnailData');
+-        if (generatedAiThumbnailData) {
+-            const { data, mime } = JSON.parse(generatedAiThumbnailData);
+-            const img = document.createElement('img');
+-            img.src = `data:${mime};base64,${data}`;
+-            img.style.maxWidth = '200px';
+-            previewContent.appendChild(img);
+-            previewFields.push({ label: 'Event Thumbnail (AI Generated)', value: 'Displayed above' });
+-        } else {
++            const generatedAiThumbnailData = sessionStorage.getItem('generatedAiThumbnailData');
++            if (generatedAiThumbnailData) {
++                const { data, mime } = JSON.parse(generatedAiThumbnailData);
++                const img = document.createElement('img');
++                img.src = `data:${mime};base64,${data}`;
++                img.style.maxWidth = '200px';
++                previewContent.appendChild(img);
++                previewFields.push({ label: 'Event Thumbnail (AI Generated)', value: 'Displayed above' });
++            } else {
+ 
+-            const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
+-            if (thumbnailFile) {
+-                const img = document.createElement('img');
+-                img.src = URL.createObjectURL(thumbnailFile);
+-                img.style.maxWidth = '200px';
+-                previewContent.appendChild(img);
+-                previewFields.push({ label: 'Event Thumbnail', value: thumbnailFile.name });
+-            }
+-        }
++                const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
++                if (thumbnailFile) {
++                    const img = document.createElement('img');
++                    img.src = URL.createObjectURL(thumbnailFile);
++                    img.style.maxWidth = '200px';
++                    previewContent.appendChild(img);
++                    previewFields.push({ label: 'Event Thumbnail', value: thumbnailFile.name });
++                }
++            }
+ 
+ 
+ 
+-        previewFields.forEach(function(field) {
+-            const previewItem = document.createElement('div');
+-            previewItem.classList.add('preview-item');
++            previewFields.forEach(function(field) {
++                const previewItem = document.createElement('div');
++                previewItem.classList.add('preview-item');
+ 
+-            let displayValue = "";
++                let displayValue = "";
+ 
+-            if (field.label === "Event Thumbnail" && typeof field.value === "string") {
+-                displayValue = field.value;
+-            } else if (typeof field.value === "object" && field.value !== null && "name" in field.value) {
+-                displayValue = field.value.name;
+-            } else {
+-                displayValue = field.value;
+-            }
++                if (field.label === "Event Thumbnail" && typeof field.value === "string") {
++                    displayValue = field.value;
++                } else if (typeof field.value === "object" && field.value !== null && "name" in field.value) {
++                    displayValue = field.value.name;
++                } else {
++                    displayValue = field.value;
++                }
+ 
+-            previewItem.innerHTML = `
++                previewItem.innerHTML = `
+                 <strong>${field.label}:</strong>
+                 <span>${displayValue}</span>
+             `;
+-            previewContent.appendChild(previewItem);
+-        });
++                previewContent.appendChild(previewItem);
++            });
+ 
+ 
+-        previewModal.style.display = 'block';
+-    } else {
+-        eventForm.reportValidity();
+-    }
+-            });
++            previewModal.style.display = 'block';
++        } else {
++            eventForm.reportValidity();
++        }
++    });
+ 
+-            editBtn.addEventListener('click', () => {
+-                previewModal.style.display = 'none';
+-            });
++    editBtn.addEventListener('click', () => {
++        previewModal.style.display = 'none';
++    });
+ 
+-            confirmBtn.addEventListener('click', async () => {
+-                const formData = new FormData(eventForm);
++    confirmBtn.addEventListener('click', async () => {
++        const formData = new FormData(eventForm);
+ 
+-                try {
+-                    const response = await fetch("/events/eventForm", {
+-                        method: "POST",
+-                        body: formData,
+-                    });
+-                    const result = await response.json();
++        try {
++            const response = await fetch("/events/eventForm", {
++                method: "POST",
++                body: formData,
++            });
++            const result = await response.json();
+ 
+-                    if (result.success) {
+-                        console.log("Event created successfully:", result.data);
+-                        window.location.href = `/events/event/${result.id}`;
+-                    } else {
+-                        console.error("Error creating event:", result.error);
+-                        alert("Failed to create event. Please try again.");
+-                    }
+-                } catch (error) {
+-                    console.error("Submission error:", error);
+-                    alert("An error occurred while submitting the event.");
+-                }
+-            });
++            if (result.success) {
++                console.log("Event created successfully:", result.data);
++                window.location.href = `/events/event/${result.id}`;
++            } else {
++                console.error("Error creating event:", result.error);
++                alert("Failed to create event. Please try again.");
++            }
++        } catch (error) {
++            console.error("Submission error:", error);
++            alert("An error occurred while submitting the event.");
++        }
++    });
+ </script>
+ </body>
+ </html>
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"344842c3-7d5f-4d8e-b59e-f18c7d7132bd\" name=\"Changes\" comment=\"creaye new genereateaithumnail function add new router and event listen on event.ejs\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/controller/eventController.js\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/controller/eventController.js\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/node_modules/.package-lock.json\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/node_modules/.package-lock.json\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/package-lock.json\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/package-lock.json\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/package.json\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/package.json\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/public/createevents.css\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/public/createevents.css\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/test.db\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/test.db\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/views/autofill.ejs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/views/autofill.ejs\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/views/event-view-page.ejs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/views/event-view-page.ejs\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/views/event.ejs\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/views/event.ejs\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"mugdha\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;history&quot;: [\n    {\n      &quot;assignee&quot;: &quot;GedionD7&quot;\n    }\n  ],\n  &quot;lastFilter&quot;: {\n    &quot;assignee&quot;: &quot;GedionD7&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;git@github.com:Innovators-for-Purpose/Library_Helper-Events.git&quot;,\n    &quot;accountId&quot;: &quot;5a6d3116-bcf8-4b40-abde-12f6225b9ead&quot;\n  }\n}</component>\n  <component name=\"ProblemsViewState\">\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 4\n}</component>\n  <component name=\"ProjectId\" id=\"2t0U9CXeozZEdKbVJNWJwnDMafR\" />\n  <component name=\"ProjectLevelVcsManager\">\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\n  </component>\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n    <option name=\"showMembers\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"JavaScript Debug.eventForm.html.executor\": \"Debug\",\n    \"JavaScript Debug.index.html.executor\": \"Run\",\n    \"Node.js.eventController.js.executor\": \"Debug\",\n    \"Node.js.index.js.executor\": \"Run\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"Final\",\n    \"last_opened_file_path\": \"/Users/ifpa/WebstormProjects/Library_Helper-Events\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"nodejs_package_manager_path\": \"npm\",\n    \"run.code.analysis.last.selected.profile\": \"pProject Default\",\n    \"ts.external.directory.path\": \"/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  },\n  \"keyToStringList\": {\n    \"com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File\": [\n      \"JSON\"\n    ]\n  }\n}]]></component>\n  <component name=\"RecentsManager\">\n    <key name=\"CopyFile.RECENT_KEYS\">\n      <recent name=\"$PROJECT_DIR$\" />\n    </key>\n  </component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-WS-243.23654.157\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"StructureViewState\">\n    <option name=\"selectedTab\" value=\"HTML\" />\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"344842c3-7d5f-4d8e-b59e-f18c7d7132bd\" name=\"Changes\" comment=\"\" />\n      <created>1739488332299</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1739488332299</updated>\n      <workItem from=\"1739488333832\" duration=\"2846000\" />\n      <workItem from=\"1741037434005\" duration=\"8286000\" />\n      <workItem from=\"1741295101649\" duration=\"13573000\" />\n      <workItem from=\"1741896305564\" duration=\"59245000\" />\n      <workItem from=\"1746477729040\" duration=\"8172000\" />\n      <workItem from=\"1752504692284\" duration=\"3304000\" />\n      <workItem from=\"1752509576510\" duration=\"14376000\" />\n      <workItem from=\"1752774754410\" duration=\"34073000\" />\n      <workItem from=\"1753230891964\" duration=\"61501000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"gedion is on\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1739489876210</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1739489876210</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"gedion is on\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1741044556757</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1741044556757</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1744059169537</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1744059169537</updated>\n    </task>\n    <task id=\"LOCAL-00004\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1744318233368</created>\n      <option name=\"number\" value=\"00004\" />\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1744318233368</updated>\n    </task>\n    <task id=\"LOCAL-00005\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1744319113356</created>\n      <option name=\"number\" value=\"00005\" />\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1744319113356</updated>\n    </task>\n    <task id=\"LOCAL-00006\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1744923790566</created>\n      <option name=\"number\" value=\"00006\" />\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1744923790566</updated>\n    </task>\n    <task id=\"LOCAL-00007\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1746480340373</created>\n      <option name=\"number\" value=\"00007\" />\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1746480340373</updated>\n    </task>\n    <task id=\"LOCAL-00008\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1752503011207</created>\n      <option name=\"number\" value=\"00008\" />\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1752503011207</updated>\n    </task>\n    <task id=\"LOCAL-00009\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1752516875087</created>\n      <option name=\"number\" value=\"00009\" />\n      <option name=\"presentableId\" value=\"LOCAL-00009\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1752516875087</updated>\n    </task>\n    <task id=\"LOCAL-00010\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1752601446157</created>\n      <option name=\"number\" value=\"00010\" />\n      <option name=\"presentableId\" value=\"LOCAL-00010\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1752601446157</updated>\n    </task>\n    <task id=\"LOCAL-00011\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1753208086585</created>\n      <option name=\"number\" value=\"00011\" />\n      <option name=\"presentableId\" value=\"LOCAL-00011\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1753208086585</updated>\n    </task>\n    <task id=\"LOCAL-00012\" summary=\"gedion is on new edit\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1753294233987</created>\n      <option name=\"number\" value=\"00012\" />\n      <option name=\"presentableId\" value=\"LOCAL-00012\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1753294233987</updated>\n    </task>\n    <task id=\"LOCAL-00013\" summary=\"creaye new genereateaithumnail function add new router and event listen on event.ejs\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1753384509419</created>\n      <option name=\"number\" value=\"00013\" />\n      <option name=\"presentableId\" value=\"LOCAL-00013\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1753384509419</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"14\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"UnknownFeatures\">\n    <option featureType=\"com.intellij.fileTypeFactory\" implementationName=\"*.env\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State>\n              <option name=\"FILTERS\">\n                <map>\n                  <entry key=\"branch\">\n                    <value>\n                      <list>\n                        <option value=\"origin/gedion\" />\n                      </list>\n                    </value>\n                  </entry>\n                </map>\n              </option>\n            </State>\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"gedion is on\" />\n    <MESSAGE value=\"gedion is on new edit\" />\n    <MESSAGE value=\"creaye new genereateaithumnail function add new router and event listen on event.ejs\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"creaye new genereateaithumnail function add new router and event listen on event.ejs\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision d48860a3ee621e27aebcef2caf1bcc27f53f8528)
++++ b/.idea/workspace.xml	(date 1753881956617)
+@@ -4,16 +4,8 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="344842c3-7d5f-4d8e-b59e-f18c7d7132bd" name="Changes" comment="creaye new genereateaithumnail function add new router and event listen on event.ejs">
+-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++    <list default="true" id="344842c3-7d5f-4d8e-b59e-f18c7d7132bd" name="Changes" comment="new changes on generate thumnail and autofill">
+       <change beforePath="$PROJECT_DIR$/controller/eventController.js" beforeDir="false" afterPath="$PROJECT_DIR$/controller/eventController.js" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/node_modules/.package-lock.json" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/public/createevents.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/createevents.css" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/test.db" beforeDir="false" afterPath="$PROJECT_DIR$/test.db" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/views/autofill.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/autofill.ejs" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/views/event-view-page.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event-view-page.ejs" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/views/event.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event.ejs" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+@@ -116,7 +108,7 @@
+       <workItem from="1752504692284" duration="3304000" />
+       <workItem from="1752509576510" duration="14376000" />
+       <workItem from="1752774754410" duration="34073000" />
+-      <workItem from="1753230891964" duration="61501000" />
++      <workItem from="1753230891964" duration="63634000" />
+     </task>
+     <task id="LOCAL-00001" summary="gedion is on">
+       <option name="closed" value="true" />
+@@ -222,7 +214,23 @@
+       <option name="project" value="LOCAL" />
+       <updated>1753384509419</updated>
+     </task>
+-    <option name="localTasksCounter" value="14" />
++    <task id="LOCAL-00014" summary="new changes on generate thumnail and autofill">
++      <option name="closed" value="true" />
++      <created>1753813852241</created>
++      <option name="number" value="00014" />
++      <option name="presentableId" value="LOCAL-00014" />
++      <option name="project" value="LOCAL" />
++      <updated>1753813852241</updated>
++    </task>
++    <task id="LOCAL-00015" summary="new changes on generate thumnail and autofill">
++      <option name="closed" value="true" />
++      <created>1753813859193</created>
++      <option name="number" value="00015" />
++      <option name="presentableId" value="LOCAL-00015" />
++      <option name="project" value="LOCAL" />
++      <updated>1753813859194</updated>
++    </task>
++    <option name="localTasksCounter" value="16" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -258,6 +266,7 @@
+     <MESSAGE value="gedion is on" />
+     <MESSAGE value="gedion is on new edit" />
+     <MESSAGE value="creaye new genereateaithumnail function add new router and event listen on event.ejs" />
+-    <option name="LAST_COMMIT_MESSAGE" value="creaye new genereateaithumnail function add new router and event listen on event.ejs" />
++    <MESSAGE value="new changes on generate thumnail and autofill" />
++    <option name="LAST_COMMIT_MESSAGE" value="new changes on generate thumnail and autofill" />
+   </component>
+ </project>
+\ No newline at end of file

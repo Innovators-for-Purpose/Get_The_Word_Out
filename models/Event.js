@@ -8,12 +8,20 @@ const Event = sequelize.define('event', {
     primaryKey: true,
     autoIncrement: true,
   },
-  thumbnail: {
+  thumbnailData: {
     type: DataTypes.BLOB,
     allowNull: true,
+  },
+  thumbnailMimeType: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  thumbnailUrl: {
+    type: DataTypes.VIRTUAL,
     get() {
-      const data = this.getDataValue('thumbnail');
-      return data ? `data:image/jpeg;base64,${data.toString('base64')}` : null;
+      const data = this.getDataValue('thumbnailData');
+      const mimeType = this.getDataValue('thumbnailMimeType');
+      return (data && mimeType) ? `data:${mimeType};base64,${data.toString('base64')}` : null;
     }
   },
   title: {
