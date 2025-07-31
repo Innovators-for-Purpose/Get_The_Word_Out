@@ -107,7 +107,7 @@
     const editBtn = document.getElementById('editBtn');
     const confirmBtn = document.getElementById('confirmBtn');
 
-    // JS: Correctly select the wrapper div by its new ID
+
     const thumbFileWrapper = document.getElementById('thumb-file-wrapper');
     const aiThumbnailDisplay = document.getElementById('ai-thumbnail-display');
 
@@ -147,15 +147,15 @@
             }
             result = await response.json();
             if (result.success && result.imageData) {
-                // JS: Hide the manual upload input, but ensure aiThumbnailDisplay is visible
+
                 document.getElementById('thumbnail-file').style.display = 'none'; // Hide the file input
-                thumbFileWrapper.style.display = 'block'; // Make sure the wrapper div is visible
+                thumbFileWrapper.style.display = 'block';
                 aiThumbnailDisplay.innerHTML = '';
                 const generatedImg = document.createElement('img');
                 generatedImg.src = `data:${result.mimeType};base64,${result.imageData}`;
                 generatedImg.style.maxWidth = '100%';
                 generatedImg.style.height = 'auto';
-                generatedImg.style.display = 'block'; // Ensure image is displayed
+                generatedImg.style.display = 'block';
                 generatedImg.style.border = '1px solid limegreen'; // For debugging visibility
                 generatedImg.style.minHeight = '150px'; // For debugging visibility
                 generatedImg.style.backgroundColor = '#e0ffe0'; // For debugging visibility
@@ -249,7 +249,7 @@
         if (generatedAiThumbnailData) {
             const { data, mime } = JSON.parse(generatedAiThumbnailData);
             const blob = await (await fetch(`data:${mime};base64,${data}`)).blob();
-            formData.append('thumbnail', blob, 'ai_generated_thumbnail.png'); // 'thumbnail' must match backend expected field name
+            formData.append('thumbnail', blob, 'ai_generated_thumbnail.png');
             console.log('AI generated thumbnail appended to FormData.'); // Debugging
         } else {
             console.log('No AI generated thumbnail found in sessionStorage to append.'); // Debugging
@@ -263,7 +263,7 @@
             const result = await response.json();
 
             if (result.success) {
-                sessionStorage.removeItem('generatedAiThumbnailData'); // Clear storage on success
+                sessionStorage.removeItem('generatedAiThumbnailData');
                 console.log("Event created successfully:", result.data); // Debugging
                 window.location.href = `/events/event/${result.id}`;
             } else {

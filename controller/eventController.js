@@ -3,7 +3,7 @@ const { GoogleGenAI } = require("@google/genai");
 const multer = require('multer'); // Import multer
 const upload = multer(); // Initialize multer for memory storage
 
-const ai = new GoogleGenAI({ apiKey:"AIzaSyBrqrCbjVXIkSCXYnTRTXiNjRzwkaZT5Q8"});
+const ai = new GoogleGenAI({ apiKey:""});
 console.log("Does ai have getGenerativeModel?", typeof ai.getGenerativeModel);
 
 const { PredictionServiceClient } = require('@google-cloud/aiplatform');
@@ -177,7 +177,7 @@ Event Description: "${description}"
       const prediction = helpers.fromValue(response.predictions[0]);
       if (prediction.bytesBase64Encoded) {
         generatedImgBase64 = prediction.bytesBase64Encoded;
-        generatedImgMimeType = 'image/png'; // Imagen 2 typically outputs PNGs
+        generatedImgMimeType = 'image/png';
       }
     }
 
@@ -250,10 +250,10 @@ exports.createEvent = async (req, res) => {
   let thumbnailMimeType = null;
 
   try {
-    // Multer populates req.file when a file is uploaded
+
     if (req.file && req.file.buffer) {
-      thumbnailBuffer = req.file.buffer; // Store the binary buffer
-      thumbnailMimeType = req.file.mimetype; // Store the MIME type
+      thumbnailBuffer = req.file.buffer;
+      thumbnailMimeType = req.file.mimetype;
       console.log(`[createEvent] Thumbnail buffer and mimetype received for DB storage. MimeType: ${thumbnailMimeType}`);
     } else {
       console.log("[createEvent] No image file uploaded via multer for this event creation.");
@@ -390,17 +390,16 @@ exports.getEventDetails = async (req, res) => {
     const { id } = req.params;
     const event = await Event.findByPk(id);
     if (event) {
-      console.log(`[getEventDetails] Fetched event ID ${id}. Thumbnail URL available: ${!!event.thumbnailUrl}`); // Check if thumbnailUrl is present
-      res.render("event-view-page", { event });
+      console.log(`[getEventDetails] Fetched event ID ${id}. Thumbnail URL available: ${!!event.thumbnailUrl}`);
     } else {
-      // Corrected error handling: ensure 'error' view exists or send JSON
+
       console.warn(`[getEventDetails] Event ID ${id} not found.`);
-      // You should have an 'error.ejs' file in your views directory for this to work
+
       res.status(404).render("error", { message: "Event not found" });
     }
   } catch (error) {
     console.error("Error getting event details in controller:", error);
-    res.status(500).render("error", { message: "Server Error: " + error.message }); // Added error message for clarity
+    res.status(500).render("error", { message: "Server Error: " + error.message });
   }
 };
 
