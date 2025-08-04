@@ -306,8 +306,8 @@ exports.createEvent = async (req, res) => {
       finalDate = new Date().toISOString().split('T')[0];
     }
 
-    const finalStartTime = startTime || "00:00";
-    const finalEndTime = endTime || "23:59";
+    const finalStartTime = startTime || "12:00AM";
+    const finalEndTime = endTime || "11:59PM";
 
     const categoryMap = {
       "STEAM": "STEAM", "Music": "Music", "Art": "Art",
@@ -390,18 +390,16 @@ exports.getEventDetails = async (req, res) => {
     const { id } = req.params;
     const event = await Event.findByPk(id);
     if (event) {
-      console.log(`[getEventDetails] Fetched event ID ${id}. Thumbnail URL available: ${!!event.thumbnailUrl}`);
+      res.render("event-view-page", { event });
     } else {
-
-      console.warn(`[getEventDetails] Event ID ${id} not found.`);
-      // You should have an 'error.ejs' file in your views directory for this to work
       res.status(404).render("error", { message: "Event not found" });
     }
   } catch (error) {
     console.error("Error getting event details in controller:", error);
-    res.status(500).render("error", { message: "Server Error: " + error.message });
+    res.status(500).render("error", { message: "Server Error" });
   }
 };
+
 
 exports.singleEvent = async (req, res) => {
   try {
