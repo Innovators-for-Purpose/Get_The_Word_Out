@@ -18,8 +18,8 @@ router.get('/', eventController.getALLEvents);
 router.get('/:id', eventController.getEventDetails);
 router.get('/event/:id', eventController.getEventDetails);
 router.post("/event", eventController.singleEvent);
-router.post("/event/:id", eventController.getEventDetails);
-router.delete("/delete-event", eventController.deleteEvent);
+router.post('/event/:id', eventController.getEventDetails);
+router.delete('/delete-event', eventController.deleteEvent);
 router.get('/', eventController.getALLEvents);
 router.get('/:id/thumbnail', async (req, res) => {
     try {

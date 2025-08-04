@@ -3,7 +3,7 @@ const { GoogleGenAI } = require("@google/genai");
 const multer = require('multer'); // Import multer
 const upload = multer(); // Initialize multer for memory storage
 
-const ai = new GoogleGenAI({ apiKey:""});
+const ai = new GoogleGenAI({ apiKey:"AIzaSyBrqrCbjVXIkSCXYnTRTXiNjRzwkaZT5Q8"});
 console.log("Does ai have getGenerativeModel?", typeof ai.getGenerativeModel);
 
 const { PredictionServiceClient } = require('@google-cloud/aiplatform');
@@ -394,7 +394,7 @@ exports.getEventDetails = async (req, res) => {
     } else {
 
       console.warn(`[getEventDetails] Event ID ${id} not found.`);
-
+      // You should have an 'error.ejs' file in your views directory for this to work
       res.status(404).render("error", { message: "Event not found" });
     }
   } catch (error) {

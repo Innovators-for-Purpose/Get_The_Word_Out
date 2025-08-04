@@ -76,7 +76,7 @@
         <span class="close" id="close-preview">&times;</span>
         <h7 class= "gradient-text" > Generate Thumbnail with Artificial Intelligence</h7>
         <p>Please type in a short description of the image you'd like to generate as your thumbnail.</p>
-        <input class="textbox"  id="textbox" name="textbox"/>
+        <textarea class="textbox"  id="textbox" row="5" name="textbox"/></textarea>
         <button class="gradient-button" id="generate-thumbnail">Generate Thumbnail</button>
     </div>
 </div>
@@ -244,7 +244,7 @@
     confirmBtn.addEventListener('click', async () => {
         const formData = new FormData(eventForm);
 
-        // This block appends the AI image to the form data
+
         const generatedAiThumbnailData = sessionStorage.getItem('generatedAiThumbnailData');
         if (generatedAiThumbnailData) {
             const { data, mime } = JSON.parse(generatedAiThumbnailData);

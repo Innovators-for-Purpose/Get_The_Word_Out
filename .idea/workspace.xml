@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="344842c3-7d5f-4d8e-b59e-f18c7d7132bd" name="Changes" comment="s">
+    <list default="true" id="344842c3-7d5f-4d8e-b59e-f18c7d7132bd" name="Changes" comment="FInal Code">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controller/eventController.js" beforeDir="false" afterPath="$PROJECT_DIR$/controller/eventController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/eventRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/eventRoutes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.db" beforeDir="false" afterPath="$PROJECT_DIR$/test.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/event.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event.ejs" afterDir="false" />
     </list>
@@ -111,6 +112,7 @@
       <workItem from="1752509576510" duration="14376000" />
       <workItem from="1752774754410" duration="34073000" />
       <workItem from="1753230891964" duration="61501000" />
+      <workItem from="1754061139308" duration="4349000" />
     </task>
     <task id="LOCAL-00001" summary="gedion is on">
       <option name="closed" value="true" />
@@ -224,7 +226,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753902826078</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="FInal Code">
+      <option name="closed" value="true" />
+      <created>1753987381834</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1753987381834</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -261,6 +271,7 @@
     <MESSAGE value="gedion is on new edit" />
     <MESSAGE value="creaye new genereateaithumnail function add new router and event listen on event.ejs" />
     <MESSAGE value="s" />
-    <option name="LAST_COMMIT_MESSAGE" value="s" />
+    <MESSAGE value="FInal Code" />
+    <option name="LAST_COMMIT_MESSAGE" value="FInal Code" />
   </component>
 </project>
