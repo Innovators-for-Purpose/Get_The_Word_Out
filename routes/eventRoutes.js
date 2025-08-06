@@ -10,7 +10,7 @@ router.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] Event Router: ${req.method} ${req.url}`);
     next();
 });
-
+router.put('/edit/:id', eventController.updateEvent);
 router.post('/generateThumbnail', eventController.generateAiThumbnail);
 router.post('/eventForm', upload.single('thumbnail'), eventController.createEvent);
 router.post('/autofill-preview', upload.single('thumbnail'), eventController.getAutofillPreview);

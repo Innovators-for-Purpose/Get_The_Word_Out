@@ -412,6 +412,28 @@ exports.singleEvent = async (req, res) => {
     res.status(500).json({ success: false, error: "Server Error" });
   }
 };
+exports.updateEvent = async (req, res) => {
+  const eventId = req.params.id;
+  const updatedData = req.body;
+
+  try {
+
+    const eventToUpdate = await Event.findByPk(eventId);
+
+    if (!eventToUpdate) {
+      return res.status(404).json({ error: 'Event not found.' });
+    }
+
+
+    await eventToUpdate.update(updatedData);
+
+
+    res.status(200).json({ message: 'Event updated successfully.', event: eventToUpdate });
+  } catch (error) {
+    console.error('Error updating event:', error);
+    res.status(500).json({ error: 'Failed to update event.', details: error.message });
+  }
+};
 
 exports.deleteEvent = async (req, res) => {
   try {

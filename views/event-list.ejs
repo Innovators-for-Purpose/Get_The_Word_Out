@@ -32,7 +32,7 @@
 
               <div class="fix">
                 <div class="editEvent">
-                  <div onclick="event.stopPropagation(); editEvent(<%= event.id %>,'<%= event.title %>','<%=event.location%>','<%=event.time%>','<%=event.date%>','<%=event.description%>','<%=event.venue%>')">
+                    <div onclick="event.stopPropagation(); editEvent(<%= event.id %>, '<%= event.thumbnailUrl %>', `<%= event.title %>`, `<%= event.location %>`, `<%= event.startTime %>`, `<%= event.endTime %>`, `<%= event.date %>`, `<%= event.description.replace(/`/g, '\\`') %>`, `<%= event.venue %>`)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
                       <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
                     </svg>
@@ -61,69 +61,129 @@
     </div>
     </div>
 
-        <script>
+    <script>
+        const previewModal = document.getElementById('previewModal');
+        const previewContent = document.getElementById('previewContent');
+        const confirmBtn = document.getElementById('confirmBtn');
 
-          const previewModal = document.getElementById('previewModal');
-          const confirmBtn = document.getElementById('confirmBtn');
-          confirmBtn.addEventListener('click', () => {
-            previewModal.style.display = 'none';
-            previewContent.innerHTML = "";
-          });
-
-          function gotoEvent(eventId) {
-            console.log('Going to event:', eventId);
-            window.location.href = `/events/event/${eventId}`;
-          }
-
-          function editEvent(eventId,eventTitle,eventLocation,eventTime,eventDescription,eventDate){
-              const previewFields = [
-                  { label: 'Event Title', value: eventTitle},
-                  { label: 'Event Description', value: eventDescription },
-                  { label: 'Date', value: eventDate },
-                  { label: 'Time', value: eventTime },
-                  { label: 'Location', value: eventLocation },
-              ];
-
-
-
-              previewFields.forEach(field => {
-                  const previewItem = document.createElement('div');
-
-                  previewItem.classList.add('preview-item');
-                  previewItem.innerHTML = `
-                        <strong>${field.label}:</strong>
-                        <span>${field.value}</span>
-                    `;
-                  previewContent.appendChild(previewItem);
-              });
-
-              previewModal.style.display = 'block';
-          }
-
-          function deleteEvent(eventId){
-            fetch(`/events/delete-event`, {
-              method: 'DELETE',
-              headers: {
-                'Content-Type' : 'application/json'
-              },
-              body: JSON.stringify({ id: eventId})
-            })
-            .then(response => {
-              if (response.ok){
-                window.location.reload()
-              } else {
-                alert('fail to delete event')
-              }
-            })
-            .catch(error => console.error('error', error))
-          }
-          
-          function confirmDelete(eventId){
-            if(confirm('Are you sure you want to delete the event? This action cannot be undone ')){
-              deleteEvent(eventId);
+        document.addEventListener('click', function(event) {
+            if (event.target === previewModal) {
+                previewModal.style.display = 'none';
             }
-          }
-          </script>
+        });
+
+        // The Confirm button now triggers the saveChanges function, but we ensure the form exists
+        confirmBtn.addEventListener('click', saveChanges);
+
+        function gotoEvent(eventId) {
+            window.location.href = `/events/event/${eventId}`;
+        }
+
+        function editEvent(eventId, eventThumbnail, eventTitle, eventLocation, eventStartTime, eventEndTime, eventDate, eventDescription) {
+            // This is your existing code to create the form
+            previewContent.innerHTML = `
+        <form id="editForm" data-event-id="${eventId}">
+            <div class="preview-item">
+                <label><strong>Event Thumbnail:</strong></label>
+                <img id="currentThumbnail" src="${eventThumbnail}" alt="Current Event Thumbnail" style="max-width: 100%; height: auto; display: block; margin-top: 10px;">
+                <div style="margin-top: 10px;">
+                    <label for="thumbnail-file">Upload new image:</label>
+                    <input type="file" id="thumbnail-file" name="thumbnailFile" accept="image/*">
+                </div>
+            </div>
+            <div class="preview-item">
+                <label for="editTitle"><strong>Event Title:</strong></label>
+                <input type="text" id="editTitle" name="title" value="${eventTitle}" required>
+            </div>
+            <div class="preview-item">
+                <label for="editDescription"><strong>Event Description:</strong></label>
+                <textarea id="editDescription" name="description" rows="5" required>${eventDescription}</textarea>
+            </div>
+            <div class="preview-item">
+                <label for="editDate"><strong>Date:</strong></label>
+                <input type="date" id="editDate" name="date" value="${eventDate}" required>
+            </div>
+            <div class="preview-item">
+                <label for="editSTime"><strong>Start Time:</strong></label>
+                <input type="time" id="editSTime" name="startTime" value="${eventStartTime}" required>
+            </div>
+            <div class="preview-item">
+                <label for="editETime"><strong>End Time:</strong></label>
+                <input type="time" id="editETime" name="endTime" value="${eventEndTime}" required>
+            </div>
+            <div class="preview-item">
+                <label for="editLocation"><strong>Location:</strong></label>
+                <input type="text" id="editLocation" name="location" value="${eventLocation}" required>
+            </div>
+        </form>
+        `;
+            previewModal.style.display = 'block';
+        }
+
+        async function saveChanges() {
+            const editForm = document.getElementById('editForm');
+
+            if (!editForm) {
+                console.error('Error: The edit form was not found.');
+                return;
+            }
+
+
+
+                const eventId = editForm.getAttribute('data-event-id');
+            const formData = new FormData(editForm);
+
+
+            const updatedEvent = {};
+            formData.forEach((value, key) => updatedEvent[key] = value);
+
+            try {
+                const response = await fetch(`/events/edit/${eventId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedEvent),
+                });
+
+                if (response.ok) {
+                    alert('Event updated successfully!');
+                    previewModal.style.display = 'none';
+                    window.location.reload();
+                } else {
+                    const errorData = await response.json();
+                    alert('Failed to update event: ' + (errorData.error || response.statusText));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while saving changes.');
+            }
+        }
+
+        function deleteEvent(eventId){
+            fetch(`/events/delete-event`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({ id: eventId})
+            })
+                .then(response => {
+                    if (response.ok){
+                        window.location.reload()
+                    } else {
+                        alert('Failed to delete event')
+                    }
+                })
+                .catch(error => console.error('error', error))
+        }
+
+        function confirmDelete(eventId){
+            if(confirm('Are you sure you want to delete the event? This action cannot be undone.')){
+                deleteEvent(eventId);
+            }
+        }
+    </script>
 
 </body>
 </html>
