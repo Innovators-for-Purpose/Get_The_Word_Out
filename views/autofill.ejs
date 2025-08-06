@@ -88,8 +88,8 @@
             aiExtractedEventData = {};
 
             try {
-                // IMPORTANT: Change the fetch URL to your AI autofill endpoint
-                const response = await fetch('/events/autofill-preview', { // <-- CORRECTED URL
+
+                const response = await fetch('/events/autofill-preview', {
                     method: 'POST',
                     body: formData,
                 });

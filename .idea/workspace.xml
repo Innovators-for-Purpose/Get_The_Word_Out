@@ -11,6 +11,8 @@
       <change beforePath="$PROJECT_DIR$/routes/eventRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/eventRoutes.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.db" beforeDir="false" afterPath="$PROJECT_DIR$/test.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/autofill.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/autofill.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/event-list.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event-list.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/event-view-page.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event-view-page.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/event.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/event.ejs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -108,7 +110,7 @@
       <workItem from="1752504692284" duration="3304000" />
       <workItem from="1752509576510" duration="14376000" />
       <workItem from="1752774754410" duration="34073000" />
-      <workItem from="1753230891964" duration="10689000" />
+      <workItem from="1753230891964" duration="33082000" />
     </task>
     <task id="LOCAL-00001" summary="gedion is on">
       <option name="closed" value="true" />
@@ -198,7 +200,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753208086585</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="gedion is on new edit">
+      <option name="closed" value="true" />
+      <created>1753294233987</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1753294233987</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

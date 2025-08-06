@@ -11,7 +11,7 @@ router.use((req, res, next) => {
     next();
 });
 
-
+router.post('/generateThumbnail', eventController.generateAiThumbnail);
 router.post('/eventForm', upload.single('thumbnail'), eventController.createEvent);
 router.post('/autofill-preview', upload.single('thumbnail'), eventController.getAutofillPreview);
 router.get('/', eventController.getALLEvents);

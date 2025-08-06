@@ -2,6 +2,7 @@ const Event = require("../models/Event.js");
 const { GoogleGenAI } = require("@google/genai");
 
 const ai = new GoogleGenAI({ apiKey:"AIzaSyBrqrCbjVXIkSCXYnTRTXiNjRzwkaZT5Q8"});
+console.log("Does ai have getGenerativeModel?", typeof ai.getGenerativeModel);
 
 async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
   try {
@@ -23,7 +24,7 @@ async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
         },
         "author": "string or null",
         "venue": "string or null",
-        "date": "YYYY-MM-DD string or (eg. Thursday ,20th) or null",
+        "date": "YYYY-MM-DD string or (eg. Thursday ,20th ) or null",
         "startTime": "HH:MM (24-hour) string or null",
         "endTime": "HH:MM (24-hour) string or null",
         "category": "string or null",
@@ -44,7 +45,7 @@ async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
       }],
     });
 
-    // CRITICAL FIX: Directly access content from candidates array
+
     let aiResponseText;
     if (result && result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
       aiResponseText = result.candidates[0].content.parts[0].text;
@@ -53,7 +54,7 @@ async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
       console.error("Full Gemini API result object (unexpected structure):", JSON.stringify(result, null, 2));
       throw new Error("Gemini API call failed: Unexpected response structure from model.");
     }
-    // END CRITICAL FIX
+
 
     console.log("AI raw response text:", aiResponseText);
 
@@ -88,6 +89,56 @@ async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
   }
 }
 
+exports.generateAiThumbnail = async (req, res) => {
+  console.log("Thumbnail Generation started!");
+  const { description } = req.body;
+
+  if (!description) {
+    return res.status(400).json({ success: false, error: 'Description is required for AI thumbnail generation.' });
+  }
+
+  try {
+    const userPrompt = `Generate a very concise, detailed, and visually descriptive prompt for an image generation AI, based on the following event description. Focus on key visual elements, colors, mood, and style. The image should be suitable for an event flyer thumbnail.
+
+Event Description: "${description}"
+
+Example Output: "Vibrant community fair with diverse people laughing, colorful banners, sun shining, food stalls, and balloons in a park. Warm, inviting atmosphere, bright lighting, realistic style."`;
+
+    console.log(`Sending text prompt to Gemini 2.5 Flash for image description: "${description}"`);
+
+    // --- THIS IS THE CRUCIAL CORRECTION ---
+    // Directly await the call to ai.models.generateContent and store its result
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{
+        role: 'user',
+        parts: [{ text: userPrompt }] // Pass the constructed userPrompt here
+      }],
+    });
+    // --- END OF CRUCIAL CORRECTION ---
+
+    // The rest of your response processing logic
+    let aiGeneratedImagePrompt;
+    if (result && result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
+      aiGeneratedImagePrompt = result.candidates[0].content.parts[0].text;
+    } else {
+      console.error("Gemini API response structure unexpected. Could not find text in candidates for image prompt generation.");
+      console.error("Full Gemini API result object (unexpected structure):", JSON.stringify(result, null, 2));
+      throw new Error("Gemini API call failed: Unexpected response structure from model for image prompt.");
+    }
+
+    console.log("Gemini generated image prompt:", aiGeneratedImagePrompt);
+
+    const dummyBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+    const mimeType = 'image/png';
+
+    res.status(200).json({ success: true, imageData: dummyBase64, mimeType: mimeType, aiPrompt: aiGeneratedImagePrompt });
+
+  } catch (error) {
+    console.error('Error during Gemini API call for image prompt or dummy image part:', error);
+    res.status(500).json({ success: false, error: 'Server error during AI thumbnail generation.', details: error.message });
+  }
+};
 exports.getAutofillPreview = async (req, res) => {
   console.log("--- getAutofillPreview function started ---");
   console.log("req.file status:", req.file ? "File exists (size: " + req.file.size + " bytes)" : "No file found");
