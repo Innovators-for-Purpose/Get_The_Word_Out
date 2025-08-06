@@ -21,6 +21,7 @@ async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
             "state": "string or null",
             "zip": "string or null"
         },
+        "author": "string or null",
         "venue": "string or null",
         "date": "YYYY-MM-DD string or (eg. Thursday ,20th) or null",
         "startTime": "HH:MM (24-hour) string or null",
@@ -148,6 +149,7 @@ exports.createEvent = async (req, res) => {
       title,
       description,
       location,
+      author,
       venue,
       category,
       age,
@@ -171,6 +173,8 @@ exports.createEvent = async (req, res) => {
     } else if (location) {
       finalLocation = location;
     }
+
+    const finalAuthor = author || "Untitled Name";
 
     let finalDate = null;
     if (date) {
@@ -217,6 +221,7 @@ exports.createEvent = async (req, res) => {
     console.log({
       thumbnail: thumbnailData ? 'BUFFER_EXISTS' : null,
       title: finalTitle,
+      author: finalAuthor,
       uid: finalUid,
       description: finalDescription,
       location: finalLocation,
@@ -233,6 +238,7 @@ exports.createEvent = async (req, res) => {
     const event = await Event.create({
       thumbnail: thumbnailData,
       title: finalTitle,
+      author: finalAuthor,
       uid: finalUid,
       description: finalDescription,
       location: finalLocation,

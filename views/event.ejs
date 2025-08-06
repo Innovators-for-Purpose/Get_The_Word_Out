@@ -52,6 +52,11 @@
                 <input name="title" id="eventTitle" class="textareas" value="" required></input><br>
             </div>
 
+            <div class="">
+                <label for="Author">Author *</label><br>
+                <input name="author" id="author" class="textareas" value="" required></input><br>
+            </div>
+
             <div class="sects">
                 <label for="Description">Event Description *</label><br>
                 <textarea name="description" id="Description" required></textarea><br>
@@ -117,6 +122,11 @@
             <div class="sects">
                 <label for="eventTitle">Event Title *</label><br>
                 <input name="title" id="eventTitle" class="textareas" value="a" required></input><br>
+            </div>
+
+            <div class="sects">
+                <label for="eventAuthor">Event Author *</label><br>
+                <input name="Author" id="eventAuthor" class="textareas" value="a" required></input><br>
             </div>
 
             <div class="sects">
@@ -235,6 +245,7 @@
 
         const previewFields = [
             { label: 'Event Title', value: document.getElementsByName('title')[0].value },
+            { label: 'Event Author', value: document.getElementsByName('author')[0].value },
             { label: 'Event Description', value: document.getElementsByName('description')[0].value },
             { label: 'Date', value: document.getElementsByName('date')[0].value },
             { label: 'Time Start', value: document.getElementsByName('startTime')[0].value },

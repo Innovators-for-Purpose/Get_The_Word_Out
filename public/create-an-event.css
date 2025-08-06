@@ -40,16 +40,17 @@ span{
     color: #5AA5FF;
 }
 
-.create-an-event{
+ .create-an-event{
     display: flex;
     flex-direction: column;
     background-color: white  ;
     display: inline-block;
+    height: 170px;
     width: 350px;
-    padding-bottom: 30px;
+    padding-bottom: 10px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     border-radius: 10px;
-}
+} 
 
 .thumbAi{
     order: none;  
@@ -94,11 +95,13 @@ span{
 }
 
 .fill-methods{
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    position: fixed;
+    top: 420px;
+    left: 600px;
     align-items: center;
     justify-content: center;
+    padding-top: 10px;
+    
 }
 
 .fill-methods a{
@@ -107,33 +110,44 @@ span{
 }
 
 
-
 .method{
     background-color:#5AA5FF;
     width: 300px;
     padding: 20px 0px 20px 0px;
-    border-radius: 10px;
+    border-radius: 20px;
+    align-items: center;
 }
 
 
 
-.main-section{
-    display: flex;
+.mainh{
+    font-size: 30px;
+    position:fixed;
     justify-content: center;
+    top: 40px;
+    left: 430px;
 }
 
 #ai-method{
-    display: flex;
+    position: fixed;
+    top: 520px;
+    left: 600px;
     background: rgb(0,212,255);
     background: linear-gradient(90deg, rgba(0,212,255,1) 0%, rgba(90,61,255,1) 35%, rgba(9,9,121,1) 100%);
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
 }
 
-.title{
+.options{
     margin-left: -180px;
     color: #5AA5FF;
+}
+
+.selections{
+    font-size: 10px;
+    top: 380px;
+    left: 580px;
+    position:fixed;
+    justify-content: center;
+    color: #000000;
 }
 
 

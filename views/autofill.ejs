@@ -128,6 +128,7 @@
                 const previewFields = [
                     { label: 'Event Thumbnail', value: imageFile ? imageFile.name : 'N/A' }, // Add thumbnail display
                     { label: 'Event Title', value: aiExtractedEventData.title || '' },
+                    { label: 'Event Author', value: aiExtractedEventData.author || '' },
                     { label: 'Event Description', value: aiExtractedEventData.description || '' },
                     { label: 'Date', value: aiExtractedEventData.date || '' }, // Date should already be YYYY-MM-DD from controller for display
                     { label: 'Time Start', value: aiExtractedEventData.startTime || '' },
@@ -180,6 +181,7 @@
 
             finalFormData.append('title', aiExtractedEventData.title || '');
             finalFormData.append('description', aiExtractedEventData.description || '');
+            finalFormData.append('author', aiExtractedEventData.author || '');
 
             // Flatten location object for server if AI returns object
             if (aiExtractedEventData.location && typeof aiExtractedEventData.location === 'object') {

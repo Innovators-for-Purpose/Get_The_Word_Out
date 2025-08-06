@@ -5,7 +5,7 @@ body, html {
 }
 
 body {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(0, 10, 9, 0.8);
    
 
 }
@@ -89,17 +89,18 @@ h1 {
 }
 
 .eventButton {
-    background-color: whitesmoke;
+    background-color: lightblue;
     align-items: center !important;
-    padding: 15px;
-    height:100px;
+    padding: 10px;
+    height:110px;
     width:400px;
-    border-radius: 10px;
+    border-radius: 20px;
     display: flex;
     gap: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     justify-content: space-between;
+    transition-duration: .3s;
 }
 
 .eventTitle {
@@ -110,6 +111,7 @@ h1 {
 
 .eventButton:hover {
     background-color: #f8f8f8;
+    transition-duration: .5s;
 }
 
 .editor {
@@ -135,11 +137,13 @@ h1 {
 }
 
 .pageTitle {
+    font-size: 60px;
     position: absolute;
-    top: 75px;
+    top: 45px;
 }
 
 .event-container {
+    color: black;
     background-color: none;
     padding: 5px;
     top: 20px;

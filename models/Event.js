@@ -29,6 +29,10 @@ const Event = sequelize.define('event', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  author: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   venue: {
     type: DataTypes.STRING,
     allowNull: true,
