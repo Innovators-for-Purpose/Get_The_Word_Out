@@ -1,5 +1,319 @@
 const Event = require("../models/Event.js");
+const { GoogleGenAI } = require("@google/genai");
 
+const ai = new GoogleGenAI({ apiKey:"AIzaSyBrqrCbjVXIkSCXYnTRTXiNjRzwkaZT5Q8"});
+console.log("Does ai have getGenerativeModel?", typeof ai.getGenerativeModel);
+
+async function getEventInfoFromGeminiVision(imageBuffer, mimeType) {
+  try {
+    const base64Image = imageBuffer.toString('base64');
+
+    const prompt = `
+    You are an AI assistant designed to extract event details from an image of an event poster.
+    Your response must be a JSON object with the following exact keys and data types.
+    If a field is not present or cannot be determined, provide null for its value.
+    Do NOT include any additional text or formatting outside the JSON.
+
+    {
+        "title": "string or null",
+        "description": "string or null",
+        "location": {
+            "city": "string or null",
+            "state": "string or null",
+            "zip": "string or null"
+        },
+        "author": "string or null",
+        "venue": "string or null",
+        "date": "YYYY-MM-DD string or (eg. Thursday ,20th ) or null",
+        "startTime": "HH:MM (24-hour) string or null",
+        "endTime": "HH:MM (24-hour) string or null",
+        "category": "string or null",
+        "ageSuitability": "string (e.g., 'All Ages', '18+', 'Adults') or null",
+        "tags": "array of strings or null"
+    }
+    `;
+
+
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{
+        role: 'user',
+        parts: [
+          { inlineData: { mimeType: mimeType, data: base64Image } },
+          { text: prompt }
+        ],
+      }],
+    });
+
+
+    let aiResponseText;
+    if (result && result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
+      aiResponseText = result.candidates[0].content.parts[0].text;
+    } else {
+      console.error("Gemini API response structure unexpected. Could not find text in candidates.");
+      console.error("Full Gemini API result object (unexpected structure):", JSON.stringify(result, null, 2));
+      throw new Error("Gemini API call failed: Unexpected response structure from model.");
+    }
+
+
+    console.log("AI raw response text:", aiResponseText);
+
+    let parsedData = {};
+    try {
+      const jsonStartIndex = aiResponseText.indexOf('```json');
+      const jsonEndIndex = aiResponseText.lastIndexOf('```');
+
+      if (jsonStartIndex !== -1 && jsonEndIndex !== -1 && jsonEndIndex > jsonStartIndex) {
+        const jsonString = aiResponseText.substring(jsonStartIndex + '```json'.length, jsonEndIndex).trim();
+        parsedData = JSON.parse(jsonString);
+      } else {
+        console.warn("AI response did not contain expected '```json' markdown block. Attempting direct JSON parse.");
+        parsedData = JSON.parse(aiResponseText);
+      }
+    } catch (parseError) {
+      console.error("Error parsing AI response text as JSON:", parseError.message);
+      const cleanedText = aiResponseText.replace(/```json\n|\n```/g, '').trim();
+      try {
+        parsedData = JSON.parse(cleanedText);
+      } catch (reparseError) {
+        console.error("Failed to re-parse cleaned AI response as JSON:", reparseError.message);
+        throw new Error("AI response was not valid JSON and could not be cleaned.");
+      }
+    }
+
+    return parsedData;
+
+  } catch (error) {
+    console.error('Full Gemini API Error Object (from catch block):', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    throw new Error('Failed to get AI response or parse JSON: ' + error.message);
+  }
+}
+
+exports.generateAiThumbnail = async (req, res) => {
+  console.log("Thumbnail Generation started!");
+  const { description } = req.body;
+
+  if (!description) {
+    return res.status(400).json({ success: false, error: 'Description is required for AI thumbnail generation.' });
+  }
+
+  try {
+    const userPrompt = `Generate a very concise, detailed, and visually descriptive prompt for an image generation AI, based on the following event description. Focus on key visual elements, colors, mood, and style. The image should be suitable for an event flyer thumbnail.
+
+Event Description: "${description}"
+
+Example Output: "Vibrant community fair with diverse people laughing, colorful banners, sun shining, food stalls, and balloons in a park. Warm, inviting atmosphere, bright lighting, realistic style."`;
+
+    console.log(`Sending text prompt to Gemini 2.5 Flash for image description: "${description}"`);
+
+    // --- THIS IS THE CRUCIAL CORRECTION ---
+    // Directly await the call to ai.models.generateContent and store its result
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [{
+        role: 'user',
+        parts: [{ text: userPrompt }] // Pass the constructed userPrompt here
+      }],
+    });
+    // --- END OF CRUCIAL CORRECTION ---
+
+    // The rest of your response processing logic
+    let aiGeneratedImagePrompt;
+    if (result && result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0 && result.candidates[0].content.parts[0].text) {
+      aiGeneratedImagePrompt = result.candidates[0].content.parts[0].text;
+    } else {
+      console.error("Gemini API response structure unexpected. Could not find text in candidates for image prompt generation.");
+      console.error("Full Gemini API result object (unexpected structure):", JSON.stringify(result, null, 2));
+      throw new Error("Gemini API call failed: Unexpected response structure from model for image prompt.");
+    }
+
+    console.log("Gemini generated image prompt:", aiGeneratedImagePrompt);
+
+    const dummyBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+    const mimeType = 'image/png';
+
+    res.status(200).json({ success: true, imageData: dummyBase64, mimeType: mimeType, aiPrompt: aiGeneratedImagePrompt });
+
+  } catch (error) {
+    console.error('Error during Gemini API call for image prompt or dummy image part:', error);
+    res.status(500).json({ success: false, error: 'Server error during AI thumbnail generation.', details: error.message });
+  }
+};
+exports.getAutofillPreview = async (req, res) => {
+  console.log("--- getAutofillPreview function started ---");
+  console.log("req.file status:", req.file ? "File exists (size: " + req.file.size + " bytes)" : "No file found");
+
+  try {
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({ success: false, error: "No image file uploaded for autofill preview." });
+    }
+
+    const thumbnailBuffer = req.file.buffer;
+    const thumbnailMimeType = req.file.mimetype;
+    console.log("Sending image to Gemini for analysis (for preview)...");
+
+    const aiData = await getEventInfoFromGeminiVision(thumbnailBuffer , thumbnailMimeType);
+    console.log("AI extracted data for preview (raw AI output):", aiData);
+
+    if (aiData.date) {
+      const parsedDate = new Date(aiData.date);
+      if (!isNaN(parsedDate.getTime())) {
+        aiData.date = parsedDate.toISOString().split('T')[0];
+      } else {
+        console.warn(`[getAutofillPreview] AI returned unparseable date: "${aiData.date}". Setting to null.`);
+        aiData.date = null;
+      }
+    } else {
+      aiData.date = null;
+    }
+
+    aiData.startTime = aiData.startTime || null;
+    aiData.endTime = aiData.endTime || null;
+
+    res.status(200).json({ success: true, data: aiData });
+
+  } catch (error) {
+    console.error("--- ERROR IN getAutofillPreview function ---");
+    console.error("Error details:", error.message);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ success: false, error: "AI Autofill Preview Error: " + error.message });
+  }
+};
+
+exports.createEvent = async (req, res) => {
+  console.log("--- createEvent function started ---");
+  console.log("req.file status:", req.file ? "File exists (size: " + req.file.size + " bytes)" : "No file found");
+  console.log("req.body content:", req.body);
+
+  let thumbnailData = null;
+
+  try {
+    if (req.file && req.file.buffer) {
+      thumbnailData = req.file.buffer;
+      console.log("Thumbnail buffer received for DB storage.");
+    }
+    else{
+      console.log("No image file uploaded");
+    }
+
+    const {
+      title,
+      description,
+      location,
+      author,
+      venue,
+      category,
+      age,
+      date,
+      startTime,
+      endTime,
+      tags,
+      uid
+    } = req.body;
+
+    const finalTitle = title || "Untitled Event";
+    const finalDescription = description || "No description provided.";
+    const finalVenue = venue || "To Be Determined";
+    const finalUid = uid || 1;
+
+    let finalLocation = "Unknown Location";
+    if (typeof location === 'object' && location !== null) {
+      if (location.city || location.state || location.zip) {
+        finalLocation = `${location.city || ''}${location.state ? ', ' + location.state : ''}${location.zip ? ' ' + location.zip : ''}`.trim();
+      }
+    } else if (location) {
+      finalLocation = location;
+    }
+
+    const finalAuthor = author || "Untitled Name";
+
+    let finalDate = null;
+    if (date) {
+      try {
+        const parsed = new Date(date);
+        if (!isNaN(parsed.getTime())) {
+          finalDate = parsed.toISOString().split('T')[0];
+        } else {
+          console.warn(`[createEvent] Invalid date string received: "${date}". Defaulting to current date.`);
+          finalDate = new Date().toISOString().split('T')[0];
+        }
+      } catch (e) {
+        console.error(`[createEvent] Error parsing date "${date}":`, e.message);
+        finalDate = new Date().toISOString().split('T')[0];
+      }
+    } else {
+      console.warn(`[createEvent] Date not provided. Defaulting to current date.`);
+      finalDate = new Date().toISOString().split('T')[0];
+    }
+
+    const finalStartTime = startTime || "00:00";
+    const finalEndTime = endTime || "23:59";
+
+    const categoryMap = {
+      "STEAM": "STEAM", "Music": "Music", "Art": "Art",
+      "Entertainment": "Entertainment", "Technology": "Technology",
+      "Conference": "Technology",
+      "Community Service": "Other"
+    };
+    const finalCategory = categoryMap[category] || "Other";
+
+    const ageMap = {
+      "Kids/1-7": "Kids/1-7", "Pre-teen/7-12": "Pre-teen/7-12", "Teen/13-17": "Teen/13-17",
+      "Young Adults/18-25": "Young Adults/18-25", "Adults/25-65": "Adults/25-65", "Senior/65+": "Senior/65+",
+      "All Ages": "Adults/25-65",
+      "18+": "Young Adults/18-25",
+      "N/A": "Adults/25-65"
+    };
+    const finalAge = ageMap[age] || "Adults/25-65";
+
+    const finalTags = (tags && Array.isArray(tags)) ? tags : (tags ? [tags] : null);
+
+    console.log("Attempting to create event in DB with final data:");
+    console.log({
+      thumbnail: thumbnailData ? 'BUFFER_EXISTS' : null,
+      title: finalTitle,
+      author: finalAuthor,
+      uid: finalUid,
+      description: finalDescription,
+      location: finalLocation,
+      venue: finalVenue,
+      time: finalStartTime,
+      category: finalCategory,
+      age: finalAge,
+      date: finalDate,
+      tags: finalTags,
+      startTime: finalStartTime,
+      endTime: finalEndTime
+    });
+
+    const event = await Event.create({
+      thumbnail: thumbnailData,
+      title: finalTitle,
+      author: finalAuthor,
+      uid: finalUid,
+      description: finalDescription,
+      location: finalLocation,
+      venue: finalVenue,
+      time: finalStartTime,
+      category: finalCategory,
+      age: finalAge,
+      date: finalDate,
+      tags: finalTags,
+      startTime: finalStartTime,
+      endTime: finalEndTime,
+    });
+
+    console.log("Event created in DB successfully. ID:", event.id);
+
+    res.status(201).json({ success: true, event: event.toJSON(), id: event.id });
+
+  } catch (outerError) {
+    console.error("--- FATAL ERROR IN createEvent function ---");
+    console.error("Error details:", outerError.message);
+    console.error("Error stack:", outerError.stack);
+    res.status(500).json({ success: false, error: "Server Error: " + outerError.message });
+  }
+};
 
 exports.getALLEvents = async (req, res) => {
   try {
@@ -10,7 +324,6 @@ exports.getALLEvents = async (req, res) => {
     res.status(500).json({ success: false, error: "Server Error" });
   }
 }
-
 
 exports.getEventDetails = async (req, res) => {
   try {
@@ -39,37 +352,6 @@ exports.singleEvent = async (req, res) => {
   }
 };
 
-exports.createEvent = async (req, res) => {
-  try {
-
-    const { title, description, location, time, category, age, date } = req.body;
-    
-    let thumbnail = null;
-    if (req.file) {
-      thumbnail = req.file.buffer;
-    }
-
-    const event = await Event.create({
-      thumbnail,
-      title, 
-      uid: 1,
-      description, 
-      location, 
-      venue: "venue", 
-      time, 
-      category: 1, 
-      age: 1, 
-      date
-    });
-
-    res.status(201).json({ success: true, data: event, id: event.id });
-
-  } catch (error) {
-    console.error("Error creating event in controller:", error);
-    res.status(500).json({ success: false, error: "Server Error" });
-  }
-};
-
 exports.deleteEvent = async (req, res) => {
   try {
     const { id } = req.body;
@@ -80,76 +362,3 @@ exports.deleteEvent = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
-/**exports.editEvent = async (req, res) => {
-  try {
-    const {id, title, thumbnail, vid, description, location, venue, time, catagory, age, date} = req.body;
-    previewButton.addEventListener('click', (event) => {
-      event.preventDefault();
-
-      const previewFields = [
-        {label: 'Event Title', value: document.getElementsByName('title')[0].value},
-        {label: 'Event Description', value: document.getElementsByName('description')[0].value},
-        {label: 'Date', value: document.getElementsByName('date')[0].value},
-        {label: 'Time', value: document.getElementsByName('time')[0].value},
-        {label: 'Location', value: document.getElementsByName('location')[0].value},
-      ];
-
-      if (form.checkValidity()) {
-        previewContent.innerHTML = "";
-
-        // Add image preview if file is selected
-        const thumbnailFile = document.getElementsByName('thumbnail')[0].files[0];
-        if (thumbnailFile) {
-          const img = document.createElement('img');
-          img.src = URL.createObjectURL(thumbnailFile);
-          img.style.maxWidth = '200px'; // Optional: control preview size
-          previewContent.appendChild(img);
-        }
-
-
-        // {
-        //     label: 'Age Range',
-        //     value: ageRangeMap[document.getElementsByName('age')[0].value]
-        // },
-        // {
-        //     label: 'Category',
-        //     value: categoryMap[document.getElementsByName('category')[0].value]
-        // }
-        ;
-
-        if ("0" in document.getElementsByName('thumbnail')[0].files) {
-          previewFields.push({
-            label: 'Event Thumbnail',
-            image: document.getElementsByName('thumbnail')[0].files[0],
-            value: document.getElementsByName('thumbnail')[0].files[0].name,
-            size: document.getElementsByName('thumbnail')[0].files[0].size,
-            type: document.getElementsByName('thumbnail')[0].files[0].type
-          })
-        }
-        console.log(previewFields);
-
-        previewFields.forEach(field => {
-          const previewItem = document.createElement('div');
-
-          previewItem.classList.add('preview-item');
-          previewItem.innerHTML = `
-                        <strong>${field.label}:</strong>
-                        <span>${field.value}</span>
-                    `;
-          previewContent.appendChild(previewItem);
-        });
-
-        previewModal.style.display = 'block';
-      } else {
-        form.reportValidity();
-      }
-    });
-
-}
-*/
-
-
-
-
-
-

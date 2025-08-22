@@ -1,42 +1,246 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home</title>
+    <title>Autofill Event</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.typekit.net/mev6qqe.css" />
     <link rel="stylesheet" href="/autofill.css" />
-  </head>
-  <body>
-    <div class="main">
-      <div class="navLogo">
-        <a href= "http://localhost:3000">
-           <p>GT<span class="word">W</span>O</p>
-        </a>
-      </div>
-      <div class="main-section">
+</head>
+<body>
+<div class="navLogo">
+    <a href="http://localhost:3000">
+        <p>GT<span class="word">W</span>O</p>
+    </a>
+</div>
+<div class="main">
+    <div class="main-section">
         <div class="create-an-event">
             <div class="title">
+                <form id="eventForm" method="POST" action="/events/eventForm" enctype="multipart/form-data">
+
                 <p id="title-head">Autofill With AI</p>
-                <p id="title-desc">Upload a picture of the event on the community bulletin board. </p>
+                <p id="title-desc">Upload a picture of the event on the community bulletin board.</p>
             </div>
-            <div class="fill-methods">
-                <div class="method">
-                    <input type="file">
-                    <!-- <a href="/create">Input Manually</a> -->
+
+
+                <div class="fill-methods">
+                    <div class="method">
+                        <label for="eventImageInput">Choose File</label>
+                        <input type="file" name="thumbnail" id="eventImageInput" accept="image/*">
+                    </div>
+                    <div class="method" id="ai-method">
+                        <img src="images/ai.png" alt="ai" height="30" class="ai-sparkle">
+                        <button type="submit" id="autofillButton">Autofill with AI</button>
+                    </div>
                 </div>
-                <div class="method" id="ai-method">
-                    <img src="images/ai.png" alt="ai" height="30" class="ai-sparkle">
-                    <a href="">Autofill with AI</a>
-                </div>
-            </div>
-          </div>
-      </div>
-      
+            </form>
+
+        </div>
     </div>
-    </script>
-  </body>
+</div>
+
+<div id="previewModal">
+    <div class="preview-modal-content">
+        <span class="close-button" onclick="document.getElementById('previewModal').style.display='none';">&times;</span>
+        <h3>Preview Event Details</h3>
+        <div id="previewContent">
+        </div>
+        <div class="preview-actions">
+            <button id="editBtn">Edit</button>
+            <button id="confirmBtn">Confirm & Create</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const autofillForm = document.getElementById('autofillForm');
+        const autofillButton = document.getElementById('autofillButton');
+        const thumbnailFileInput = document.getElementById('eventImageInput');
+
+        const previewModal = document.getElementById('previewModal');
+        const previewContent = document.getElementById('previewContent');
+        const editBtn = document.getElementById('editBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+
+        let aiExtractedEventData = {};
+
+        autofillButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            const imageFile = thumbnailFileInput.files[0];
+            if (!imageFile) {
+                alert("Please select an image file to autofill.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('thumbnail', imageFile);
+
+            autofillButton.textContent = 'Processing...';
+            autofillButton.disabled = true;
+
+            let aiErrorMessage = '';
+            aiExtractedEventData = {};
+
+            try {
+
+                const response = await fetch('/events/autofill-preview', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    console.log("AI extracted data:", result.data);
+                    aiExtractedEventData = result.data;
+                    alert("Event fields auto-filled successfully! Review and click 'Confirm & Create'.");
+                } else {
+                    console.error("Server responded with error during AI autofill:", result.error || "Unknown error");
+                    aiErrorMessage = result.error || "Unknown server error.";
+                    alert("AI autofill failed: " + aiErrorMessage + "\nPreview will show empty or incomplete fields.");
+                }
+
+            } catch (error) {
+                console.error("Network or parsing error during autofill:", error);
+                aiErrorMessage = "Network error: " + error.message;
+                alert("An error occurred during AI autofill: " + aiErrorMessage + "\nPreview will show empty or incomplete fields.");
+            } finally {
+                autofillButton.textContent = 'Autofill with AI';
+                autofillButton.disabled = false;
+
+                previewContent.innerHTML = ""; // Clear previous content
+
+                // Create and display the image in the preview
+                if (imageFile) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(imageFile);
+                    img.style.maxWidth = '200px';
+                    previewContent.appendChild(img);
+                }
+
+                // Prepare fields for display, including the image name
+                const previewFields = [
+                    { label: 'Event Thumbnail', value: imageFile ? imageFile.name : 'N/A' }, // Add thumbnail display
+                    { label: 'Event Title', value: aiExtractedEventData.title || '' },
+                    { label: 'Event Author', value: aiExtractedEventData.author || '' },
+                    { label: 'Event Description', value: aiExtractedEventData.description || '' },
+                    { label: 'Date', value: aiExtractedEventData.date || '' }, // Date should already be YYYY-MM-DD from controller for display
+                    { label: 'Time Start', value: aiExtractedEventData.startTime || '' },
+                    { label: 'Time End', value: aiExtractedEventData.endTime || '' },
+                    {
+                        label: 'Location',
+                        value: aiExtractedEventData.location
+                            ? (typeof aiExtractedEventData.location === 'object'
+                                ? `${aiExtractedEventData.location.city || ''}${aiExtractedEventData.location.state ? ', ' + aiExtractedEventData.location.state : ''}${aiExtractedEventData.location.zip ? ' ' + aiExtractedEventData.location.zip : ''}`.trim()
+                                : aiExtractedEventData.location)
+                            : ''
+                    },
+                    { label: 'Venue', value: aiExtractedEventData.venue || '' }, // Add venue
+                    { label: 'Category', value: aiExtractedEventData.category || '' },
+                    { label: 'Age Suitability', value: aiExtractedEventData.ageSuitability || '' }, // Use ageSuitability from AI
+                    { label: 'Tags', value: (aiExtractedEventData.tags && Array.isArray(aiExtractedEventData.tags)) ? aiExtractedEventData.tags.join(', ') : '' }
+                ];
+
+
+                previewFields.forEach(function(field) {
+                    const previewItem = document.createElement('div');
+                    previewItem.classList.add('preview-item');
+                    previewItem.innerHTML = `<strong>${field.label}:</strong> <span>${field.value || 'N/A'}</span>`;
+                    previewContent.appendChild(previewItem);
+                });
+
+                previewModal.style.display = 'flex'; // Show the modal
+            }
+        });
+
+        editBtn.addEventListener('click', () => {
+            previewModal.style.display = 'none';
+            alert("To edit, please proceed to the 'Create An Event' page and fill fields manually, or try autofill again with a different image.");
+
+        });
+
+        confirmBtn.addEventListener('click', async () => {
+            previewModal.style.display = 'none';
+
+            const imageFile = thumbnailFileInput.files[0];
+            const finalFormData = new FormData();
+
+            if (imageFile) {
+                finalFormData.append('thumbnail', imageFile);
+            } else {
+                alert("No image selected for event creation. Please select an image.");
+                return;
+            }
+
+
+            finalFormData.append('title', aiExtractedEventData.title || '');
+            finalFormData.append('description', aiExtractedEventData.description || '');
+            finalFormData.append('author', aiExtractedEventData.author || '');
+
+            // Flatten location object for server if AI returns object
+            if (aiExtractedEventData.location && typeof aiExtractedEventData.location === 'object') {
+                finalFormData.append('location', `${aiExtractedEventData.location.city || ''}${aiExtractedEventData.location.state ? ', ' + aiExtractedEventData.location.state : ''}${aiExtractedEventData.location.zip ? ' ' + aiExtractedEventData.location.zip : ''}`.trim());
+            } else {
+                finalFormData.append('location', aiExtractedEventData.location || '');
+            }
+
+            finalFormData.append('venue', aiExtractedEventData.venue || '');
+            finalFormData.append('category', aiExtractedEventData.category || '');
+            finalFormData.append('age', aiExtractedEventData.ageSuitability || ''); // Use ageSuitability from AI
+            finalFormData.append('date', aiExtractedEventData.date || ''); // Date should be YYYY-MM-DD
+            finalFormData.append('startTime', aiExtractedEventData.startTime || '');
+            finalFormData.append('endTime', aiExtractedEventData.endTime || '');
+
+            // Handle tags array
+            if (aiExtractedEventData.tags && Array.isArray(aiExtractedEventData.tags)) {
+                aiExtractedEventData.tags.forEach(tag => finalFormData.append('tags[]', tag)); // Append as array
+            } else {
+                finalFormData.append('tags', ''); // Send empty if no tags or not an array
+            }
+
+            finalFormData.append('uid', '1'); // Assuming a default UID for now
+
+            try {
+                const response = await fetch("/events/eventForm", { // Submit to the main event creation endpoint
+                    method: 'POST',
+                    body: finalFormData, // Use finalFormData
+                });
+
+                const result = await response.json(); // Parse response after it's received
+
+                if (response.ok && result.success) { // Check response.ok in addition to result.success
+                    console.log("Event created successfully:", result.event); // Log the created event data
+                    alert("Event created successfully!");
+                    window.location.href = `/events/event/${result.id}`;
+                } else {
+                    console.error("Error creating event:", result.error || "Unknown server error.");
+                    alert("Failed to create event: " + (result.error || "Unknown error."));
+                }
+            } catch (error) {
+                console.error("Final submission error:", error);
+                alert("An error occurred while submitting the event: " + error.message);
+            }
+        });
+
+        const closeButton = document.querySelector('.close-button');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                previewModal.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target == previewModal) {
+                previewModal.style.display = 'none';
+            }
+        });
+    });
+</script>
+</body>
 </html>

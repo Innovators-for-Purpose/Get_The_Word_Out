@@ -1,14 +1,35 @@
 body, html {
     height: 100%;
     font-family: "Quicksand", system-ui;
+    
 }
 
 body {
+    background: rgba(0, 10, 9, 0.8);
+   
+
+}
+
+.bg {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
-    position: relative;
+    justify-content: center;
+    flex-direction: column;
+}
+
+
+.navLogo {
+    font-size: 25px;
+    font-weight: 700;
+    padding-inline: 10px;
+
+}
+
+
+.navLogo a {
+    text-decoration: none !important;
+    color: black;
+    
 }
 
 body::before {
@@ -35,7 +56,7 @@ body::after {
     z-index: -1;
 }
 
-.navLogo {
+/* .navLogo {
     display: flex;
     position: fixed;
     z-index: 10px;
@@ -50,7 +71,7 @@ body::after {
     margin: -410px 650px 100px -570px;
     color: black;
    position:fixed;
-}
+} */
 
 .logo {
     font-size: 25px; /* Optional: Maintain visual consistency */
@@ -68,17 +89,18 @@ h1 {
 }
 
 .eventButton {
-    background-color: whitesmoke;
+    background-color: lightblue;
     align-items: center !important;
-    padding: 15px;
-    height:100px;
-    width:290px;
-    border-radius: 10px;
+    padding: 10px;
+    height:110px;
+    width:400px;
+    border-radius: 20px;
     display: flex;
     gap: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     justify-content: space-between;
+    transition-duration: .3s;
 }
 
 .eventTitle {
@@ -89,6 +111,7 @@ h1 {
 
 .eventButton:hover {
     background-color: #f8f8f8;
+    transition-duration: .5s;
 }
 
 .editor {
@@ -114,11 +137,13 @@ h1 {
 }
 
 .pageTitle {
+    font-size: 60px;
     position: absolute;
-    top: 75px;
+    top: 45px;
 }
 
 .event-container {
+    color: black;
     background-color: none;
     padding: 5px;
     top: 20px;
@@ -148,7 +173,7 @@ h1 {
     background-color: rgba(0,0,0,0.5);
 }
 
-/*.preview-modal-content {
+.preview-modal-content {
     background-color: #fefefe;
     margin: 10% auto;
     padding: 20px;
@@ -184,4 +209,4 @@ h1 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-} */
+}

@@ -1,3 +1,4 @@
+/* --- Base Body and Main Container Styling --- */
 body, html {
     height: 100%;
     margin: 0;
@@ -5,13 +6,8 @@ body, html {
     font-family: "Quicksand", system-ui;
     background: url(images/bg.png);
     background-size: cover;
-}
-
-
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .main{
@@ -24,37 +20,73 @@ body {
     justify-content: center;
 }
 
-.navLogo{
-    display: flex;
-    margin: -325px 0px 160px 50px;
+.navLogo {
     font-size: 25px;
     font-weight: 700;
-    position: relative;
-
+    padding-inline: 10px;
+    position: absolute; /* Position relative to body/html */
+    top: 10px;
+    left: 10px;
+    z-index: 100; /* Ensure it's above background content */
 }
 
 .navLogo a {
     text-decoration: none !important;
-    color: black
-}
-
-.logo{
-    font-size: 25px;
+    color: black;
 }
 
 span{
     color: #5AA5FF;
 }
 
+.main-section{
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Vertically center in main if space allows */
+    flex-grow: 1; /* Allow it to take available space */
+}
+
 .create-an-event{
     display: flex;
     flex-direction: column;
     background-color: white;
-    display: inline-block;
-    width: 600px;
-    padding-bottom: 30px;
+    width: 600px; /* Max width for the main content box */
+    max-width: 90%; /* Ensure it's responsive on smaller screens */
+    padding: 30px 0; /* Vertical padding */
     box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
     border-radius: 10px;
+    margin: auto; /* Center the box */
+}
+
+.options{
+    margin-left: 20px; /* Indent the title */
+    color: #5AA5FF;
+    text-align: start;
+    padding: 0 15px; /* Add internal padding */
+    box-sizing: border-box;
+}
+
+#title-head{
+    font-size: 20px;
+    font-weight: bold;
+    background-image: linear-gradient(100deg, rgba(0,212,255,1) 15%, rgba(90,61,255,1) 36%, rgba(9,9,121,1) 66%);
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text; /* For webkit browsers */
+}
+
+#title-desc{
+    color: black;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* --- Form (autofillForm) Styling --- */
+#autofillForm {
+    width: 100%;
+    padding: 0 30px; /* Horizontal padding for the form content */
+    box-sizing: border-box;
+    margin-top: 20px;
 }
 
 .fill-methods{
@@ -65,72 +97,219 @@ span{
     justify-content: center;
 }
 
-.fill-methods a{
-    text-decoration: none;
-    color: white;
-}
-
-
 .method{
-    width: 570px;
-    padding: 20px 0px 20px 0px;
-    border-radius: 7px;
+    background-color:#F0F2F8; /* Changed to match file-selector-button background */
+    width: 100%; /* Take full width of parent */
+    padding: 15px 0; /* Vertical padding */
+    border-radius: 10px;
+    box-sizing: border-box;
 }
 
-.method input{
-    width: 400px;
-    border: 2px solid #F0F2F8;
-    padding: 0px 150px 0px 0px;
-    margin-bottom: -10px;
-    margin-top: -10px;
+.method label { /* For "Choose File" label */
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.method input[type="file"]{
+    width: calc(100% - 30px); /* Adjust for internal padding */
+    padding: 10px;
+    border: 1px solid #ddd;
     border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+    color: #444;
+    text-align: left;
+    margin-top: 0; /* Reset default margin */
 }
 
 .method input[type="file"]::file-selector-button {
-    background-color: #F0F2F8;
-    width: 210px;
-    height: 30px;
+    background-color: #5AA5FF; /* Blue color for the button */
+    color: white;
     border: none;
-    margin-right: 30px;
-  }
-
-
-.main-section{
-    display: flex;
-    justify-content: center;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 15px; /* Space between button and filename */
+    font-weight: bold;
 }
 
+.method input[type="file"]::file-selector-button:hover {
+    background-color: #458acb; /* Darker blue on hover */
+}
 
 #ai-method{
     display: flex;
-    background: rgb(0,212,255);
     background: linear-gradient(90deg, rgba(0,212,255,1) 0%, rgba(90,61,255,1) 35%, rgba(9,9,121,1) 100%);
     align-items: center;
     justify-content: center;
     gap: 10px;
+    width: 100%; /* Take full width of parent */
+    padding: 15px 0; /* Consistent padding */
+    border-radius: 10px; /* Consistent border-radius */
 }
 
-.title{
-    margin-left: 20px;
-    color: #5AA5FF;
-    text-align: start;
-}
-
-#title-head{
-    font-size: 20px;
+/* --- Styling for #autofillButton (inside #ai-method) --- */
+#autofillButton {
+    background: transparent; /* Button background handled by parent #ai-method gradient */
+    color: white;
+    border: none;
+    padding: 0; /* Remove internal padding, let parent handle it */
+    border-radius: 0; /* Remove internal border-radius */
+    cursor: pointer;
+    font-size: 16px;
     font-weight: bold;
+    display: flex; /* To align img and h6 */
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Space between img and text */
+    width: 100%; /* Take full width of container */
+    height: 100%; /* Take full height of container */
+}
+
+#autofillButton:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 40px auto;
+    width: 80%;
+}
+
+
+/* --- Modal Styling for #previewModal --- */
+#previewModal {
+    display: none; /* Hidden by default - JS will set to 'flex' */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+      /* Use flex for centering when visible */
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-modal-content {
+    background-color: #fefefe;
+    padding: 30px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 650px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 12px 40px 0 rgba(0,0,0,0.19);
+    border-radius: 10px;
+    position: relative;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    text-align: left;
+}
+
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+.preview-modal-content h3 { /* Renamed from h2 for previewModal title */
+    margin-top: 0;
+    font-size: 24px;
+    color: #5AA5FF;
     background-image: linear-gradient(100deg, rgba(0,212,255,1) 15%, rgba(90,61,255,1) 36%, rgba(9,9,121,1) 66%);
     color: transparent;
     background-clip: text;
+    -webkit-background-clip: text;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
 }
 
-#title-desc{
-    color: black;
+#previewContent {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.preview-item {
+    margin-bottom: 12px;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed #eee;
+    font-size: 16px;
+    color: #333;
+}
+
+.preview-item:last-child {
+    border-bottom: none;
+}
+
+.preview-item strong {
+    display: inline-block;
+    min-width: 140px;
+    color: #5AA5FF;
+}
+
+.preview-item span {
+    word-break: break-word;
+}
+
+.preview-item img {
+    display: block;
+    margin: 15px auto;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.preview-actions {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.preview-actions button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#editBtn {
+    background-color: #f0f2f8;
+    color: #555;
+}
+
+#editBtn:hover {
+    background-color: #e0e2e8;
+    transform: translateY(-2px);
+}
+
+#confirmBtn {
+    background: linear-gradient(90deg, rgba(0,212,255,1) 0%, rgba(90,61,255,1) 35%, rgba(9,9,121,1) 100%);
+    color: white;
+}
+
+#confirmBtn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
 }
 
 
 
-
-
-
-
+.popup-overlay {
+    display: none; /* Hide by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */

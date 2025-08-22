@@ -26,9 +26,12 @@ body {
 
 .navLogo{
     display: flex;
-    margin: -100px 0px 160px 50px;
-    font-size: 25px;
+    margin: -100px 0px 10px 50px;
+    font-size: 85px;
     font-weight: 700;
+    position: fixed;
+    top: 100px;
+    left: 555px;
     t
 }
 
@@ -92,7 +95,9 @@ span{
     font-size: 20px;
 }
 
-
+.mainBtns{
+    color:darkblue;
+}
 
 
 

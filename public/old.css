@@ -1,6 +1,6 @@
-/* create event css */
+create event css 
 
-/* html,
+html,
 body {
     display: inline-list;
     font-family: "quicksand", sans-serif;
@@ -180,15 +180,8 @@ label{
 .locationLabel {
     position: relative;
     right: 210px;
-} */
+} 
 
-
-
-
-/* existing events css
-
-
-html,
 body {
     display: inline-list;
     font-family: "quicksand", sans-serif;
@@ -226,4 +219,4 @@ h1 {
 .eventButton:active {
     transform: translateY(-1px);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-}  */
+}  
